@@ -20,15 +20,26 @@ Consume the next input character:
 	Emit the current input character as a character token.
 */
 
-		public DataState(Html5Parser p) : base(p){}
+		public DataState(RedFaceParser p) : base(p){}
 
 		public override void Read(){
-
-			
-			
-			if(Parser.IsEOF) return;
-			char c = ReadChar();
-			Console.Write(c);
+			Parser.ConsumeChar();
+			switch(Parser.NextInputChar){
+				case Chars.AMPERSAND:
+					Parser.AddError("&");
+					break;
+				case Chars.LESS_THAN_SIGN:
+					Parser.AddError("LT");
+					break;
+				case Chars.NULL:
+					Parser.AddError("NULL文字が含まれています。");
+					break;
+				case null:
+					Console.WriteLine("end");
+					break;
+				default:
+					break;
+			}
 		}
 	}
 
