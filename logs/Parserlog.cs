@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace Bakera.RedFaceLint{
+namespace Bakera.RedFace{
 
 	public abstract class ParserLog{
 		public string Message {get; set;}

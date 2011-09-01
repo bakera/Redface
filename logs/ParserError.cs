@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace Bakera.RedFaceLint{
+namespace Bakera.RedFace{
 
 	public class ParserError : ParserLog{
 	}

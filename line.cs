@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 
-namespace Bakera.RedFaceLint{
+namespace Bakera.RedFace{
 
 	public class Line{
 
