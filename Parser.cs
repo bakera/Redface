@@ -2,53 +2,56 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 
-namespace Bakera.RedFaceLint{
+namespace Bakera.RedFace{
 
-	public class RedFaceParser{
+	public partial class RedFaceParser{
 
 		private List<ParserLog> myLogs = new List<ParserLog>();
 		private Dictionary<Type, TokenState> myTokenStateManager = new Dictionary<Type, TokenState>();
 
-		public delegate void ParserEventHandler(Object sender, EventArgs e);
-		public event ParserEventHandler TokenStateChanged;
+		private long myUnConsumePosition = 0; // UnConsumeしたときの戻り先
 
 
 // プロパティ
 		private MemoryStream Stream {get; set;}
 		public StreamReader Reader {get; set;}
-		private TokenState CurrentTokenState{get; set;}
+		public TokenState CurrentTokenState{get; private set;}
 		public char? CurrentInputChar {get; set;}
 		public char? NextInputChar {get; set;}
 		public Line CurrentLine {get; private set;}
 		public int Column {get; private set;}
+		public DateTime StartTime {get; private set;}
+		public DateTime EndTime {get; private set;}
+
+		public long CurrentPosition{
+			get{
+				if(Stream == null) return 0;
+				return Stream.Position;
+			}
+		}
 
 
 
 // コンストラクタ
 
-		public RedFaceParser(){
-			TokenStateChange(typeof(DataState));
+		public RedFaceParser(){}
+
+		private void Init(){
+			ChangeTokenState(typeof(DataState));
 			this.CurrentLine = new Line(1);
 			this.Column = 0;
 		}
-
-// イベント
-
-		// TokenStateChangeイベントを発生します。
-		protected virtual void OnTokenStateChange(){
-			if(TokenStateChanged != null){
-				TokenStateChanged(this, null);
-			}
-		}
-
 
 
 // メソッド
 
 		public void Parse(){
+			StartTime = DateTime.Now;
+			this.Init();
 			while(Reader.Peek() >= 0){
 				CurrentTokenState.Read();
 			}
+			EndTime = DateTime.Now;
 		}
 
 		public ParserLog[] GetLogs(){
@@ -56,40 +59,16 @@ namespace Bakera.RedFaceLint{
 		}
 
 
-		// トークン走査モードを変更します。
-		public void TokenStateChange(Type t){
+// パース系
+
+		// トークン走査状態を変更します。
+		public void ChangeTokenState(Type t){
+			if(CurrentTokenState != null && t == CurrentTokenState.GetType()) return;
 			if(!myTokenStateManager.ContainsKey(t)){
 				myTokenStateManager[t] = TokenState.CreateTokenState(t, this);
 			}
 			CurrentTokenState = myTokenStateManager[t];
-		}
-
-
-		public void AddError(string message){
-			ParserError pe = new ParserError(){Message = message};
-			AddError(pe);
-		}
-		public void AddError(ParserError pe){
-			pe.Line = this.CurrentLine;
-			pe.ColumnNumber = this.Column;
-			myLogs.Add(pe);
-		}
-
-
-		// 指定されたファイル名のファイルを読み取り、メモリに格納します。
-		public void Load(string filename){
-			FileInfo f = new FileInfo(filename);
-			Load(f);
-		}
-
-		// 指定されたファイルを読み取り、メモリに格納します。
-		public void Load(FileInfo file){
-			using(FileStream fs = file.Open(FileMode.Open, FileAccess.Read, FileShare.Read)){
-				Stream = new MemoryStream();
-				fs.CopyTo(Stream);
-			}
-			Stream.Position = 0;
-			Reader = new StreamReader(Stream);
+			OnTokenStateChange();
 		}
 
 		// 一つ読み進みます。
@@ -110,6 +89,24 @@ namespace Bakera.RedFaceLint{
 			}
 			return;
 		}
+		// 指定された数だけ読み進みます。
+		public void ConsumeChar(int count){
+			for(int i=0; i < count; i++) ConsumeChar();
+		}
+
+		// UnConsumeできるように現在の位置を記憶します。
+		public void SaveUnConsumePosition(){
+			myUnConsumePosition = CurrentPosition;
+		}
+
+		// UnConsumeします。
+		public void UnConsume(){
+			Stream.Seek(myUnConsumePosition, SeekOrigin.Begin);
+		}
+
+		// 文字を受け取ります。
+		public void Emit(string s){
+		}
 
 		// CurentInputCharが改行かどうかを調べます。
 		// 自身が LF = 改行
@@ -123,6 +120,37 @@ namespace Bakera.RedFaceLint{
 			}
 			return false;
 		}
+
+// エラー記録
+
+		public void AddError(string message){
+			ParserError pe = new ParserError(){Message = message};
+			AddError(pe);
+		}
+		public void AddError(ParserError pe){
+			pe.Line = this.CurrentLine;
+			pe.ColumnNumber = this.Column;
+			myLogs.Add(pe);
+		}
+
+// ロード
+
+		// 指定されたファイル名のファイルを読み取り、メモリに格納します。
+		public void Load(string filename){
+			FileInfo f = new FileInfo(filename);
+			Load(f);
+		}
+
+		// 指定されたファイルを読み取り、メモリに格納します。
+		public void Load(FileInfo file){
+			using(FileStream fs = file.Open(FileMode.Open, FileAccess.Read, FileShare.Read)){
+				Stream = new MemoryStream();
+				fs.CopyTo(Stream);
+			}
+			Stream.Position = 0;
+			Reader = new StreamReader(Stream);
+		}
+
 
 	}
 
