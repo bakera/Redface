@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Bakera.RedFaceLint{
 
-	public class DataState : TokenizationState{
+	public class DataState : TokenState{
 
 /*
 8.2.4.1 Data state

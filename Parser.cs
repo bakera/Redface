@@ -6,15 +6,17 @@ namespace Bakera.RedFaceLint{
 
 	public class RedFaceParser{
 
-// フィールド
-
 		private List<ParserLog> myLogs = new List<ParserLog>();
+		private Dictionary<Type, TokenState> myTokenStateManager = new Dictionary<Type, TokenState>();
+
+		public delegate void ParserEventHandler(Object sender, EventArgs e);
+		public event ParserEventHandler TokenStateChanged;
 
 
 // プロパティ
 		private MemoryStream Stream {get; set;}
 		public StreamReader Reader {get; set;}
-		private TokenizationState State{get; set;}
+		private TokenState CurrentTokenState{get; set;}
 		public char? CurrentInputChar {get; set;}
 		public char? NextInputChar {get; set;}
 		public Line CurrentLine {get; private set;}
@@ -25,17 +27,27 @@ namespace Bakera.RedFaceLint{
 // コンストラクタ
 
 		public RedFaceParser(){
-			this.State = new DataState(this);
+			TokenStateChange(typeof(DataState));
 			this.CurrentLine = new Line(1);
 			this.Column = 0;
 		}
+
+// イベント
+
+		// TokenStateChangeイベントを発生します。
+		protected virtual void OnTokenStateChange(){
+			if(TokenStateChanged != null){
+				TokenStateChanged(this, null);
+			}
+		}
+
 
 
 // メソッド
 
 		public void Parse(){
 			while(Reader.Peek() >= 0){
-				State.Read();
+				CurrentTokenState.Read();
 			}
 		}
 
@@ -44,6 +56,13 @@ namespace Bakera.RedFaceLint{
 		}
 
 
+		// トークン走査モードを変更します。
+		public void TokenStateChange(Type t){
+			if(!myTokenStateManager.ContainsKey(t)){
+				myTokenStateManager[t] = TokenState.CreateTokenState(t, this);
+			}
+			CurrentTokenState = myTokenStateManager[t];
+		}
 
 
 		public void AddError(string message){

@@ -1,9 +1,10 @@
 using System;
 using System.IO;
+using System.Reflection;
 
 namespace Bakera.RedFaceLint{
 
-	public abstract class TokenizationState{
+	public abstract class TokenState{
 		
 		protected RedFaceParser Parser{get; set;}
 
@@ -12,12 +13,23 @@ namespace Bakera.RedFaceLint{
 
 
 // コンストラクタ
-		public TokenizationState(RedFaceParser p){
+		public TokenState(RedFaceParser p){
 			Parser = p;
 		}
 
 // 抽象メソッド
 		public virtual void Read(){
+		}
+
+// ファクトリ
+
+		public static TokenState CreateTokenState(Type t, RedFaceParser parser){
+			if(!(typeof(TokenState)).IsAssignableFrom(t)){
+				throw new Exception("CreateTokenStateメソッドはTokenStateしか作成できません。渡された型 :" + t.ToString());
+			}
+			ConstructorInfo ci = t.GetConstructor(new Type[]{typeof(RedFaceParser)});
+			TokenState result = ci.Invoke(new Object[]{parser}) as TokenState;
+			return result;
 		}
 
 
