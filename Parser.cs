@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Bakera.RedFace{
 
@@ -10,10 +11,11 @@ namespace Bakera.RedFace{
 		private Dictionary<Type, TokenState> myTokenStateManager = new Dictionary<Type, TokenState>();
 
 		private long myUnConsumePosition = 0; // UnConsumeしたときの戻り先
+		private StringBuilder myEmittedToken = new StringBuilder();
 
 
 // プロパティ
-		private MemoryStream Stream {get; set;}
+		private Stream Stream {get; set;}
 		public StreamReader Reader {get; set;}
 		public TokenState CurrentTokenState{get; private set;}
 		public char? CurrentInputChar {get; set;}
@@ -30,6 +32,12 @@ namespace Bakera.RedFace{
 			}
 		}
 
+		public string EmittedToken{
+			get{
+				return myEmittedToken.ToString();
+			}
+		}
+
 
 
 // コンストラクタ
@@ -40,6 +48,7 @@ namespace Bakera.RedFace{
 			ChangeTokenState(typeof(DataState));
 			this.CurrentLine = new Line(1);
 			this.Column = 0;
+			ConsumeChar();
 		}
 
 
@@ -68,7 +77,7 @@ namespace Bakera.RedFace{
 				myTokenStateManager[t] = TokenState.CreateTokenState(t, this);
 			}
 			CurrentTokenState = myTokenStateManager[t];
-			OnTokenStateChange();
+			OnTokenStateChanged();
 		}
 
 		// 一つ読み進みます。
@@ -89,6 +98,7 @@ namespace Bakera.RedFace{
 			}
 			return;
 		}
+
 		// 指定された数だけ読み進みます。
 		public void ConsumeChar(int count){
 			for(int i=0; i < count; i++) ConsumeChar();
@@ -105,7 +115,16 @@ namespace Bakera.RedFace{
 		}
 
 		// 文字を受け取ります。
+		public void Emit(){
+			Emit(CurrentInputChar);
+		}
+		// 文字を受け取ります。
+		public void Emit(char? c){
+			Emit(c.ToString());
+		}
+		// 文字を受け取ります。
 		public void Emit(string s){
+			myEmittedToken.Append(s);
 		}
 
 		// CurentInputCharが改行かどうかを調べます。
@@ -135,19 +154,27 @@ namespace Bakera.RedFace{
 
 // ロード
 
-		// 指定されたファイル名のファイルを読み取り、メモリに格納します。
-		public void Load(string filename){
-			FileInfo f = new FileInfo(filename);
-			Load(f);
-		}
 
-		// 指定されたファイルを読み取り、メモリに格納します。
+		// 指定されたファイルからデータを読み取ります。
 		public void Load(FileInfo file){
 			using(FileStream fs = file.Open(FileMode.Open, FileAccess.Read, FileShare.Read)){
 				Stream = new MemoryStream();
 				fs.CopyTo(Stream);
 			}
 			Stream.Position = 0;
+			Reader = new StreamReader(Stream);
+		}
+
+
+		// 指定されたストリームを読み取ります。
+		public void Load(Stream s){
+			if(s.CanSeek){
+				Stream = s;
+			} else {
+				Stream = new MemoryStream();
+				s.CopyTo(Stream);
+				Stream.Position = 0;
+			}
 			Reader = new StreamReader(Stream);
 		}
 

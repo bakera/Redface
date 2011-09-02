@@ -10,12 +10,11 @@ namespace Bakera.RedFace{
 			public CharacterReferenceInDataState(RedFaceParser p) : base(p){}
 
 			public override void Read(){
-				Parser.ConsumeChar();
 				Parser.SaveUnConsumePosition();
 				string result = ConsumeCharacterReference();
 				if(result == null){
 					Parser.UnConsume();
-					Parser.Emit("\u0023");
+					Parser.Emit(Chars.AMPERSAND);
 				} else {
 					Parser.Emit(result);
 				}

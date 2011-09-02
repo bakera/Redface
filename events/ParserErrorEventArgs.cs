@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 namespace Bakera.RedFace{
 
-	public class ParserErrorEventArgs : ParserEventArgs{
-		public ParserErrorEventArgs(RedFaceParser p) : base(p){}
+	public class ParseErrorEventArgs : ParserEventArgs{
+		public ParseErrorEventArgs(RedFaceParser p) : base(p){}
 	}
 
 }

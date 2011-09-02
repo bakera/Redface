@@ -7,13 +7,14 @@ namespace Bakera.RedFace{
 		public static int Main(){
 
 			try{
-
 				string f = "data/test.html";
 				FileInfo file = new FileInfo(f);
 				RedFaceParser p = new RedFaceParser();
 				p.TokenStateChanged += Write;
+				p.ParseErrorRaised += WriteError;
+				p.CharacterReferenced += WriteCharRef;
 
-				p.Load(f);
+				p.Load(file);
 				p.Parse();
 				var logs = p.GetLogs();
 				foreach(ParserLog log in logs){
@@ -24,6 +25,7 @@ namespace Bakera.RedFace{
 				Console.WriteLine("パース開始: {0}", p.StartTime);
 				Console.WriteLine("パース終了: {0}", p.EndTime);
 				Console.WriteLine("処理バイト数: {0}", p.CurrentPosition);
+				Console.WriteLine(p.EmittedToken);
 
 				return 0;
 			} catch(Exception e){
@@ -32,8 +34,21 @@ namespace Bakera.RedFace{
 			}
 		}
 
-		public static void Write(ParserEventArgs e){
-			Console.WriteLine(e.Parser.CurrentTokenState);
+		public static void Write(Object sender, EventArgs e){
+			RedFaceParser p = sender as RedFaceParser;
+			Console.WriteLine(p.CurrentTokenState.Name);
+		}
+
+		public static void WriteError(Object sender, EventArgs e){
+			RedFaceParser p = sender as RedFaceParser;
+			ParseErrorEventArgs pe = e as ParseErrorEventArgs;
+			Console.WriteLine(pe.Message);
+		}
+
+		public static void WriteCharRef(Object sender, EventArgs e){
+			RedFaceParser p = sender as RedFaceParser;
+			CharacterReferencedEventArgs cre = e as CharacterReferencedEventArgs;
+			Console.WriteLine("charref: {0}→{1}", cre.OriginalString, cre.Result);
 		}
 
 

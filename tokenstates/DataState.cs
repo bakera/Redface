@@ -11,7 +11,7 @@ namespace Bakera.RedFace{
 
 			public override void Read(){
 				Parser.ConsumeChar();
-				switch(Parser.NextInputChar){
+				switch(Parser.CurrentInputChar){
 					case Chars.AMPERSAND:
 						Parser.ChangeTokenState(typeof(CharacterReferenceInDataState));
 						break;
@@ -19,12 +19,13 @@ namespace Bakera.RedFace{
 						Parser.ChangeTokenState(typeof(TagOpenState));
 						break;
 					case Chars.NULL:
-						Parser.AddError("NULL文字が含まれています。");
+						Parser.OnParseErrorRaised(string.Format("NULL文字が検出されました。"));
+						Parser.Emit();
 						break;
 					case null:
-						Console.WriteLine("end");
 						break;
 					default:
+						Parser.Emit();
 						break;
 				}
 			}

@@ -3,29 +3,17 @@ using System.Collections.Generic;
 
 namespace Bakera.RedFace{
 
-	public class Chars{
-
-		public const char NULL              = '\u0000';
-		public const char EXCLAMATION_MARK  = '!';
-		public const char QUESTION_MARK     = '?';
-		public const char CHARACTER_TABULATION = '\u0009';
-		public const char LINE_FEED = '\u000a';
-		public const char FORM_FEED = '\u000c';
-		public const char CARRIAGE_RETURN = '\u000d';
-		public const char HYPHEN_MINUS = '-';
-		public const char EQUALS_SIGN = '=';
-		public const char SPACE  = '\u0020';
-		public const char QUOTATION_MARK = '\u0022';
-		public const char NUMBER_SIGN  = '\u0023';
-		public const char AMPERSAND  = '\u0026';
-		public const char APOSTROPHE = '\u0027';
-		public const char SOLIDUS		    = '\u002f';
-		public const char LESS_THAN_SIGN    = '\u003c';
-		public const char GREATER_THAN_SIGN = '\u003e';
+	public static partial class Chars{
 
 		public static string GetNamedChar(string name){
 			return myNamedCharacterReferences[name];
 		}
+
+		public static bool ExistsNamedChar(string name){
+			return myNamedCharacterReferences.ContainsKey(name);
+		}
+
+		private const int NameMaxLength = 32; // CounterClockwiseContourIntegral;
 
 		private static readonly Dictionary<string, string> myNamedCharacterReferences = new Dictionary<string, string>(){
 			{"AElig;", "\U000000C6"},

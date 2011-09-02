@@ -4,23 +4,33 @@ namespace Bakera.RedFace{
 
 	public partial class RedFaceParser{
 
-		public delegate void ParserEventHandler(ParserEventArgs e);
+		public delegate void ParserEventHandler(Object sender, EventArgs e);
 		public event ParserEventHandler TokenStateChanged;
 		public event ParserEventHandler ParseErrorRaised;
+		public event ParserEventHandler CharacterReferenced;
 
-		// TokenStateChangeイベントを発生します。
-		protected virtual void OnTokenStateChange(){
+		// TokenStateChangedイベントを発生します。
+		protected virtual void OnTokenStateChanged(){
 			if(TokenStateChanged != null){
-				TokenStateChanged(new ParserEventArgs(this));
+				TokenStateChanged(this, new ParserEventArgs(this));
 			}
 		}
 
-		// ParseErrorイベントを発生します。
+		// ParseErrorRaisedイベントを発生します。
 		protected virtual void OnParseErrorRaised(string s){
 			if(ParseErrorRaised != null){
-				ParseErrorRaised(new ParserErrorEventArgs(this){Message = s});
+				ParseErrorRaised(this, new ParseErrorEventArgs(this){Message = s});
 			}
 		}
+
+		// CharacterReferencedイベントを発生します。
+		protected virtual void OnCharacterReferenced(string original, string result){
+			if(CharacterReferenced != null){
+				CharacterReferenced(this, new CharacterReferencedEventArgs(this){OriginalString=original, Result = result});
+			}
+		}
+
+
 	}
 }
 
