@@ -8,10 +8,10 @@ namespace Bakera.RedFace{
 	public partial class RedFaceParser{
 
 		private List<ParserLog> myLogs = new List<ParserLog>();
-		private Dictionary<Type, TokenState> myTokenStateManager = new Dictionary<Type, TokenState>();
+		private KeyedByTypeCollection<TokenState> myTokenStateManager = new KeyedByTypeCollection<TokenState>();
 
-		private long myUnConsumePosition = 0; // UnConsumeしたときの戻り先
 		private StringBuilder myEmittedToken = new StringBuilder();
+		private Queue<char> myUnConsumedQueue = new Queue<char>(); // UnConsumeされた文字をためておくキュー
 
 
 // プロパティ
@@ -19,7 +19,6 @@ namespace Bakera.RedFace{
 		public StreamReader Reader {get; set;}
 		public TokenState CurrentTokenState{get; private set;}
 		public char? CurrentInputChar {get; set;}
-		public char? NextInputChar {get; set;}
 		public Line CurrentLine {get; private set;}
 		public int Column {get; private set;}
 		public DateTime StartTime {get; private set;}
@@ -39,7 +38,6 @@ namespace Bakera.RedFace{
 		}
 
 
-
 // コンストラクタ
 
 		public RedFaceParser(){}
@@ -48,7 +46,7 @@ namespace Bakera.RedFace{
 			ChangeTokenState(typeof(DataState));
 			this.CurrentLine = new Line(1);
 			this.Column = 0;
-			ConsumeChar();
+			myUnConsumedQueue.Clear();
 		}
 
 
@@ -73,45 +71,55 @@ namespace Bakera.RedFace{
 		// トークン走査状態を変更します。
 		public void ChangeTokenState(Type t){
 			if(CurrentTokenState != null && t == CurrentTokenState.GetType()) return;
-			if(!myTokenStateManager.ContainsKey(t)){
-				myTokenStateManager[t] = TokenState.CreateTokenState(t, this);
+			if(!myTokenStateManager.Contains(t)){
+				myTokenStateManager.Add(TokenState.CreateTokenState(t, this));
 			}
 			CurrentTokenState = myTokenStateManager[t];
 			OnTokenStateChanged();
 		}
 
 		// 一つ読み進みます。
-		public void ConsumeChar(){
-			if(IsNewLine()){
-				this.CurrentLine = new Line(this.CurrentLine);
-				this.Column = 0;
-			} else {
-				this.CurrentLine.AddChar(CurrentInputChar);
-				this.Column++;
-			}
-			CurrentInputChar = NextInputChar;
-			int charNum = Reader.Read();
-			if(charNum == 0) {
-				NextInputChar = null;
-			} else {
-				NextInputChar = (char)charNum;
-			}
-			return;
+		public char? ConsumeChar(){
+			CheckNewLine();
+			CurrentInputChar = ReadChar();
+			return CurrentInputChar;
 		}
 
 		// 指定された数だけ読み進みます。
-		public void ConsumeChar(int count){
-			for(int i=0; i < count; i++) ConsumeChar();
+		public string ConsumeChar(int count){
+			StringBuilder result = new StringBuilder();
+			for(int i=0; i < count; i++){
+				result.Append(ConsumeChar());
+			}
+			return result.ToString();
 		}
 
-		// UnConsumeできるように現在の位置を記憶します。
-		public void SaveUnConsumePosition(){
-			myUnConsumePosition = CurrentPosition;
+		// 読み取った文字を返してUnConsumeします。
+		// 返された文字はキューに格納されて再利用されます。
+		public void UnConsume(string s){
+			if(string.IsNullOrEmpty(s)) return;
+			Console.WriteLine("unconsume: {0}", s);
+			foreach(char c in s){
+				myUnConsumedQueue.Enqueue(c);
+			}
+			CurrentInputChar = s[0];
 		}
 
-		// UnConsumeします。
-		public void UnConsume(){
-			Stream.Seek(myUnConsumePosition, SeekOrigin.Begin);
+		// 読み取った文字を返してUnConsumeします。
+		// 返された文字はキューに格納されて再利用されます。
+		public void UnConsume(char? c){
+			if(c == null) return;
+			Console.WriteLine("unconsume: {0}", c);
+			myUnConsumedQueue.Enqueue((char)c);
+			CurrentInputChar = c;
+		}
+
+		// 次の1文字をこっそり読み取ります。
+		public char? GetNextInputChar(){
+			if(myUnConsumedQueue.Count > 0) return myUnConsumedQueue.Peek();
+			int charNum = Reader.Peek();
+			if(charNum < 0) return null;
+			return (char)charNum;
 		}
 
 		// 文字を受け取ります。
@@ -127,6 +135,28 @@ namespace Bakera.RedFace{
 			myEmittedToken.Append(s);
 		}
 
+		// 文字を読み取ります
+		// キューがあればキューから、なければStreamから読み取ります。
+		// EOFならnullを返します。
+		private char? ReadChar(){
+			if(myUnConsumedQueue.Count > 0) return myUnConsumedQueue.Dequeue();
+			int charNum = Reader.Read();
+			if(charNum < 0) return null;
+			return (char)charNum;
+		}
+
+		// 改行かどうかを調べ、現在の行数をカウントします。
+		// Todo: UnConsumeが発生すると二重にカウントされる問題が発生?
+		private void CheckNewLine(){
+			if(IsNewLine()){
+				this.CurrentLine = new Line(this.CurrentLine);
+				this.Column = 0;
+			} else {
+				this.CurrentLine.AddChar(CurrentInputChar);
+				this.Column++;
+			}
+		}
+
 		// CurentInputCharが改行かどうかを調べます。
 		// 自身が LF = 改行
 		// 自身が CR = 次がLFならまだ改行しない (次のLFで改行)
@@ -134,7 +164,7 @@ namespace Bakera.RedFace{
 			if(CurrentInputChar == Chars.LINE_FEED){
 				return true;
 			}
-			if(CurrentInputChar == Chars.CARRIAGE_RETURN && NextInputChar != Chars.LINE_FEED){
+			if(CurrentInputChar == Chars.CARRIAGE_RETURN && GetNextInputChar() != Chars.LINE_FEED){
 				return true;
 			}
 			return false;

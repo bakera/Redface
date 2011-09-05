@@ -52,10 +52,13 @@ namespace Bakera.RedFace{
 				return ConsumeCharacterReference(null);
 			}
 			protected string ConsumeCharacterReference(char? additional_allowed_character){
-				if(additional_allowed_character != null && Parser.NextInputChar == additional_allowed_character){
+				char? nextCharacter = Parser.ConsumeChar();
+				
+				if(additional_allowed_character != null && nextCharacter == additional_allowed_character){
+					Parser.UnConsume(nextCharacter);
 					return null;
 				}
-				switch(Parser.NextInputChar){
+				switch(nextCharacter){
 					case Chars.AMPERSAND:
 					case Chars.LINE_FEED:
 					case Chars.FORM_FEED:
@@ -63,6 +66,7 @@ namespace Bakera.RedFace{
 					case Chars.LESS_THAN_SIGN:
 					case null:
 						// Not a character reference. No characters are consumed, and nothing is returned. (This is not an error, either.)
+						Parser.UnConsume(nextCharacter);
 						return null;
 					case Chars.NUMBER_SIGN:
 						return ConsumeNumericCharacterReference();
@@ -77,13 +81,12 @@ namespace Bakera.RedFace{
 				Regex numericPattern = Chars.NameToken;
 				StringBuilder matchResult = new StringBuilder();
 				bool semicolonFound = false;
-				while(numericPattern.IsMatch(Parser.NextInputChar.ToString())){
-					matchResult.Append(Parser.NextInputChar);
+				while(numericPattern.IsMatch(Parser.CurrentInputChar.ToString())){
+					matchResult.Append(Parser.CurrentInputChar);
 					Parser.ConsumeChar();
 				}
-				if(Parser.NextInputChar == Chars.SEMICOLON){
-					matchResult.Append(Parser.NextInputChar);
-					Parser.ConsumeChar();
+				if(Parser.CurrentInputChar == Chars.SEMICOLON){
+					matchResult.Append(Parser.CurrentInputChar);
 					semicolonFound = true;
 				}
 				string originalString = matchResult.ToString();
@@ -98,12 +101,13 @@ namespace Bakera.RedFace{
 				}
 				if(result == null){
 					Parser.OnParseErrorRaised(string.Format("文字参照 {0} を参照しようとしましたが、みつかりませんでした。", originalString));
+					Parser.UnConsume(originalString);
 				}
 				if(!semicolonFound){
 					Parser.OnParseErrorRaised(string.Format("文字参照 &{0}; の末尾にセミコロンがついていません。", matchResult));
 					int diff = originalString.Length - matchResult.Length;
 					if(diff > 0){
-						result += originalString.Substring(matchResult.Length, diff);
+						Parser.UnConsume(originalString.Substring(matchResult.Length, diff) + Parser.CurrentInputChar);
 					}
 				}
 				Parser.OnCharacterReferenced(originalString, result);
@@ -118,8 +122,8 @@ namespace Bakera.RedFace{
 				System.Globalization.NumberStyles parseStyle = Chars.DecimalParseStyle;
 				string prefix = "";
 				string suffix = "";
-				if(Parser.NextInputChar == 'x' || Parser.NextInputChar == 'X'){
-					prefix = Parser.NextInputChar.ToString();
+				if(Parser.CurrentInputChar == 'x' || Parser.CurrentInputChar == 'X'){
+					prefix = Parser.CurrentInputChar.ToString();
 					numericPattern = Chars.HexDigitRange;
 					parseStyle = Chars.HexParseStyle;
 					Parser.ConsumeChar();
@@ -128,8 +132,8 @@ namespace Bakera.RedFace{
 				}
 
 				StringBuilder matchResult = new StringBuilder();
-				while(numericPattern.IsMatch(Parser.NextInputChar.ToString())){
-					matchResult.Append(Parser.NextInputChar);
+				while(numericPattern.IsMatch(Parser.CurrentInputChar.ToString())){
+					matchResult.Append(Parser.CurrentInputChar);
 					Parser.ConsumeChar();
 				}
 				if(matchResult.Length == 0){
@@ -139,11 +143,11 @@ namespace Bakera.RedFace{
 				string numberString = matchResult.ToString();
 				int resultNumber = int.Parse(numberString, parseStyle);
 				string result = GetNumberedChar(resultNumber);
-				if(Parser.NextInputChar == Chars.SEMICOLON){
+				if(Parser.CurrentInputChar == Chars.SEMICOLON){
 					suffix += Chars.SEMICOLON;
-					Parser.ConsumeChar();
 				} else {
 					Parser.OnParseErrorRaised(string.Format("文字参照の末尾にセミコロンがありません。"));
+					Parser.UnConsume(Parser.CurrentInputChar);
 				}
 				string originalString = prefix + numberString + suffix;
 				Parser.OnCharacterReferenced(originalString, result);

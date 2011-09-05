@@ -11,8 +11,12 @@ namespace Bakera.RedFace{
 
 			public override void Read(){
 				Parser.ConsumeChar();
-				switch(Parser.NextInputChar){
-					case Chars.AMPERSAND:
+				switch(Parser.CurrentInputChar){
+					case Chars.EXCLAMATION_MARK:
+						Parser.ChangeTokenState(typeof(MarkupDeclarationOpenState));
+						break;
+					case Chars.SOLIDUS:
+					case Chars.QUESTION_MARK :
 					default:
 						break;
 				}
