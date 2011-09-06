@@ -11,7 +11,6 @@ namespace Bakera.RedFace{
 
 			public override void Read(){
 				Parser.ConsumeChar();
-				Console.WriteLine("{0} {1}", Parser.CurrentInputChar, (int)Parser.CurrentInputChar);
 				switch(Parser.CurrentInputChar){
 					case Chars.AMPERSAND:
 						Parser.ChangeTokenState(typeof(CharacterReferenceInDataState));

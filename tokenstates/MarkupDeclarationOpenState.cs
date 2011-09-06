@@ -12,29 +12,33 @@ namespace Bakera.RedFace{
 
 			public override void Read(){
 				Parser.ConsumeChar();
-				switch(Parser.CurrentInputChar){
-					case Chars.HYPHEN_MINUS:
-						// ToDo: Comment
-						break;
-					case 'D':
-					case 'd':
-						string s = Parser.CurrentInputChar + Parser.ConsumeChar(DoctypeString.Length - 1);
-						if(s.Equals(DoctypeString, StringComparison.InvariantCultureIgnoreCase)){
-							
-						}
 
-						// ToDo: DOCTYPE
-						break;
-					case '[':
-						// ToDo: CDATA
-					default:
-						break;
+				if(Parser.CurrentInputChar == Chars.HYPHEN_MINUS){
+					// ToDo: Comment
+				} else if(IsDoctypeMatch()){
+					Parser.ChangeTokenState(typeof(DoctypeState));
+				} else {
+					Parser.Stop();
 				}
-				Parser.ChangeTokenState(typeof(DataState));
 			}
 
+			// 文字が doctype であるかどうかを調べます。
+			// マッチすればそのまま true を返し、マッチしなければUnConsumeしてfalseを返します。
+			// UnConsumeした場合の CurrentInputChar は 'D' に相当する文字になります。
+			private bool IsDoctypeMatch(){
+				if(Parser.CurrentInputChar != 'D' && Parser.CurrentInputChar != 'd') return false;
 
+				string probablyDoctypeString = Parser.CurrentInputChar.ToString();
+				string nextString = Parser.ConsumeChar(DoctypeString.Length - 1);
+				probablyDoctypeString += nextString;
+				if(probablyDoctypeString.Equals(DoctypeString, StringComparison.InvariantCultureIgnoreCase)){
+					return true;
+				}
+				Parser.UnConsume(nextString);
+				return false;
+			}
 
 		}
+
 	}
 }

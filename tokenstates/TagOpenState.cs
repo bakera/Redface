@@ -18,9 +18,9 @@ namespace Bakera.RedFace{
 					case Chars.SOLIDUS:
 					case Chars.QUESTION_MARK :
 					default:
+						Parser.ChangeTokenState(typeof(DataState));
 						break;
 				}
-				Parser.ChangeTokenState(typeof(DataState));
 			}
 		}
 	}

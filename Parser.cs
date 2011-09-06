@@ -12,6 +12,7 @@ namespace Bakera.RedFace{
 
 		private StringBuilder myEmittedToken = new StringBuilder();
 		private Queue<char> myUnConsumedQueue = new Queue<char>(); // UnConsumeされた文字をためておくキュー
+		private bool myStopFlag = false;
 
 
 // プロパティ
@@ -47,6 +48,7 @@ namespace Bakera.RedFace{
 			this.CurrentLine = new Line(1);
 			this.Column = 0;
 			myUnConsumedQueue.Clear();
+			myStopFlag = false;
 		}
 
 
@@ -55,7 +57,9 @@ namespace Bakera.RedFace{
 		public void Parse(){
 			StartTime = DateTime.Now;
 			this.Init();
-			while(Reader.Peek() >= 0){
+			// ToDo: ラスト付近でUnConsumeが発生するとうまく動作しない可能性がある
+			// Reader.Peekを見ないようにする必要がある
+			while(!myStopFlag && Reader.Peek() >= 0){
 				CurrentTokenState.Read();
 			}
 			EndTime = DateTime.Now;
@@ -67,6 +71,12 @@ namespace Bakera.RedFace{
 
 
 // パース系
+
+		// パース停止フラグをONにします。
+		// 次の文字の読み取りを止めて停止します。
+		public void Stop(){
+			myStopFlag = true;
+		}
 
 		// トークン走査状態を変更します。
 		public void ChangeTokenState(Type t){
@@ -112,6 +122,11 @@ namespace Bakera.RedFace{
 			Console.WriteLine("unconsume: {0}", c);
 			myUnConsumedQueue.Enqueue((char)c);
 			CurrentInputChar = c;
+		}
+
+		// CurrentInputCharをUnConsumeします。
+		public void UnConsume(){
+			UnConsume(CurrentInputChar);
 		}
 
 		// 次の1文字をこっそり読み取ります。

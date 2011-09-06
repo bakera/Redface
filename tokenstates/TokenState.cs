@@ -14,9 +14,12 @@ namespace Bakera.RedFace{
 
 
 	// プロパティ
-
 			public virtual string Name{get{return this.GetType().Name;}}
-
+			public char? CurrentInputChar{
+				get{
+					return Parser.CurrentInputChar;
+				}
+			}
 
 	// コンストラクタ
 			public TokenState(RedFaceParser p){
@@ -38,12 +41,11 @@ namespace Bakera.RedFace{
 			}
 
 
-
 	// メソッド
 
 			// 1文字読み進めます。
-			protected char ReadChar(){
-				char c = (char)Parser.Reader.Read();
+			protected char? ConsumeChar(){
+				char? c = Parser.ConsumeChar();
 				return c;
 			}
 
