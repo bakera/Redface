@@ -15,6 +15,8 @@ namespace Bakera.RedFace{
 		private bool myStopFlag = false;
 
 
+
+
 // プロパティ
 		private Stream Stream {get; set;}
 		public StreamReader Reader {get; set;}
