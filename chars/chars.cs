@@ -23,6 +23,7 @@ namespace Bakera.RedFace{
 		public const char EQUALS_SIGN           = '\u003d';
 		public const char GREATER_THAN_SIGN     = '\u003e';
 		public const char QUESTION_MARK         = '\u003f';
+		public const char BOM                   = '\ufeff';
 		public const char REPLACEMENT_CHARACTER = '\ufffd';
 
 		public static readonly Regex NameToken = new Regex("[0-9A-Za-z]");

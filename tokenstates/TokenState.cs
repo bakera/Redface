@@ -44,9 +44,8 @@ namespace Bakera.RedFace{
 	// メソッド
 
 			// 1文字読み進めます。
-			protected char? ConsumeChar(){
-				char? c = Parser.ConsumeChar();
-				return c;
+			protected void ConsumeChar(){
+				Parser.ConsumeChar();
 			}
 
 			// 参照されている文字を取得します。失敗したときはnullを返します。
@@ -54,10 +53,11 @@ namespace Bakera.RedFace{
 				return ConsumeCharacterReference(null);
 			}
 			protected string ConsumeCharacterReference(char? additional_allowed_character){
-				char? nextCharacter = Parser.ConsumeChar();
+				Parser.ConsumeChar();
+				char? nextCharacter = CurrentInputChar;
 				
 				if(additional_allowed_character != null && nextCharacter == additional_allowed_character){
-					Parser.UnConsume(nextCharacter);
+					Parser.UnConsume(1);
 					return null;
 				}
 				switch(nextCharacter){
@@ -68,7 +68,7 @@ namespace Bakera.RedFace{
 					case Chars.LESS_THAN_SIGN:
 					case null:
 						// Not a character reference. No characters are consumed, and nothing is returned. (This is not an error, either.)
-						Parser.UnConsume(nextCharacter);
+						Parser.UnConsume(1);
 						return null;
 					case Chars.NUMBER_SIGN:
 						return ConsumeNumericCharacterReference();
@@ -103,14 +103,12 @@ namespace Bakera.RedFace{
 				}
 				if(result == null){
 					Parser.OnParseErrorRaised(string.Format("文字参照 {0} を参照しようとしましたが、みつかりませんでした。", originalString));
-					Parser.UnConsume(originalString);
+					Parser.UnConsume(originalString.Length);
 				}
 				if(!semicolonFound){
-					Parser.OnParseErrorRaised(string.Format("文字参照 &{0}; の末尾にセミコロンがついていません。", matchResult));
+					Parser.OnParseErrorRaised(string.Format("文字参照 &{0}; の末尾のセミコロンがありません。", matchResult));
 					int diff = originalString.Length - matchResult.Length;
-					if(diff > 0){
-						Parser.UnConsume(originalString.Substring(matchResult.Length, diff) + Parser.CurrentInputChar);
-					}
+					Parser.UnConsume(diff+1);
 				}
 				Parser.OnCharacterReferenced(originalString, result);
 				return result;
@@ -149,7 +147,7 @@ namespace Bakera.RedFace{
 					suffix += Chars.SEMICOLON;
 				} else {
 					Parser.OnParseErrorRaised(string.Format("文字参照の末尾にセミコロンがありません。"));
-					Parser.UnConsume(Parser.CurrentInputChar);
+					Parser.UnConsume(1);
 				}
 				string originalString = prefix + numberString + suffix;
 				Parser.OnCharacterReferenced(originalString, result);
@@ -175,7 +173,7 @@ namespace Bakera.RedFace{
 				}
 				string result = Chars.GetCharByNumber(num);
 				if(Chars.IsErrorChar(num)){
-					Parser.OnParseErrorRaised(string.Format("指定された文字のコード {0} はパースエラーとなりますが、文字はそのまま返します。", num));
+					Parser.OnParseErrorRaised(string.Format("指定された文字のコード {0} は非Unicode文字 (noncharacters) です。", num));
 				}
 				return result;
 			}

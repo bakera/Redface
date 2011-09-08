@@ -7,6 +7,7 @@ namespace Bakera.RedFace{
 		public delegate void ParserEventHandler(Object sender, EventArgs e);
 		public event ParserEventHandler TokenStateChanged;
 		public event ParserEventHandler ParseErrorRaised;
+		public event ParserEventHandler WillfulViolationRaised;
 		public event ParserEventHandler CharacterReferenced;
 
 		// TokenStateChangedイベントを発生します。
@@ -20,6 +21,13 @@ namespace Bakera.RedFace{
 		protected virtual void OnParseErrorRaised(string s){
 			if(ParseErrorRaised != null){
 				ParseErrorRaised(this, new ParseErrorEventArgs(this){Message = s});
+			}
+		}
+
+		// WillfulViolationRaisedイベントを発生します。
+		protected virtual void OnWillfulViolationRaised(string s){
+			if(WillfulViolationRaised != null){
+				WillfulViolationRaised(this, new ParseErrorEventArgs(this){Message = s});
 			}
 		}
 

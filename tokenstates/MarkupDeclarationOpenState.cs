@@ -34,7 +34,7 @@ namespace Bakera.RedFace{
 				if(probablyDoctypeString.Equals(DoctypeString, StringComparison.InvariantCultureIgnoreCase)){
 					return true;
 				}
-				Parser.UnConsume(nextString);
+				Parser.UnConsume(DoctypeString.Length - 1);
 				return false;
 			}
 
