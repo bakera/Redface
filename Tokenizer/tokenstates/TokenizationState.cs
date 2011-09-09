@@ -8,27 +8,24 @@ namespace Bakera.RedFace{
 
 	public partial class RedFaceParser{
 
-		public abstract class TokenState{
+		public abstract class TokenizationState{
 			
 			protected Tokenizer myTokenizer;
 
 
 	// プロパティ
-			public virtual string Name{get{return this.GetType().Name;}}
-			public char? CurrentInputChar{
-				get{
-					return myTokenizer.CurrentInputChar;
-				}
+			public virtual string Name{
+				get{return this.GetType().Name;}
 			}
-
+			public char? CurrentInputChar{
+				get{return myTokenizer.CurrentInputChar;}
+			}
 			public RedFaceParser Parser{
-				get{
-					return myTokenizer.Parser;
-				}
+				get{return myTokenizer.Parser;}
 			}
 
 	// コンストラクタ
-			public TokenState(Tokenizer t){
+			public TokenizationState(Tokenizer t){
 				myTokenizer = t;
 			}
 
@@ -37,12 +34,12 @@ namespace Bakera.RedFace{
 
 	// ファクトリ
 
-			public static TokenState CreateTokenState(Type t, Tokenizer tokenizer){
-				if(!(typeof(TokenState)).IsAssignableFrom(t)){
-					throw new Exception("CreateTokenStateメソッドはTokenStateしか作成できません。渡された型 :" + t.ToString());
+			public static TokenizationState CreateTokenState(Type t, Tokenizer tokenizer){
+				if(!(typeof(TokenizationState)).IsAssignableFrom(t)){
+					throw new Exception("CreateTokenStateメソッドはTokenizationStateしか作成できません。渡された型 :" + t.ToString());
 				}
 				ConstructorInfo ci = t.GetConstructor(new Type[]{typeof(Tokenizer)});
-				TokenState result = ci.Invoke(new Object[]{tokenizer}) as TokenState;
+				TokenizationState result = ci.Invoke(new Object[]{tokenizer}) as TokenizationState;
 				return result;
 			}
 

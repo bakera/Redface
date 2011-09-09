@@ -9,10 +9,10 @@ namespace Bakera.RedFace{
 
 		public partial class Tokenizer{
 
-			private KeyedByTypeCollection<TokenState> myTokenStateManager = new KeyedByTypeCollection<TokenState>();
+			private KeyedByTypeCollection<TokenizationState> myTokenStateManager = new KeyedByTypeCollection<TokenizationState>();
 			private RedFaceParser myParser = null;
 			private Token myCurrentToken;
-			private TokenState myCurrentTokenState;
+			private TokenizationState myCurrentTokenState;
 			private InputStream myInputStream;
 
 			public char? CurrentInputChar {
@@ -27,16 +27,15 @@ namespace Bakera.RedFace{
 				}
 			}
 
-			public TokenState CurrentTokenState {
+			public TokenizationState CurrentTokenState {
 				get{
 					return myCurrentTokenState;
 				}
 			}
 
 			public Token CurrentToken {
-				get{
-					return myCurrentToken;
-				}
+				get{return myCurrentToken;}
+				set{myCurrentToken = value;}
 			}
 
 
@@ -70,7 +69,7 @@ namespace Bakera.RedFace{
 			// トークン走査状態を設定します。
 			public void SetTokenState(Type t){
 				if(!myTokenStateManager.Contains(t)){
-					myTokenStateManager.Add(TokenState.CreateTokenState(t, this));
+					myTokenStateManager.Add(TokenizationState.CreateTokenState(t, this));
 				}
 				myCurrentTokenState = myTokenStateManager[t];
 			}

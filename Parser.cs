@@ -12,6 +12,7 @@ namespace Bakera.RedFace{
 
 		private bool myStopFlag = false;
 		private Tokenizer myTokenizer = null;
+		private TreeConstruction myTreeConstruction = null;
 
 
 
@@ -57,6 +58,8 @@ namespace Bakera.RedFace{
 			TextReader tr = new StreamReader(s);
 			InputStream stream = new InputStream(this, tr);
 			myTokenizer = new Tokenizer(this, stream);
+			myTreeConstruction = new TreeConstruction(this);
+
 			while(!myStopFlag){
 				Token t = myTokenizer.GetToken();
 				if(t == null) break;

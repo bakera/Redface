@@ -6,6 +6,7 @@ namespace Bakera.RedFace{
 
 		public delegate void ParserEventHandler(Object sender, EventArgs e);
 		public event ParserEventHandler TokenStateChanged;
+		public event ParserEventHandler InsertionModeChanged;
 		public event ParserEventHandler ParseErrorRaised;
 		public event ParserEventHandler WillfulViolationRaised;
 		public event ParserEventHandler CharacterReferenced;
@@ -15,6 +16,13 @@ namespace Bakera.RedFace{
 		protected virtual void OnTokenStateChanged(){
 			if(TokenStateChanged != null){
 				TokenStateChanged(this, new ParserEventArgs(this));
+			}
+		}
+
+		// InsertionModeChangedイベントを発生します。
+		protected virtual void OnInsertionModeChanged(){
+			if(InsertionModeChanged != null){
+				InsertionModeChanged(this, new ParserEventArgs(this));
 			}
 		}
 

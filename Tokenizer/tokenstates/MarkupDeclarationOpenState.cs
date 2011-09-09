@@ -6,7 +6,7 @@ namespace Bakera.RedFace{
 	public partial class RedFaceParser{
 
 		public const string DoctypeString = "DOCTYPE";
-		public class MarkupDeclarationOpenState : TokenState{
+		public class MarkupDeclarationOpenState : TokenizationState{
 
 			public MarkupDeclarationOpenState(Tokenizer t) : base(t){}
 

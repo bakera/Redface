@@ -5,7 +5,7 @@ namespace Bakera.RedFace{
 
 	public partial class RedFaceParser{
 
-		public class DataState : TokenState{
+		public class DataState : TokenizationState{
 
 			public DataState(Tokenizer t) : base(t){}
 

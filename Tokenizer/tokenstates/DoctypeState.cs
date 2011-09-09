@@ -5,7 +5,7 @@ namespace Bakera.RedFace{
 
 	public partial class RedFaceParser{
 
-		public class DoctypeState : TokenState{
+		public class DoctypeState : TokenizationState{
 
 			public DoctypeState(Tokenizer t) : base(t){}
 
@@ -22,13 +22,9 @@ namespace Bakera.RedFace{
 						Parser.OnParseErrorRaised(string.Format("DOCTYPEの解析中に終端に達しました。"));
 						UnConsume();
 						ChangeTokenState(typeof(DataState));
-						// ToDo:
-						// Parse error. Create a new DOCTYPE token.
-						// Set its force-quirks flag to on.
-						// Emit the token. Reconsume the EOF character in the data state.
-						break;
+						return new DoctypeToken(){ForceQuirks = true};
 					default:
-						Parser.OnParseErrorRaised(string.Format("DOCTYPEの解析中に不明な文字を検出しました: {0}", CurrentInputChar));
+						Parser.OnParseErrorRaised(string.Format("文書型宣言のDOCTYPEの後ろにスペースがありません。出現した文字: {0}", CurrentInputChar));
 						UnConsume();
 						ChangeTokenState(typeof(BeforeDoctypeNameState));
 						break;

@@ -31,6 +31,8 @@ namespace Bakera.RedFace{
 	// メソッド
 
 
+			public abstract void AppendToken(Token t);
+
 		}
 	}
 }
