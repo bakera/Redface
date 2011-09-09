@@ -10,54 +10,74 @@ namespace Bakera.RedFace{
 
 		public abstract class TokenState{
 			
-			protected RedFaceParser Parser{get; set;}
+			protected Tokenizer myTokenizer;
 
 
 	// プロパティ
 			public virtual string Name{get{return this.GetType().Name;}}
 			public char? CurrentInputChar{
 				get{
-					return Parser.CurrentInputChar;
+					return myTokenizer.CurrentInputChar;
+				}
+			}
+
+			public RedFaceParser Parser{
+				get{
+					return myTokenizer.Parser;
 				}
 			}
 
 	// コンストラクタ
-			public TokenState(RedFaceParser p){
-				Parser = p;
+			public TokenState(Tokenizer t){
+				myTokenizer = t;
 			}
 
 	// 抽象メソッド
-			public virtual void Read(){}
+			public abstract Token Read();
 
 	// ファクトリ
 
-			public static TokenState CreateTokenState(Type t, RedFaceParser parser){
+			public static TokenState CreateTokenState(Type t, Tokenizer tokenizer){
 				if(!(typeof(TokenState)).IsAssignableFrom(t)){
 					throw new Exception("CreateTokenStateメソッドはTokenStateしか作成できません。渡された型 :" + t.ToString());
 				}
-				ConstructorInfo ci = t.GetConstructor(new Type[]{typeof(RedFaceParser)});
-				TokenState result = ci.Invoke(new Object[]{parser}) as TokenState;
+				ConstructorInfo ci = t.GetConstructor(new Type[]{typeof(Tokenizer)});
+				TokenState result = ci.Invoke(new Object[]{tokenizer}) as TokenState;
 				return result;
 			}
 
 
 	// メソッド
 
-			// 1文字読み進めます。
-			protected void ConsumeChar(){
-				Parser.ConsumeChar();
+
+		// tokenizerのメソッド
+			protected void ChangeTokenState(Type t){
+				myTokenizer.ChangeTokenState(t);
+			}
+			protected void UnConsume(){
+				myTokenizer.UnConsume();
+			}
+			protected void UnConsume(int n){
+				myTokenizer.UnConsume(n);
 			}
 
+			// 1文字読み進めます。
+			protected void ConsumeChar(){
+				myTokenizer.ConsumeChar();
+			}
+
+
+// 
 			// 参照されている文字を取得します。失敗したときはnullを返します。
 			protected string ConsumeCharacterReference(){
 				return ConsumeCharacterReference(null);
 			}
 			protected string ConsumeCharacterReference(char? additional_allowed_character){
-				Parser.ConsumeChar();
+				ConsumeChar();
 				char? nextCharacter = CurrentInputChar;
 				
 				if(additional_allowed_character != null && nextCharacter == additional_allowed_character){
-					Parser.UnConsume(1);
+					UnConsume(1);
 					return null;
 				}
 				switch(nextCharacter){
@@ -68,7 +88,7 @@ namespace Bakera.RedFace{
 					case Chars.LESS_THAN_SIGN:
 					case null:
 						// Not a character reference. No characters are consumed, and nothing is returned. (This is not an error, either.)
-						Parser.UnConsume(1);
+						UnConsume(1);
 						return null;
 					case Chars.NUMBER_SIGN:
 						return ConsumeNumericCharacterReference();
@@ -83,12 +103,12 @@ namespace Bakera.RedFace{
 				Regex numericPattern = Chars.NameToken;
 				StringBuilder matchResult = new StringBuilder();
 				bool semicolonFound = false;
-				while(numericPattern.IsMatch(Parser.CurrentInputChar.ToString())){
-					matchResult.Append(Parser.CurrentInputChar);
-					Parser.ConsumeChar();
+				while(numericPattern.IsMatch(CurrentInputChar.ToString())){
+					matchResult.Append(CurrentInputChar);
+					ConsumeChar();
 				}
-				if(Parser.CurrentInputChar == Chars.SEMICOLON){
-					matchResult.Append(Parser.CurrentInputChar);
+				if(CurrentInputChar == Chars.SEMICOLON){
+					matchResult.Append(CurrentInputChar);
 					semicolonFound = true;
 				}
 				string originalString = matchResult.ToString();
@@ -103,12 +123,12 @@ namespace Bakera.RedFace{
 				}
 				if(result == null){
 					Parser.OnParseErrorRaised(string.Format("文字参照 {0} を参照しようとしましたが、みつかりませんでした。", originalString));
-					Parser.UnConsume(originalString.Length);
+					UnConsume(originalString.Length);
 				}
 				if(!semicolonFound){
 					Parser.OnParseErrorRaised(string.Format("文字参照 &{0}; の末尾のセミコロンがありません。", matchResult));
 					int diff = originalString.Length - matchResult.Length;
-					Parser.UnConsume(diff+1);
+					UnConsume(diff+1);
 				}
 				Parser.OnCharacterReferenced(originalString, result);
 				return result;
@@ -117,24 +137,24 @@ namespace Bakera.RedFace{
 
 			// 数値文字参照を展開します。
 			protected string ConsumeNumericCharacterReference(){
-				Parser.ConsumeChar();
+				ConsumeChar();
 				Regex numericPattern = null;
 				System.Globalization.NumberStyles parseStyle = Chars.DecimalParseStyle;
 				string prefix = "";
 				string suffix = "";
-				if(Parser.CurrentInputChar == 'x' || Parser.CurrentInputChar == 'X'){
-					prefix = Parser.CurrentInputChar.ToString();
+				if(CurrentInputChar == 'x' || CurrentInputChar == 'X'){
+					prefix = CurrentInputChar.ToString();
 					numericPattern = Chars.HexDigitRange;
 					parseStyle = Chars.HexParseStyle;
-					Parser.ConsumeChar();
+					ConsumeChar();
 				} else {
 					numericPattern = Chars.DigitRange;
 				}
 
 				StringBuilder matchResult = new StringBuilder();
-				while(numericPattern.IsMatch(Parser.CurrentInputChar.ToString())){
-					matchResult.Append(Parser.CurrentInputChar);
-					Parser.ConsumeChar();
+				while(numericPattern.IsMatch(CurrentInputChar.ToString())){
+					matchResult.Append(CurrentInputChar);
+					ConsumeChar();
 				}
 				if(matchResult.Length == 0){
 					Parser.OnParseErrorRaised("数値文字参照の数値が空です。");
@@ -143,11 +163,11 @@ namespace Bakera.RedFace{
 				string numberString = matchResult.ToString();
 				int resultNumber = int.Parse(numberString, parseStyle);
 				string result = GetNumberedChar(resultNumber);
-				if(Parser.CurrentInputChar == Chars.SEMICOLON){
+				if(CurrentInputChar == Chars.SEMICOLON){
 					suffix += Chars.SEMICOLON;
 				} else {
 					Parser.OnParseErrorRaised(string.Format("文字参照の末尾にセミコロンがありません。"));
-					Parser.UnConsume(1);
+					myTokenizer.UnConsume(1);
 				}
 				string originalString = prefix + numberString + suffix;
 				Parser.OnCharacterReferenced(originalString, result);

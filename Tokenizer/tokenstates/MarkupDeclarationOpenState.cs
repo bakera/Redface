@@ -8,33 +8,34 @@ namespace Bakera.RedFace{
 		public const string DoctypeString = "DOCTYPE";
 		public class MarkupDeclarationOpenState : TokenState{
 
-			public MarkupDeclarationOpenState(RedFaceParser p) : base(p){}
+			public MarkupDeclarationOpenState(Tokenizer t) : base(t){}
 
-			public override void Read(){
-				Parser.ConsumeChar();
+			public override Token Read(){
+				ConsumeChar();
 
-				if(Parser.CurrentInputChar == Chars.HYPHEN_MINUS){
+				if(CurrentInputChar == Chars.HYPHEN_MINUS){
 					// ToDo: Comment
 				} else if(IsDoctypeMatch()){
-					Parser.ChangeTokenState(typeof(DoctypeState));
+					ChangeTokenState(typeof(DoctypeState));
 				} else {
 					Parser.Stop();
 				}
+				return null;
 			}
 
 			// 文字が doctype であるかどうかを調べます。
 			// マッチすればそのまま true を返し、マッチしなければUnConsumeしてfalseを返します。
 			// UnConsumeした場合の CurrentInputChar は 'D' に相当する文字になります。
 			private bool IsDoctypeMatch(){
-				if(Parser.CurrentInputChar != 'D' && Parser.CurrentInputChar != 'd') return false;
+				if(CurrentInputChar != 'D' && CurrentInputChar != 'd') return false;
 
-				string probablyDoctypeString = Parser.CurrentInputChar.ToString();
-				string nextString = Parser.ConsumeChar(DoctypeString.Length - 1);
+				string probablyDoctypeString = CurrentInputChar.ToString();
+				string nextString = myTokenizer.ConsumeChar(DoctypeString.Length - 1);
 				probablyDoctypeString += nextString;
 				if(probablyDoctypeString.Equals(DoctypeString, StringComparison.InvariantCultureIgnoreCase)){
 					return true;
 				}
-				Parser.UnConsume(DoctypeString.Length - 1);
+				UnConsume(DoctypeString.Length - 1);
 				return false;
 			}
 

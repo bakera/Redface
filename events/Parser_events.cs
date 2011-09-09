@@ -9,11 +9,19 @@ namespace Bakera.RedFace{
 		public event ParserEventHandler ParseErrorRaised;
 		public event ParserEventHandler WillfulViolationRaised;
 		public event ParserEventHandler CharacterReferenced;
+		public event ParserEventHandler TokenCreated;
 
 		// TokenStateChangedイベントを発生します。
 		protected virtual void OnTokenStateChanged(){
 			if(TokenStateChanged != null){
 				TokenStateChanged(this, new ParserEventArgs(this));
+			}
+		}
+
+		// TokenCreatedイベントを発生します。
+		protected virtual void OnTokenCreated(Token t){
+			if(TokenCreated != null){
+				TokenCreated(this, new ParserTokenEventArgs(this, t));
 			}
 		}
 

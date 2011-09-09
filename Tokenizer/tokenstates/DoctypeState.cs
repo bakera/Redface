@@ -7,21 +7,21 @@ namespace Bakera.RedFace{
 
 		public class DoctypeState : TokenState{
 
-			public DoctypeState(RedFaceParser p) : base(p){}
+			public DoctypeState(Tokenizer t) : base(t){}
 
-			public override void Read(){
+			public override Token Read(){
 				ConsumeChar();
 				switch(CurrentInputChar){
 					case Chars.CHARACTER_TABULATION:
 					case Chars.LINE_FEED:
 					case Chars.FORM_FEED:
 					case Chars.SPACE:
-						Parser.ChangeTokenState(typeof(BeforeDoctypeNameState));
+						ChangeTokenState(typeof(BeforeDoctypeNameState));
 						break;
 					case null:
 						Parser.OnParseErrorRaised(string.Format("DOCTYPEの解析中に終端に達しました。"));
-						Parser.UnConsume();
-						Parser.ChangeTokenState(typeof(DataState));
+						UnConsume();
+						ChangeTokenState(typeof(DataState));
 						// ToDo:
 						// Parse error. Create a new DOCTYPE token.
 						// Set its force-quirks flag to on.
@@ -29,10 +29,11 @@ namespace Bakera.RedFace{
 						break;
 					default:
 						Parser.OnParseErrorRaised(string.Format("DOCTYPEの解析中に不明な文字を検出しました: {0}", CurrentInputChar));
-						Parser.UnConsume();
-						Parser.ChangeTokenState(typeof(BeforeDoctypeNameState));
+						UnConsume();
+						ChangeTokenState(typeof(BeforeDoctypeNameState));
 						break;
 				}
+				return null;
 			}
 
 

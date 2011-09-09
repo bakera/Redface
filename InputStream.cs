@@ -22,17 +22,15 @@ namespace Bakera.RedFace{
 				} else {
 					myConsumedChars = new StringBuilder();
 				}
-				ReadCharFromStream();
 			}
 
 
 	// プロパティ
 			public char? CurrentInputChar{
-				get {return GetCharByPosition(CurrentPosition);}
-			}
-
-			public char? NextInputChar{
-				get {return GetCharByPosition(CurrentPosition + 1);}
+				get {
+					char? result =  GetCharByPosition(CurrentPosition);
+					return result;
+				}
 			}
 
 			public RedFaceParser Parser{
@@ -53,7 +51,7 @@ namespace Bakera.RedFace{
 
 
 	// メソッド
-			void IDisposable.Dispose(){
+			public void Dispose(){
 				if(myTextReader != null) myTextReader.Dispose();
 			}
 

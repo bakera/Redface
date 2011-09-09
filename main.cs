@@ -13,9 +13,11 @@ namespace Bakera.RedFace{
 				p.TokenStateChanged += Write;
 				p.ParseErrorRaised += WriteError;
 				p.CharacterReferenced += WriteCharRef;
+				p.TokenCreated += WriteToken;
 
-				p.Load(file);
-				p.Parse();
+				using(FileStream fs = file.Open(FileMode.Open, FileAccess.Read, FileShare.Read)){
+					p.Parse(fs);
+				}
 				var logs = p.GetLogs();
 				foreach(ParserLog log in logs){
 					Console.WriteLine("{0}行{1}文字: {2}", log.Line.Number, log.ColumnNumber, log.Message);
@@ -24,8 +26,6 @@ namespace Bakera.RedFace{
 
 				Console.WriteLine("パース開始: {0}", p.StartTime);
 				Console.WriteLine("パース終了: {0}", p.EndTime);
-				Console.WriteLine("処理バイト数: {0}", p.CurrentPosition);
-				Console.WriteLine(p.EmittedToken);
 
 				return 0;
 			} catch(Exception e){
@@ -36,7 +36,7 @@ namespace Bakera.RedFace{
 
 		public static void Write(Object sender, EventArgs e){
 			RedFaceParser p = sender as RedFaceParser;
-			Console.WriteLine(p.CurrentTokenState.Name);
+			Console.WriteLine(p.CurrentTokenState);
 		}
 
 		public static void WriteError(Object sender, EventArgs e){
@@ -51,10 +51,16 @@ namespace Bakera.RedFace{
 			Console.WriteLine("charref: {0}→{1}", cre.OriginalString, cre.Result);
 		}
 
+		public static void WriteToken(Object sender, EventArgs e){
+			RedFaceParser p = sender as RedFaceParser;
+			ParserTokenEventArgs pte = e as ParserTokenEventArgs;
+			Console.WriteLine("Token: {0}", pte.Token);
+		}
+
 
 	}
 
-	public enum ParserMode{
+	public enum InsetionMode{
 		Initial,
 		BeforeHtml,
 		BeforeHead,

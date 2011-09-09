@@ -7,10 +7,11 @@ namespace Bakera.RedFace{
 
 		public class BeforeDoctypeNameState : TokenState{
 
-			public BeforeDoctypeNameState(RedFaceParser p) : base(p){}
+			public BeforeDoctypeNameState(Tokenizer t) : base(t){}
 
-			public override void Read(){
+			public override Token Read(){
 				Parser.Stop();
+				return null;
 			}
 
 		}

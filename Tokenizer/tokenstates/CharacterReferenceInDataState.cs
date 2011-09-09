@@ -7,16 +7,16 @@ namespace Bakera.RedFace{
 
 		public class CharacterReferenceInDataState : TokenState{
 
-			public CharacterReferenceInDataState(RedFaceParser p) : base(p){}
+			public CharacterReferenceInDataState(Tokenizer t) : base(t){}
 
-			public override void Read(){
+			public override Token Read(){
 				string result = ConsumeCharacterReference();
+				ChangeTokenState(typeof(DataState));
 				if(result == null){
-					Parser.Emit(Chars.AMPERSAND);
+					return new CharacterToken(Chars.AMPERSAND);
 				} else {
-					Parser.Emit(result);
+					return new CharacterToken(result);
 				}
-				Parser.ChangeTokenState(typeof(DataState));
 			}
 		}
 	}
