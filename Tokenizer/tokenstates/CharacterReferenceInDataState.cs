@@ -7,11 +7,9 @@ namespace Bakera.RedFace{
 
 		public class CharacterReferenceInDataState : TokenizationState{
 
-			public CharacterReferenceInDataState(Tokenizer t) : base(t){}
-
-			public override Token Read(){
-				string result = ConsumeCharacterReference();
-				ChangeTokenState(typeof(DataState));
+			public override Token Read(Tokenizer t){
+				string result = ConsumeCharacterReference(t);
+				t.ChangeTokenState<DataState>();
 				if(result == null){
 					return new CharacterToken(Chars.AMPERSAND);
 				} else {

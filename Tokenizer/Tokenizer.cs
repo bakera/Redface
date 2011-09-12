@@ -9,10 +9,9 @@ namespace Bakera.RedFace{
 
 		public partial class Tokenizer{
 
-			private KeyedByTypeCollection<TokenizationState> myTokenStateManager = new KeyedByTypeCollection<TokenizationState>();
+			private StateManager<TokenizationState> myTokenStateManager = null;
 			private RedFaceParser myParser = null;
 			private Token myCurrentToken;
-			private TokenizationState myCurrentTokenState;
 			private InputStream myInputStream;
 
 			public char? CurrentInputChar {
@@ -29,7 +28,7 @@ namespace Bakera.RedFace{
 
 			public TokenizationState CurrentTokenState {
 				get{
-					return myCurrentTokenState;
+					return myTokenStateManager.CurrentState;
 				}
 			}
 
@@ -44,41 +43,33 @@ namespace Bakera.RedFace{
 			public Tokenizer(RedFaceParser p, InputStream stream){
 				myParser = p;
 				myInputStream = stream;
-				SetTokenState(typeof(DataState));
+				myTokenStateManager = new StateManager<TokenizationState>(p);
+				myTokenStateManager.SetState<DataState>();
 			}
 
 
 	// トークンの取得
 			public Token GetToken(){
 				while(!Parser.IsStopped){
-					Token t = CurrentTokenState.Read();
+					Token t = CurrentTokenState.Read(this);
 					if(t == null) continue;
 					return t;
 				}
 				return null;
 			}
 
-
 			// トークン走査状態を変更します。
-			public void ChangeTokenState(Type t){
-				if(myCurrentTokenState != null && t == myCurrentTokenState.GetType()) return;
-				SetTokenState(t);
+			public void ChangeTokenState<T>() where T : TokenizationState, new(){
+				if(CurrentTokenState != null && typeof(T) == CurrentTokenState.GetType()) return;
+				myTokenStateManager.SetState<T>();
 				Parser.OnTokenStateChanged();
 			}
 
-			// トークン走査状態を設定します。
-			public void SetTokenState(Type t){
-				if(!myTokenStateManager.Contains(t)){
-					myTokenStateManager.Add(TokenizationState.CreateTokenState(t, this));
-				}
-				myCurrentTokenState = myTokenStateManager[t];
-			}
-
-
 	// 文字の読み取り
 			// 一つ読み進みます。
-			public void ConsumeChar(){
+			public char? ConsumeChar(){
 				myInputStream.ConsumeNextInputChar();
+				return CurrentInputChar;
 			}
 
 			// 指定された文字数の文字を読んで文字列を返します。

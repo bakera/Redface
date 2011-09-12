@@ -7,26 +7,24 @@ namespace Bakera.RedFace{
 
 		public class DoctypeState : TokenizationState{
 
-			public DoctypeState(Tokenizer t) : base(t){}
-
-			public override Token Read(){
-				ConsumeChar();
-				switch(CurrentInputChar){
+			public override Token Read(Tokenizer t){
+				char? c = t.ConsumeChar();
+				switch(c){
 					case Chars.CHARACTER_TABULATION:
 					case Chars.LINE_FEED:
 					case Chars.FORM_FEED:
 					case Chars.SPACE:
-						ChangeTokenState(typeof(BeforeDoctypeNameState));
+						t.ChangeTokenState<BeforeDoctypeNameState>();
 						break;
 					case null:
-						Parser.OnParseErrorRaised(string.Format("DOCTYPEの解析中に終端に達しました。"));
-						UnConsume();
-						ChangeTokenState(typeof(DataState));
+						t.Parser.OnParseErrorRaised(string.Format("DOCTYPEの解析中に終端に達しました。"));
+						t.UnConsume(1);
+						t.ChangeTokenState<DataState>();
 						return new DoctypeToken(){ForceQuirks = true};
 					default:
-						Parser.OnParseErrorRaised(string.Format("文書型宣言のDOCTYPEの後ろにスペースがありません。出現した文字: {0}", CurrentInputChar));
-						UnConsume();
-						ChangeTokenState(typeof(BeforeDoctypeNameState));
+						t.Parser.OnParseErrorRaised(string.Format("文書型宣言のDOCTYPEの後ろにスペースがありません。出現した文字: {0}", c));
+						t.UnConsume(1);
+						t.ChangeTokenState<BeforeDoctypeNameState>();
 						break;
 				}
 				return null;

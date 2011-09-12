@@ -7,11 +7,9 @@ namespace Bakera.RedFace{
 
 		public class BeforeDoctypeNameState : TokenizationState{
 
-			public BeforeDoctypeNameState(Tokenizer t) : base(t){}
-
-			public override Token Read(){
-				ConsumeChar();
-				Parser.Stop();
+			public override Token Read(Tokenizer t){
+				char? c = t.ConsumeChar();
+				t.Parser.Stop();
 				return null;
 			}
 
