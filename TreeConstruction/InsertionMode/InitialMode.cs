@@ -7,9 +7,7 @@ namespace Bakera.RedFace{
 
 		public class InitialMode : InsertionMode{
 
-			public InitialMode(RedFaceParser p) : base(p){}
-
-			public override void AppendToken(Token t){
+			public override void AppendToken(TreeConstruction tc, Token t){
 
 			}
 

@@ -64,6 +64,7 @@ namespace Bakera.RedFace{
 				Token t = myTokenizer.GetToken();
 				if(t == null) break;
 				OnTokenCreated(t);
+				myTreeConstruction.AppendToken(t);
 				if(t is EndOfFileToken) break;
 			}
 			EndTime = DateTime.Now;

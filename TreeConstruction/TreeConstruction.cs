@@ -10,48 +10,41 @@ namespace Bakera.RedFace{
 
 		public partial class TreeConstruction{
 
-			private KeyedByTypeCollection<InsertionMode> myInsertionModeManager = new KeyedByTypeCollection<InsertionMode>();
+			private StateManager<InsertionMode> myInsertionModeManager = null;
 
 			private XmlDocument myDocumentTree = new XmlDocument(){XmlResolver=null};
 			private Stack<XmlElement> myStackOfOpenlement = null;
-			private InsertionMode myCurrentInsertionMode = null;
 			private RedFaceParser myParser = null;
 			public RedFaceParser Parser {
 				get{
 					return myParser;
 				}
 			}
-
+			public InsertionMode CurrentInsertionMode{
+				get{return myInsertionModeManager.CurrentState;}
+			}
 
 
 	// コンストラクタ
 
 			public TreeConstruction(RedFaceParser p){
 				myParser = p;
-				SetInsertionMode(typeof(InitialMode));
+				myInsertionModeManager = new StateManager<InsertionMode>(p);
+				myInsertionModeManager.SetState<InitialMode>();
 			}
 
 
 	// メソッド
 			public void AppendToken(Token t){
-				myCurrentInsertionMode.AppendToken(t);
+				CurrentInsertionMode.AppendToken(this, t);
 			}
 
 			// InsertionModeを変更します。
-			public void ChangeInsertionMode(Type t){
-				if(myCurrentInsertionMode != null && t == myCurrentInsertionMode.GetType()) return;
-				SetInsertionMode(t);
+			public void ChangeInsertionMode<T>() where T : InsertionMode, new(){
+				if(CurrentInsertionMode != null && CurrentInsertionMode.GetType() == typeof(T)) return;
+				myInsertionModeManager.SetState<T>();
 				Parser.OnInsertionModeChanged();
 			}
-
-			// InsertionModeを設定します。
-			public void SetInsertionMode(Type t){
-				if(!myInsertionModeManager.Contains(t)){
-					myInsertionModeManager.Add(InsertionMode.CreateInsertionMode(t, Parser));
-				}
-				myCurrentInsertionMode = myInsertionModeManager[t];
-			}
-
 
 		}
 	}
