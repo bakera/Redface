@@ -14,8 +14,7 @@ namespace Bakera.RedFace{
 					case Chars.LINE_FEED:
 					case Chars.FORM_FEED:
 					case Chars.SPACE:
-						t.ChangeTokenState<BeforeDoctypeNameState>();
-						break;
+						return null;
 					case null:
 						t.Parser.OnParseErrorRaised(string.Format("DOCTYPEの解析中に終端に達しました。"));
 						t.UnConsume(1);

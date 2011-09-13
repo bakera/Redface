@@ -54,7 +54,9 @@ namespace Bakera.RedFace{
 		public static void WriteToken(Object sender, EventArgs e){
 			RedFaceParser p = sender as RedFaceParser;
 			ParserTokenEventArgs pte = e as ParserTokenEventArgs;
-			Console.WriteLine("Token: {0}", pte.Token);
+			Token t = pte.Token;
+			Console.Write("Token: {0}", t);
+			Console.Write("Token: {0}", t.Name);
 		}
 
 

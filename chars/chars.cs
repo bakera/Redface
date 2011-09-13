@@ -29,9 +29,14 @@ namespace Bakera.RedFace{
 		public static readonly Regex NameToken = new Regex("[0-9A-Za-z]");
 		public static readonly Regex HexDigitRange = new Regex("[0-9A-Fa-f]");
 		public static readonly Regex DigitRange = new Regex("[0-9]");
+		public static readonly Regex LatinCapitalLetter = new Regex("[A-Z]");
 
 		public const System.Globalization.NumberStyles HexParseStyle = System.Globalization.NumberStyles.AllowHexSpecifier;
 		public const System.Globalization.NumberStyles DecimalParseStyle = System.Globalization.NumberStyles.None;
+
+		public static bool IsLatinCapitalLetter(char? c){
+			return '\u0041' <= c && c <= '\u0058';
+		}
 
 	}
 }
