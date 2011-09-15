@@ -26,18 +26,28 @@ namespace Bakera.RedFace{
 		public const char BOM                   = '\ufeff';
 		public const char REPLACEMENT_CHARACTER = '\ufffd';
 
-		public static readonly Regex NameToken = new Regex("[0-9A-Za-z]");
-		public static readonly Regex HexDigitRange = new Regex("[0-9A-Fa-f]");
-		public static readonly Regex DigitRange = new Regex("[0-9]");
-		public static readonly Regex LatinCapitalLetter = new Regex("[A-Z]");
-
 		public const System.Globalization.NumberStyles HexParseStyle = System.Globalization.NumberStyles.AllowHexSpecifier;
 		public const System.Globalization.NumberStyles DecimalParseStyle = System.Globalization.NumberStyles.None;
 
 		public static bool IsLatinCapitalLetter(char? c){
+			if(c == null) return false;
 			return '\u0041' <= c && c <= '\u0058';
 		}
-
+		public static bool IsLatinSmallLetter(char? c){
+			if(c == null) return false;
+			return '\u0061' <= c && c <= '\u007a';
+		}
+		public static bool IsDigit(char? c){
+			if(c == null) return false;
+			return '\u0030' <= c && c <= '\u0039';
+		}
+		public static bool IsHexDigit(char? c){
+			if(c == null) return false;
+			return IsDigit(c) || ('\u0041' <= c && c <= '\u0046') || ('\u0061' <= c && c <= '\u0066');
+		}
+		public static bool IsNameToken(char? c){
+			return IsLatinSmallLetter(c) || IsLatinCapitalLetter(c) || IsDigit(c);
+		}
 	}
 }
 

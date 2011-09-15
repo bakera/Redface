@@ -73,12 +73,11 @@ namespace Bakera.RedFace{
 
 			// 名前による文字参照を展開します。
 			protected string ConsumeNamedCharacterReference(Tokenizer t){
-				Regex namePattern = Chars.NameToken;
 				StringBuilder matchResult = new StringBuilder();
 				bool semicolonFound = false;
 
 				char? c = t.CurrentInputChar;
-				while(namePattern.IsMatch(c.ToString())){
+				while(Chars.IsNameToken(c)){
 					matchResult.Append(c);
 					c = t.ConsumeChar();
 				}
@@ -99,8 +98,7 @@ namespace Bakera.RedFace{
 				if(result == null){
 					t.Parser.OnParseErrorRaised(string.Format("文字参照 {0} を参照しようとしましたが、みつかりませんでした。", originalString));
 					t.UnConsume(originalString.Length);
-				}
-				if(!semicolonFound){
+				} else if(!semicolonFound){
 					t.Parser.OnParseErrorRaised(string.Format("文字参照 &{0}; の末尾のセミコロンがありません。", matchResult));
 					int diff = originalString.Length - matchResult.Length;
 					t.UnConsume(diff+1);
@@ -113,21 +111,20 @@ namespace Bakera.RedFace{
 			// 数値文字参照を展開します。
 			protected string ConsumeNumericCharacterReference(Tokenizer t){
 				char? c = t.ConsumeChar();
-				Regex numericPattern = null;
+				Predicate<char?> numericMatch = null;
 				System.Globalization.NumberStyles parseStyle = Chars.DecimalParseStyle;
 				string prefix = "";
 				string suffix = "";
 				if(c == 'x' || c == 'X'){
 					prefix = c.ToString();
-					numericPattern = Chars.HexDigitRange;
+					numericMatch = Chars.IsHexDigit;
 					parseStyle = Chars.HexParseStyle;
 					c = t.ConsumeChar();
 				} else {
-					numericPattern = Chars.DigitRange;
+					numericMatch = Chars.IsDigit;
 				}
-
 				StringBuilder matchResult = new StringBuilder();
-				while(numericPattern.IsMatch(c.ToString())){
+				while(numericMatch(c)){
 					matchResult.Append(c);
 					c = t.ConsumeChar();
 				}
