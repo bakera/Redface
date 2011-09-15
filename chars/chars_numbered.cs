@@ -6,19 +6,19 @@ namespace Bakera.RedFace{
 
 	public static partial class Chars{
 
-		public static string GetReplacedCharByNumber(int num){
+		public static string GetReplacedCharByNumber(this int num){
 			return myReplacedChars[num];
 		}
 
-		public static bool IsReplacedChar(int num){
+		public static bool IsReplacedChar(this int num){
 			return myReplacedChars.ContainsKey(num);
 		}
 
-		public static bool IsSurrogate(int num){
+		public static bool IsSurrogate(this int num){
 			return 0xD800 <= num && num >= 0xDFFF;
 		}
 
-		public static bool IsErrorChar(int num){
+		public static bool IsErrorChar(this int num){
 			if(0x0001 <= num && num <= 0x0008) return true;
 			if(0x000E <= num && num <= 0x001F) return true;
 			if(0x007F <= num && num <= 0x009F) return true;
@@ -28,7 +28,7 @@ namespace Bakera.RedFace{
 		}
 
 
-		public static string GetCharByNumber(int num){
+		public static string GetCharByNumber(this int num){
 			byte[] bytes = BitConverter.GetBytes(num);
 			return Encoding.UTF32.GetString(bytes);
 		}

@@ -29,23 +29,23 @@ namespace Bakera.RedFace{
 		public const System.Globalization.NumberStyles HexParseStyle = System.Globalization.NumberStyles.AllowHexSpecifier;
 		public const System.Globalization.NumberStyles DecimalParseStyle = System.Globalization.NumberStyles.None;
 
-		public static bool IsLatinCapitalLetter(char? c){
+		public static bool IsLatinCapitalLetter(this char? c){
 			if(c == null) return false;
 			return '\u0041' <= c && c <= '\u0058';
 		}
-		public static bool IsLatinSmallLetter(char? c){
+		public static bool IsLatinSmallLetter(this char? c){
 			if(c == null) return false;
 			return '\u0061' <= c && c <= '\u007a';
 		}
-		public static bool IsDigit(char? c){
+		public static bool IsDigit(this char? c){
 			if(c == null) return false;
 			return '\u0030' <= c && c <= '\u0039';
 		}
-		public static bool IsHexDigit(char? c){
+		public static bool IsHexDigit(this char? c){
 			if(c == null) return false;
 			return IsDigit(c) || ('\u0041' <= c && c <= '\u0046') || ('\u0061' <= c && c <= '\u0066');
 		}
-		public static bool IsNameToken(char? c){
+		public static bool IsNameToken(this char? c){
 			return IsLatinSmallLetter(c) || IsLatinCapitalLetter(c) || IsDigit(c);
 		}
 	}

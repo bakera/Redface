@@ -9,7 +9,6 @@ namespace Bakera.RedFace{
 
 			public override Token Read(Tokenizer t){
 				char? c = t.ConsumeChar();
-				DoctypeToken result = null;
 
 				switch(c){
 					case Chars.CHARACTER_TABULATION:
@@ -25,17 +24,17 @@ namespace Bakera.RedFace{
 					case Chars.GREATER_THAN_SIGN:
 						t.Parser.OnParseErrorRaised(string.Format("DOCTYPEのNameが空です。"));
 						t.ChangeTokenState<DataState>();
-						result = new DoctypeToken(){ForceQuirks = true};
-						return result;
-					case null:
+						return new DoctypeToken(){ForceQuirks = true};
+					case null:{
 						t.Parser.OnParseErrorRaised(string.Format("DOCTYPEの解析中に終端に達しました。"));
-						result = new DoctypeToken(){ForceQuirks = true};
+						DoctypeToken result = new DoctypeToken(){ForceQuirks = true};
 						t.UnConsume(1);
 						t.ChangeTokenState<DataState>();
 						return result;
-					default:
-						result = new DoctypeToken();
-						if(Chars.IsLatinCapitalLetter(c)){
+					}
+					default:{
+						DoctypeToken result = new DoctypeToken();
+						if(c.IsLatinCapitalLetter()){
 							result.Name = char.ToLower((char)c).ToString();
 						} else {
 							result.Name = c.ToString();
@@ -43,6 +42,7 @@ namespace Bakera.RedFace{
 						t.CurrentToken = result;
 						t.ChangeTokenState<DoctypeNameState>();
 						return null;
+					}
 				}
 			}
 

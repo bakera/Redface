@@ -77,7 +77,7 @@ namespace Bakera.RedFace{
 				bool semicolonFound = false;
 
 				char? c = t.CurrentInputChar;
-				while(Chars.IsNameToken(c)){
+				while(c.IsNameToken()){
 					matchResult.Append(c);
 					c = t.ConsumeChar();
 				}
@@ -111,20 +111,20 @@ namespace Bakera.RedFace{
 			// 数値文字参照を展開します。
 			protected string ConsumeNumericCharacterReference(Tokenizer t){
 				char? c = t.ConsumeChar();
-				Predicate<char?> numericMatch = null;
+				Predicate<char?> isNumeric = null;
 				System.Globalization.NumberStyles parseStyle = Chars.DecimalParseStyle;
 				string prefix = "";
 				string suffix = "";
 				if(c == 'x' || c == 'X'){
 					prefix = c.ToString();
-					numericMatch = Chars.IsHexDigit;
+					isNumeric = Chars.IsHexDigit;
 					parseStyle = Chars.HexParseStyle;
 					c = t.ConsumeChar();
 				} else {
-					numericMatch = Chars.IsDigit;
+					isNumeric = Chars.IsDigit;
 				}
 				StringBuilder matchResult = new StringBuilder();
-				while(numericMatch(c)){
+				while(isNumeric(c)){
 					matchResult.Append(c);
 					c = t.ConsumeChar();
 				}
@@ -148,12 +148,12 @@ namespace Bakera.RedFace{
 
 
 			private string GetNumberedChar(Tokenizer t, int num){
-				if(Chars.IsReplacedChar(num)){
+				if(num.IsReplacedChar()){
 					string errorResult = Chars.GetReplacedCharByNumber(num);
 					t.Parser.OnParseErrorRaised(string.Format("参照不可能な文字のコード {0} を参照しようとしました。文字は「{1}」に置換されます。", num, errorResult));
 					return errorResult;
 				}
-				if(Chars.IsSurrogate(num)){
+				if(num.IsSurrogate()){
 					string errorResult = Chars.REPLACEMENT_CHARACTER.ToString();
 					t.Parser.OnParseErrorRaised(string.Format("サロゲート文字のコード {0} を参照しようとしました。文字は「{1}」に置換されます。", num, errorResult));
 					return errorResult;
@@ -164,7 +164,7 @@ namespace Bakera.RedFace{
 					return errorResult;
 				}
 				string result = Chars.GetCharByNumber(num);
-				if(Chars.IsErrorChar(num)){
+				if(num.IsErrorChar()){
 					t.Parser.OnParseErrorRaised(string.Format("指定された文字のコード {0} は非Unicode文字 (noncharacters) です。", num));
 				}
 				return result;

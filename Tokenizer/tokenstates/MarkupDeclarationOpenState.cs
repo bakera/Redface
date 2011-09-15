@@ -14,6 +14,7 @@ namespace Bakera.RedFace{
 				} else if(IsStringMatch(t, DoctypeId)){
 					t.ChangeTokenState<DoctypeState>();
 				} else {
+					//ToDo: CDATA
 					t.Parser.Stop();
 				}
 				return null;
