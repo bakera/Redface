@@ -5,7 +5,7 @@ namespace Bakera.RedFace{
 
 	public partial class RedFaceParser{
 
-		public class DoctypeNameState : TokenizationState{
+		public class BetweenDoctypePublicAndSystemIdentifiersState : TokenizationState{
 
 			public override Token Read(Tokenizer t){
 				char? c = t.ConsumeChar();
@@ -15,19 +15,24 @@ namespace Bakera.RedFace{
 					case Chars.LINE_FEED:
 					case Chars.FORM_FEED:
 					case Chars.SPACE:
-						t.ChangeTokenState<AfterDoctypeNameState>();
 						return null;
 					case Chars.GREATER_THAN_SIGN:
 						t.ChangeTokenState<DataState>();
 						return t.CurrentToken;
-					case Chars.NULL:{
-						t.Parser.OnParseErrorRaised(string.Format("DOCTYPE nameの解析中にNULL文字を検出しました。"));
+					case Chars.QUOTATION_MARK:{
 						DoctypeToken result = (DoctypeToken)t.CurrentToken;
-						result.Name += Chars.REPLACEMENT_CHARACTER.ToString();
+						result.SystemIdentifier = "";
+						t.ChangeTokenState<DoctypeSystemIdentifierState<DoubleQuoted>>();
+						return null;
+					}
+					case Chars.APOSTROPHE:{
+						DoctypeToken result = (DoctypeToken)t.CurrentToken;
+						result.SystemIdentifier = "";
+						t.ChangeTokenState<DoctypeSystemIdentifierState<SingleQuoted>>();
 						return null;
 					}
 					case null:{
-						t.Parser.OnParseErrorRaised(string.Format("DOCTYPE nameの解析中に終端に達しました。"));
+						t.Parser.OnParseErrorRaised(string.Format("DOCTYPEの公開識別子の後で終端に達しました。"));
 						DoctypeToken result = (DoctypeToken)t.CurrentToken;
 						result.ForceQuirks = true;
 						t.UnConsume(1);
@@ -35,12 +40,10 @@ namespace Bakera.RedFace{
 						return result;
 					}
 					default:{
+						t.Parser.OnParseErrorRaised(string.Format("DOCTYPEの解析中に不明な文字を検出しました。"));
 						DoctypeToken result = (DoctypeToken)t.CurrentToken;
-						if(Chars.IsLatinCapitalLetter(c)){
-							result.Name += char.ToLower((char)c).ToString();
-						} else {
-							result.Name += c.ToString();
-						}
+						result.ForceQuirks = true;
+						t.ChangeTokenState<BogusDoctypeState>();
 						return null;
 					}
 				}

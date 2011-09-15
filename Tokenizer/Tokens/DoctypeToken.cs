@@ -23,5 +23,20 @@ namespace Bakera.RedFace{
 			this.SystemIdentifier = null;
 			this.ForceQuirks = false;
 		}
+
+		public override string ToString(){
+			string result = string.Format("{0}\n Name: \"{1}\"", this.GetType().Name, this.Name);
+			if(this.PublicIdentifier != null){
+				result += string.Format("\n PublicIdentifier: \"{0}\"", this.PublicIdentifier);
+			}
+			if(this.SystemIdentifier != null){
+				result += string.Format("\n SystemIdentifier: \"{0}\"", this.SystemIdentifier);
+			}
+			if(this.ForceQuirks){
+				result += "\n Force-quirks Flag: ON";
+			}
+			return result;
+		}
+
 	}
 }

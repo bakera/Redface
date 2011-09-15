@@ -10,6 +10,10 @@ namespace Bakera.RedFace{
 
 		public abstract class TokenizationState : RedFaceParserState{
 
+			public const string DoctypeId = "DOCTYPE";
+			public const string DoctypePublicId = "PUBLIC";
+			public const string DoctypeSystemId = "SYSTEM";
+
 
 	// プロパティ
 			public virtual string Name{
@@ -22,6 +26,20 @@ namespace Bakera.RedFace{
 
 
 	// メソッド
+
+			// CurrentInputCharを含むこの先の文字が、渡された文字列にマッチするかどうか Case Insensitive で調べます。
+			// マッチすればそのまま true を返し、マッチしなければUnConsumeしてfalseを返します。
+			// UnConsumeした場合は CurrentInputChar は変更されません。
+			protected bool IsStringMatch(Tokenizer t, string testString){
+				char? c = t.CurrentInputChar;
+				string inputString = c.ToString() + t.ConsumeChar(testString.Length - 1);
+				if(inputString.Equals(testString, StringComparison.InvariantCultureIgnoreCase)){
+					return true;
+				}
+				t.UnConsume(testString.Length - 1);
+				return false;
+			}
+
 
 			// 参照されている文字を取得します。失敗したときはnullを返します。
 			protected string ConsumeCharacterReference(Tokenizer t){
@@ -50,6 +68,7 @@ namespace Bakera.RedFace{
 						return ConsumeNamedCharacterReference(t);
 				}
 			}
+
 
 
 			// 名前による文字参照を展開します。
