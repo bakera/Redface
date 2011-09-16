@@ -7,7 +7,7 @@ namespace Bakera.RedFace{
 
 		public class AfterDoctypePublicIdentifierState : TokenizationState{
 
-			public override Token Read(Tokenizer t){
+			public override void Read(Tokenizer t){
 				char? c = t.ConsumeChar();
 
 				switch(c){
@@ -16,40 +16,34 @@ namespace Bakera.RedFace{
 					case Chars.FORM_FEED:
 					case Chars.SPACE:
 						t.ChangeTokenState<BetweenDoctypePublicAndSystemIdentifiersState>();
-						return null;
+						return;
 					case Chars.GREATER_THAN_SIGN:{
 						t.ChangeTokenState<DataState>();
-						return t.CurrentToken;
+						t.EmitToken();
+						return;
 					}
-					case Chars.QUOTATION_MARK:{
+					case Chars.QUOTATION_MARK:
 						t.Parser.OnParseErrorRaised(string.Format("DOCTYPEのSYSTEM識別子の前にスペースがありません。"));
-						DoctypeToken result = (DoctypeToken)t.CurrentToken;
-						result.SystemIdentifier = "";
+						((DoctypeToken)t.CurrentToken).SystemIdentifier = "";
 						t.ChangeTokenState<DoctypeSystemIdentifierState<DoubleQuoted>>();
-						return null;
-					}
-					case Chars.APOSTROPHE:{
+						return;
+					case Chars.APOSTROPHE:
 						t.Parser.OnParseErrorRaised(string.Format("DOCTYPEのSYSTEM識別子の前にスペースがありません。"));
-						DoctypeToken result = (DoctypeToken)t.CurrentToken;
-						result.SystemIdentifier = "";
+						((DoctypeToken)t.CurrentToken).SystemIdentifier = "";
 						t.ChangeTokenState<DoctypeSystemIdentifierState<SingleQuoted>>();
-						return null;
-					}
-					case null:{
+						return;
+					case null:
 						t.Parser.OnParseErrorRaised(string.Format("DOCTYPEの公開識別子の後で終端に達しました。"));
-						DoctypeToken result = (DoctypeToken)t.CurrentToken;
-						result.ForceQuirks = true;
+						((DoctypeToken)t.CurrentToken).ForceQuirks = true;
 						t.UnConsume(1);
 						t.ChangeTokenState<DataState>();
-						return result;
-					}
-					default:{
+						t.EmitToken();
+						return;
+					default:
 						t.Parser.OnParseErrorRaised(string.Format("DOCTYPEの解析中に不明な文字を検出しました。"));
-						DoctypeToken result = (DoctypeToken)t.CurrentToken;
-						result.ForceQuirks = true;
+						((DoctypeToken)t.CurrentToken).ForceQuirks = true;
 						t.ChangeTokenState<BogusDoctypeState>();
-						return null;
-					}
+						return;
 				}
 			}
 		}

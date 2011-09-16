@@ -7,21 +7,20 @@ namespace Bakera.RedFace{
 
 		public class BogusDoctypeState : TokenizationState{
 
-			public override Token Read(Tokenizer t){
+			public override void Read(Tokenizer t){
 				char? c = t.ConsumeChar();
 				switch(c){
 					case Chars.GREATER_THAN_SIGN:{
 						t.ChangeTokenState<DataState>();
-						return t.CurrentToken;
+						return;
 					}
-					case null:{
+					case null:
 						t.UnConsume(1);
 						t.ChangeTokenState<DataState>();
-						return t.CurrentToken;
-					}
-					default:{
-						return null;
-					}
+						t.EmitToken();
+						return;
+					default:
+						return;
 				}
 			}
 		}

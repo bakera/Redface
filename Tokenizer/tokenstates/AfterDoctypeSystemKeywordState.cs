@@ -7,7 +7,7 @@ namespace Bakera.RedFace{
 
 		public class AfterDoctypeSystemKeywordState : TokenizationState{
 
-			public override Token Read(Tokenizer t){
+			public override void Read(Tokenizer t){
 				char? c = t.ConsumeChar();
 
 				switch(c){
@@ -16,39 +16,35 @@ namespace Bakera.RedFace{
 					case Chars.FORM_FEED:
 					case Chars.SPACE:
 						t.ChangeTokenState<BeforeDoctypeSystemIdentifierState>();
-						return null;
-					case Chars.QUOTATION_MARK:{
+						return;
+					case Chars.QUOTATION_MARK:
 						t.Parser.OnParseErrorRaised(string.Format("DOCTYPE の SYSTEM キーワードの後にスペースがありません。"));
-						DoctypeToken result = (DoctypeToken)t.CurrentToken;
-						result.SystemIdentifier = "";
+						((DoctypeToken)t.CurrentToken).SystemIdentifier = "";
 						t.ChangeTokenState<DoctypeSystemIdentifierState<DoubleQuoted>>();
-						return null;
-					}
-					case Chars.APOSTROPHE:{
+						return;
+					case Chars.APOSTROPHE:
 						t.Parser.OnParseErrorRaised(string.Format("DOCTYPE の SYSTEM キーワードの後にスペースがありません。"));
-						DoctypeToken result = (DoctypeToken)t.CurrentToken;
-						result.SystemIdentifier = "";
+						((DoctypeToken)t.CurrentToken).SystemIdentifier = "";
 						t.ChangeTokenState<DoctypePublicIdentifierState<SingleQuoted>>();
-						return null;
-					}
-					case Chars.GREATER_THAN_SIGN:{
+						return;
+					case Chars.GREATER_THAN_SIGN:
 						t.Parser.OnParseErrorRaised(string.Format("DOCTYPE の SYSTEM キーワードの後に識別子がありません。"));
-						DoctypeToken result = (DoctypeToken)t.CurrentToken;
-						result.ForceQuirks = true;
+						((DoctypeToken)t.CurrentToken).ForceQuirks = true;
 						t.ChangeTokenState<DataState>();
-						return t.CurrentToken;
-					}
-					case null:{
+						t.EmitToken();
+						return;
+					case null:
 						t.Parser.OnParseErrorRaised(string.Format("DOCTYPE の SYSTEM キーワードの後で終端に達しました。"));
-						DoctypeToken result = (DoctypeToken)t.CurrentToken;
-						result.ForceQuirks = true;
+						((DoctypeToken)t.CurrentToken).ForceQuirks = true;
 						t.UnConsume(1);
 						t.ChangeTokenState<DataState>();
-						return result;
-					}
+						t.EmitToken();
+						return;
 					default:
-						// ToDo: Bogus
-						return null;
+						t.Parser.OnParseErrorRaised(string.Format("DOCTYPE の SYSTEM キーワードの後に不明な文字があります。"));
+						((DoctypeToken)t.CurrentToken).ForceQuirks = true;
+						t.ChangeTokenState<BogusDoctypeState>();
+						return;
 				}
 			}
 		}

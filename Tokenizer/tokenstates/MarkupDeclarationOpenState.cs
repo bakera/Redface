@@ -7,7 +7,7 @@ namespace Bakera.RedFace{
 
 		public class MarkupDeclarationOpenState : TokenizationState{
 
-			public override Token Read(Tokenizer t){
+			public override void Read(Tokenizer t){
 				char? c = t.ConsumeChar();
 				if(c == Chars.HYPHEN_MINUS){
 					// ToDo: Comment
@@ -17,7 +17,6 @@ namespace Bakera.RedFace{
 					//ToDo: CDATA
 					t.Parser.Stop();
 				}
-				return null;
 			}
 
 

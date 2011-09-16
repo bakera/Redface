@@ -7,7 +7,7 @@ namespace Bakera.RedFace{
 
 		public class BeforeDoctypeNameState : TokenizationState{
 
-			public override Token Read(Tokenizer t){
+			public override void Read(Tokenizer t){
 				char? c = t.ConsumeChar();
 
 				switch(c){
@@ -15,22 +15,23 @@ namespace Bakera.RedFace{
 					case Chars.LINE_FEED:
 					case Chars.FORM_FEED:
 					case Chars.SPACE:
-						return null;
+						return;
 					case Chars.NULL:
 						t.Parser.OnParseErrorRaised(string.Format("DOCTYPEの解析中にNULL文字を検出しました。"));
 						t.ChangeTokenState<DoctypeNameState>();
 						t.CurrentToken = new DoctypeToken(){Name = Chars.REPLACEMENT_CHARACTER.ToString()};
-						return null;
+						return;
 					case Chars.GREATER_THAN_SIGN:
 						t.Parser.OnParseErrorRaised(string.Format("DOCTYPEのNameが空です。"));
 						t.ChangeTokenState<DataState>();
-						return new DoctypeToken(){ForceQuirks = true};
+						t.EmitToken(new DoctypeToken(){ForceQuirks = true});
+						return;
 					case null:{
 						t.Parser.OnParseErrorRaised(string.Format("DOCTYPEの解析中に終端に達しました。"));
-						DoctypeToken result = new DoctypeToken(){ForceQuirks = true};
 						t.UnConsume(1);
 						t.ChangeTokenState<DataState>();
-						return result;
+						t.EmitToken(new DoctypeToken(){ForceQuirks = true});
+						return;
 					}
 					default:{
 						DoctypeToken result = new DoctypeToken();
@@ -41,7 +42,7 @@ namespace Bakera.RedFace{
 						}
 						t.CurrentToken = result;
 						t.ChangeTokenState<DoctypeNameState>();
-						return null;
+						return;
 					}
 				}
 			}

@@ -8,12 +8,12 @@ namespace Bakera.RedFace{
 		public class TagOpenState : TokenizationState{
 
 
-			public override Token Read(Tokenizer t){
+			public override void Read(Tokenizer t){
 				char? c = t.ConsumeChar();
 				switch(c){
 					case Chars.EXCLAMATION_MARK:
 						t.ChangeTokenState<MarkupDeclarationOpenState>();
-						return null;
+						return;
 					case Chars.SOLIDUS:
 						// ToDo: end tag open
 						break;
@@ -23,18 +23,19 @@ namespace Bakera.RedFace{
 						break;
 				}
 				if(c.IsLatinCapitalLetter()){
-					t.CurrentToken = new DoctypeToken(){Name = char.ToLower((char)c).ToString()};
+					t.CurrentToken = new StartTagToken(){Name = char.ToLower((char)c).ToString()};
 					t.ChangeTokenState<TagNameState>();
-					return null;
+					return;
 				} else if(c.IsLatinSmallLetter()){
-					t.CurrentToken = new DoctypeToken(){Name = c.ToString()};
+					t.CurrentToken = new StartTagToken(){Name = c.ToString()};
 					t.ChangeTokenState<TagNameState>();
-					return null;
+					return;
  				}
 				t.Parser.OnParseErrorRaised(string.Format("LESS THAN SIGNの後の文字がTag Nameではありません。"));
 				t.UnConsume(1);
 				t.ChangeTokenState<DataState>();
-				return new CharacterToken(Chars.LESS_THAN_SIGN);
+				t.EmitToken(new CharacterToken(Chars.LESS_THAN_SIGN));
+				return;
 			}
 		}
 	}

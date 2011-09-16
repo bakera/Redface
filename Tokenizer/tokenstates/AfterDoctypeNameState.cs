@@ -7,7 +7,7 @@ namespace Bakera.RedFace{
 
 		public class AfterDoctypeNameState : TokenizationState{
 
-			public override Token Read(Tokenizer t){
+			public override void Read(Tokenizer t){
 				char? c = t.ConsumeChar();
 
 				switch(c){
@@ -15,32 +15,33 @@ namespace Bakera.RedFace{
 					case Chars.LINE_FEED:
 					case Chars.FORM_FEED:
 					case Chars.SPACE:
-						return null;
+						return;
 					case Chars.GREATER_THAN_SIGN:
 						t.ChangeTokenState<DataState>();
-						return t.CurrentToken;
+						t.EmitToken();
+						return;
 					case null:{
 						t.Parser.OnParseErrorRaised(string.Format("DOCTYPE nameの解析中に終端に達しました。"));
 						DoctypeToken result = (DoctypeToken)t.CurrentToken;
 						result.ForceQuirks = true;
 						t.UnConsume(1);
 						t.ChangeTokenState<DataState>();
-						return result;
+						t.EmitToken();
+						return;
 					}
 					default:
 						if(IsStringMatch(t, DoctypePublicId)){
 							t.ChangeTokenState<AfterDoctypePublicKeywordState>();
-							return null;
+							return;
 						}
 						if(IsStringMatch(t, DoctypeSystemId)){
 							t.ChangeTokenState<AfterDoctypeSystemKeywordState>();
-							return null;
+							return;
 						} else {
 							t.Parser.OnParseErrorRaised(string.Format("DOCTYPE に PUBLIC, SYSTEM 以外の識別子が含まれています。"));
-							DoctypeToken result = (DoctypeToken)t.CurrentToken;
-							result.ForceQuirks = true;
+							((DoctypeToken)t.CurrentToken).ForceQuirks = true;
 							t.ChangeTokenState<BogusDoctypeState>();
-							return null;
+							return;
 						}
 				}
 			}

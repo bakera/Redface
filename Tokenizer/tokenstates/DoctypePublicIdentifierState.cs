@@ -7,42 +7,36 @@ namespace Bakera.RedFace{
 
 		public class DoctypePublicIdentifierState<T> : TokenizationState where T : Quoted, new(){
 
-			public override Token Read(Tokenizer t){
+			public override void Read(Tokenizer t){
 				char? c = t.ConsumeChar();
 				char quote = (new T()).Quote;
 
 				if(c == quote){
 					t.ChangeTokenState<AfterDoctypePublicIdentifierState>();
-					return null;
+					return;
 				}
 
 				switch(c){
-					case Chars.NULL:{
+					case Chars.NULL:
 						t.Parser.OnParseErrorRaised(string.Format("DOCTYPE 公開識別子の解析中にNULL文字を検出しました。"));
-						DoctypeToken result = (DoctypeToken)t.CurrentToken;
-						result.PublicIdentifier += Chars.REPLACEMENT_CHARACTER;
-						return null;
-					}
-					case Chars.GREATER_THAN_SIGN:{
+						((DoctypeToken)t.CurrentToken).PublicIdentifier += Chars.REPLACEMENT_CHARACTER;
+						return;
+					case Chars.GREATER_THAN_SIGN:
 						t.Parser.OnParseErrorRaised(string.Format("DOCTYPE 公開識別子の解析中に U+003E GREATER THAN SIGN を検出しました。"));
-						DoctypeToken result = (DoctypeToken)t.CurrentToken;
-						result.ForceQuirks = true;
+						((DoctypeToken)t.CurrentToken).ForceQuirks = true;
 						t.ChangeTokenState<DataState>();
-						return t.CurrentToken;
-					}
-					case null:{
+						t.EmitToken();
+						return;
+					case null:
 						t.Parser.OnParseErrorRaised(string.Format("DOCTYPE 公開識別子の解析中に終端に達しました。"));
-						DoctypeToken result = (DoctypeToken)t.CurrentToken;
-						result.ForceQuirks = true;
+						((DoctypeToken)t.CurrentToken).ForceQuirks = true;
 						t.UnConsume(1);
 						t.ChangeTokenState<DataState>();
-						return result;
-					}
-					default:{
-						DoctypeToken result = (DoctypeToken)t.CurrentToken;
-						result.PublicIdentifier += c;
-						return null;
-					}
+						t.EmitToken();
+						return;
+					default:
+						((DoctypeToken)t.CurrentToken).PublicIdentifier += c;
+						return;
 				}
 			}
 		}

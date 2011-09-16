@@ -12,6 +12,7 @@ namespace Bakera.RedFace{
 			private StateManager<TokenizationState> myTokenStateManager = null;
 			private RedFaceParser myParser = null;
 			private Token myCurrentToken;
+			private Token myEmittedToken;
 			private InputStream myInputStream;
 
 			public char? CurrentInputChar {
@@ -51,11 +52,25 @@ namespace Bakera.RedFace{
 	// トークンの取得
 			public Token GetToken(){
 				while(!Parser.IsStopped){
-					Token t = CurrentTokenState.Read(this);
-					if(t == null) continue;
-					return t;
+					CurrentTokenState.Read(this);
+					if(myEmittedToken != null){
+						Token result = myEmittedToken;
+						myEmittedToken = null;
+						return result;
+					}
 				}
 				return null;
+			}
+
+
+			// TokenをEmitします。
+			public void EmitToken(Token t){
+				myEmittedToken = t;
+				myCurrentToken = null;
+			}
+			// CurrentTokenをEmitします。
+			public void EmitToken(){
+				EmitToken(myCurrentToken);
 			}
 
 			// トークン走査状態を変更します。

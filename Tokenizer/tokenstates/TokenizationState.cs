@@ -22,7 +22,7 @@ namespace Bakera.RedFace{
 
 
 	// 抽象メソッド
-			public abstract Token Read(Tokenizer t);
+			public abstract void Read(Tokenizer t);
 
 
 	// メソッド

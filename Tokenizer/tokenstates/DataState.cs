@@ -7,7 +7,7 @@ namespace Bakera.RedFace{
 
 		public class DataState : TokenizationState{
 
-			public override Token Read(Tokenizer t){
+			public override void Read(Tokenizer t){
 				char? c = t.ConsumeChar();
 				switch(c){
 					case Chars.AMPERSAND:
@@ -18,13 +18,15 @@ namespace Bakera.RedFace{
 						break;
 					case Chars.NULL:
 						t.Parser.OnParseErrorRaised(string.Format("NULL文字が検出されました。"));
-						return new CharacterToken(c);
+						t.EmitToken(new CharacterToken(c));
+						return;
 					case null:
-						return new EndOfFileToken();
+						t.EmitToken(new EndOfFileToken());
+						return;
 					default:
-						return new CharacterToken(c);
+						t.EmitToken(new CharacterToken(c));
+						return;
 				}
-				return null;
 			}
 
 		}

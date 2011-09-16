@@ -5,7 +5,7 @@ namespace Bakera.RedFace{
 
 	public partial class RedFaceParser{
 
-		public class DoctypeNameState : TokenizationState{
+		public class TagNameState : TokenizationState{
 
 			public override void Read(Tokenizer t){
 				char? c = t.ConsumeChar();
@@ -15,29 +15,30 @@ namespace Bakera.RedFace{
 					case Chars.LINE_FEED:
 					case Chars.FORM_FEED:
 					case Chars.SPACE:
-						t.ChangeTokenState<AfterDoctypeNameState>();
+//						t.ChangeTokenState<BeforeAttributeNameState>();
+						return;
+					case Chars.SOLIDUS:
+//						t.ChangeTokenState<SelfClosingStartTagState>();
 						return;
 					case Chars.GREATER_THAN_SIGN:
 						t.ChangeTokenState<DataState>();
 						t.EmitToken();
 						return;
 					case Chars.NULL:
-						t.Parser.OnParseErrorRaised(string.Format("DOCTYPE nameの解析中にNULL文字を検出しました。"));
-						((DoctypeToken)t.CurrentToken).Name += Chars.REPLACEMENT_CHARACTER;
+						t.Parser.OnParseErrorRaised(string.Format("開始タグの解析中にNULL文字を検出しました。"));
+						((TagToken)t.CurrentToken).Name += Chars.REPLACEMENT_CHARACTER;
 						return;
 					case null:
-						t.Parser.OnParseErrorRaised(string.Format("DOCTYPE nameの解析中に終端に達しました。"));
-						((DoctypeToken)t.CurrentToken).ForceQuirks = true;
+						t.Parser.OnParseErrorRaised(string.Format("開始タグの解析中に終端に達しました。"));
 						t.UnConsume(1);
 						t.ChangeTokenState<DataState>();
-						t.EmitToken();
 						return;
 					default:{
-						DoctypeToken result = (DoctypeToken)t.CurrentToken;
+						TagToken result = (TagToken)t.CurrentToken;
 						if(c.IsLatinCapitalLetter()){
-							result.Name += char.ToLower((char)c).ToString();
+							result.Name += char.ToLower((char)c);
 						} else {
-							result.Name += c.ToString();
+							result.Name += c;
 						}
 						return;
 					}
