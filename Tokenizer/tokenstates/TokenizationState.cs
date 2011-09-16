@@ -41,11 +41,13 @@ namespace Bakera.RedFace{
 			}
 
 
+	// 文字参照
+
 			// 参照されている文字を取得します。失敗したときはnullを返します。
-			protected string ConsumeCharacterReference(Tokenizer t){
+			protected ReferencedCharacterToken ConsumeCharacterReference(Tokenizer t){
 				return ConsumeCharacterReference(t, null);
 			}
-			protected string ConsumeCharacterReference(Tokenizer t, char? additional_allowed_character){
+			protected ReferencedCharacterToken ConsumeCharacterReference(Tokenizer t, char? additional_allowed_character){
 				char? c = t.ConsumeChar();
 				
 				if(additional_allowed_character != null && c == additional_allowed_character){
@@ -72,7 +74,7 @@ namespace Bakera.RedFace{
 
 
 			// 名前による文字参照を展開します。
-			protected string ConsumeNamedCharacterReference(Tokenizer t){
+			protected ReferencedCharacterToken ConsumeNamedCharacterReference(Tokenizer t){
 				StringBuilder matchResult = new StringBuilder();
 				bool semicolonFound = false;
 
@@ -103,13 +105,15 @@ namespace Bakera.RedFace{
 					int diff = originalString.Length - matchResult.Length;
 					t.UnConsume(diff+1);
 				}
-				t.Parser.OnCharacterReferenced(originalString, result);
-				return result;
+				ReferencedCharacterToken resultToken = new ReferencedCharacterToken();
+				resultToken.Data = result;
+				resultToken.OriginalString = matchResult.ToString();
+				return resultToken;
 			}
 
 
 			// 数値文字参照を展開します。
-			protected string ConsumeNumericCharacterReference(Tokenizer t){
+			protected ReferencedCharacterToken ConsumeNumericCharacterReference(Tokenizer t){
 				char? c = t.ConsumeChar();
 				Predicate<char?> isNumeric = null;
 				System.Globalization.NumberStyles parseStyle = Chars.DecimalParseStyle;
@@ -142,8 +146,11 @@ namespace Bakera.RedFace{
 					t.UnConsume(1);
 				}
 				string originalString = prefix + numberString + suffix;
-				t.Parser.OnCharacterReferenced(originalString, result);
-				return result;
+
+				ReferencedCharacterToken resultToken = new ReferencedCharacterToken();
+				resultToken.Data = result;
+				resultToken.OriginalString = originalString;
+				return resultToken;
 			}
 
 

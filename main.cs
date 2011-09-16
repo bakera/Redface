@@ -12,7 +12,6 @@ namespace Bakera.RedFace{
 				RedFaceParser p = new RedFaceParser();
 				p.TokenStateChanged += Write;
 				p.ParseErrorRaised += WriteError;
-				p.CharacterReferenced += WriteCharRef;
 				p.TokenCreated += WriteToken;
 
 				using(FileStream fs = file.Open(FileMode.Open, FileAccess.Read, FileShare.Read)){
@@ -43,12 +42,6 @@ namespace Bakera.RedFace{
 			RedFaceParser p = sender as RedFaceParser;
 			ParseErrorEventArgs pe = e as ParseErrorEventArgs;
 			Console.WriteLine(pe.Message);
-		}
-
-		public static void WriteCharRef(Object sender, EventArgs e){
-			RedFaceParser p = sender as RedFaceParser;
-			CharacterReferencedEventArgs cre = e as CharacterReferencedEventArgs;
-			Console.WriteLine("charref: {0}→{1}", cre.OriginalString, cre.Result);
 		}
 
 		public static void WriteToken(Object sender, EventArgs e){

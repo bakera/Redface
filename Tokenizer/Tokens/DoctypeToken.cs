@@ -25,7 +25,7 @@ namespace Bakera.RedFace{
 		}
 
 		public override string ToString(){
-			string result = string.Format("{0}\n Name: \"{1}\"", this.GetType().Name, this.Name);
+			string result = string.Format("{0} / Name: \"{1}\"", this.GetType().Name, this.Name);
 			if(this.PublicIdentifier != null){
 				result += string.Format("\n PublicIdentifier: \"{0}\"", this.PublicIdentifier);
 			}

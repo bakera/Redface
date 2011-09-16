@@ -15,10 +15,10 @@ namespace Bakera.RedFace{
 					case Chars.LINE_FEED:
 					case Chars.FORM_FEED:
 					case Chars.SPACE:
-//						t.ChangeTokenState<BeforeAttributeNameState>();
+						t.ChangeTokenState<BeforeAttributeNameState>();
 						return;
 					case Chars.SOLIDUS:
-//						t.ChangeTokenState<SelfClosingStartTagState>();
+						t.ChangeTokenState<SelfClosingStartTagState>();
 						return;
 					case Chars.GREATER_THAN_SIGN:
 						t.ChangeTokenState<DataState>();

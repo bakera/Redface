@@ -15,12 +15,12 @@ namespace Bakera.RedFace{
 						t.ChangeTokenState<MarkupDeclarationOpenState>();
 						return;
 					case Chars.SOLIDUS:
-						// ToDo: end tag open
-						break;
+						t.ChangeTokenState<EndTagOpenState>();
+						return;
 					case Chars.QUESTION_MARK:
-						// ToDo: bogus comment
-						// 処理命令は bogus comment として扱われる
-						break;
+						t.Parser.OnParseErrorRaised(string.Format("処理命令を検出しました。"));
+						t.ChangeTokenState<BogusCommentState>();
+						return;
 				}
 				if(c.IsLatinCapitalLetter()){
 					t.CurrentToken = new StartTagToken(){Name = char.ToLower((char)c).ToString()};

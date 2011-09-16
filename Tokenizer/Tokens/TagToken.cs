@@ -13,7 +13,12 @@ namespace Bakera.RedFace{
 
 		public string Name{get; set;}
 		public bool SelfClosing{get; set;}
-		private Dictionary<string, string> myAttributes = new Dictionary<string, string>();
+		private Dictionary<string, Attribute> myAttributes = new Dictionary<string, Attribute>();
+		private Attribute myCurrentAttribute;
+
+		public Attribute CurrentAttribute{
+			get{return myCurrentAttribute;}
+		}
 
 		public TagToken(){
 			Name = null;
@@ -21,16 +26,26 @@ namespace Bakera.RedFace{
 		}
 
 
-		public string this[string key]{
-			get{return myAttributes[key];}
-		}
-
 		public bool HasAttribute(string key){
 			return myAttributes.ContainsKey(key);
 		}
 
-		public void AddAttribute(string key, string value){
-			myAttributes.Add(key, value);
+		public Attribute CreateAttribute(){
+			myCurrentAttribute = new Attribute();
+			return CurrentAttribute;
+		}
+
+		public bool FixAttribute(){
+			string attrName = myCurrentAttribute.Name;
+			if(myAttributes.ContainsKey(attrName)) return false;
+			myAttributes.Add(attrName, myCurrentAttribute);
+			myCurrentAttribute = null;
+			return true;
+		}
+
+		public override string ToString(){
+			string result = string.Format("{0} / Name: \"{1}\"", this.GetType().Name, this.Name);
+			return result;
 		}
 
 
