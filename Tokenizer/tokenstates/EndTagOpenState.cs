@@ -23,7 +23,7 @@ namespace Bakera.RedFace{
 						return;
 				}
 				if(c.IsLatinCapitalLetter()){
-					t.CurrentToken = new EndTagToken(){Name = char.ToLower((char)c).ToString()};
+					t.CurrentToken = new EndTagToken(){Name = c.ToLower().ToString()};
 					t.ChangeTokenState<TagNameState>();
 					return;
 				} else if(c.IsLatinSmallLetter()){

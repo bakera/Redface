@@ -13,10 +13,10 @@ namespace Bakera.RedFace{
 
 		public string Name{get; set;}
 		public bool SelfClosing{get; set;}
-		private Dictionary<string, Attribute> myAttributes = new Dictionary<string, Attribute>();
-		private Attribute myCurrentAttribute;
+		private Dictionary<string, AttributeToken> myAttributes = new Dictionary<string, AttributeToken>();
+		private AttributeToken myCurrentAttribute;
 
-		public Attribute CurrentAttribute{
+		public AttributeToken CurrentAttribute{
 			get{return myCurrentAttribute;}
 		}
 
@@ -30,11 +30,20 @@ namespace Bakera.RedFace{
 			return myAttributes.ContainsKey(key);
 		}
 
-		public Attribute CreateAttribute(){
-			myCurrentAttribute = new Attribute();
+		public AttributeToken CreateAttribute(){
+			return CreateAttribute(null);
+		}
+		public AttributeToken CreateAttribute(char? c){
+			myCurrentAttribute = new AttributeToken();
+			if(c != null){
+				myCurrentAttribute.Name = c.ToString();
+				myCurrentAttribute.Value = "";
+			}
 			return CurrentAttribute;
 		}
 
+		// CurrentAttributeを確定してこのトークンに追加します。成功するとtrueを返します。
+		// 既存の属性と名前がかぶっている場合は失敗し、falseを返します。
 		public bool FixAttribute(){
 			string attrName = myCurrentAttribute.Name;
 			if(myAttributes.ContainsKey(attrName)) return false;
@@ -45,6 +54,7 @@ namespace Bakera.RedFace{
 
 		public override string ToString(){
 			string result = string.Format("{0} / Name: \"{1}\"", this.GetType().Name, this.Name);
+			if(this.SelfClosing) result += "\n SelfClosing: true";
 			return result;
 		}
 

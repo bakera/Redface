@@ -48,6 +48,13 @@ namespace Bakera.RedFace{
 		public static bool IsNameToken(this char? c){
 			return IsLatinSmallLetter(c) || IsLatinCapitalLetter(c) || IsDigit(c);
 		}
+
+		public static char? ToLower(this char? c){
+			if(c == null) return null;
+			return (char)(c + 0x20);
+		}
+
+
 	}
 }
 

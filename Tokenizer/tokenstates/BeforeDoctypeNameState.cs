@@ -36,7 +36,7 @@ namespace Bakera.RedFace{
 					default:{
 						DoctypeToken result = new DoctypeToken();
 						if(c.IsLatinCapitalLetter()){
-							result.Name = char.ToLower((char)c).ToString();
+							result.Name = c.ToLower().ToString();
 						} else {
 							result.Name = c.ToString();
 						}
