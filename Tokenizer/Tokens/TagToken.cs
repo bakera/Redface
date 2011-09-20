@@ -31,20 +31,25 @@ namespace Bakera.RedFace{
 		}
 
 		public AttributeToken CreateAttribute(){
-			return CreateAttribute(null);
+			return CreateAttribute(null, null);
 		}
 		public AttributeToken CreateAttribute(char? c){
+			return CreateAttribute(c, null);
+		}
+		public AttributeToken CreateAttribute(char? c, string s){
 			myCurrentAttribute = new AttributeToken();
 			if(c != null){
 				myCurrentAttribute.Name = c.ToString();
-				myCurrentAttribute.Value = "";
+				myCurrentAttribute.Value = s;
 			}
 			return CurrentAttribute;
 		}
 
+
 		// CurrentAttributeを確定してこのトークンに追加します。成功するとtrueを返します。
 		// 既存の属性と名前がかぶっている場合は失敗し、falseを返します。
 		public bool FixAttribute(){
+			if(myCurrentAttribute == null) return true;
 			string attrName = myCurrentAttribute.Name;
 			if(myAttributes.ContainsKey(attrName)) return false;
 			myAttributes.Add(attrName, myCurrentAttribute);
@@ -54,6 +59,12 @@ namespace Bakera.RedFace{
 
 		public override string ToString(){
 			string result = string.Format("{0} / Name: \"{1}\"", this.GetType().Name, this.Name);
+			foreach(string key in myAttributes.Keys){
+				AttributeToken attr = myAttributes[key];
+				result += string.Format("\n Attribute: {0}", attr.Name);
+				if(attr.Value != null) result += string.Format(" = \"{0}\"", attr.Value);
+			}
+
 			if(this.SelfClosing) result += "\n SelfClosing: true";
 			return result;
 		}

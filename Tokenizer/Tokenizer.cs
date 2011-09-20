@@ -67,6 +67,14 @@ namespace Bakera.RedFace{
 			public void EmitToken(Token t){
 				myEmittedToken = t;
 				myCurrentToken = null;
+				// TagTokenがEmitされた場合、CurrentAtrtributeを処理する必要がある
+				if(t is TagToken){
+					TagToken tt = (TagToken)t;
+					bool attrFixResult = tt.FixAttribute();
+					if(!attrFixResult){
+						this.Parser.OnParseErrorRaised(string.Format("属性が重複しています。{0}", tt.Name));
+					}
+				}
 			}
 			// CurrentTokenをEmitします。
 			public void EmitToken(){

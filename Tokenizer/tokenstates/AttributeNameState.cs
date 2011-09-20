@@ -15,29 +15,37 @@ namespace Bakera.RedFace{
 					case Chars.LINE_FEED:
 					case Chars.FORM_FEED:
 					case Chars.SPACE:
-						t.ChangeTokenState<AfterDoctypeNameState>();
+						t.ChangeTokenState<AfterAttributeNameState>();
+						return;
+					case Chars.SOLIDUS:
+						t.ChangeTokenState<SelfClosingStartTagState>();
+						return;
+					case Chars.EQUALS_SIGN:
+						t.ChangeTokenState<BeforeAttributeValueState>();
 						return;
 					case Chars.GREATER_THAN_SIGN:
 						t.ChangeTokenState<DataState>();
 						t.EmitToken();
 						return;
 					case Chars.NULL:
-						t.Parser.OnParseErrorRaised(string.Format("DOCTYPE nameの解析中にNULL文字を検出しました。"));
-						((DoctypeToken)t.CurrentToken).Name += Chars.REPLACEMENT_CHARACTER;
+						t.Parser.OnParseErrorRaised(string.Format("属性名の解析中にNULL文字を検出しました。"));
+						((TagToken)t.CurrentToken).CurrentAttribute.Name += Chars.REPLACEMENT_CHARACTER;
 						return;
+					case Chars.QUOTATION_MARK:
+					case Chars.APOSTROPHE:
+					case Chars.LESS_THAN_SIGN:
+						t.Parser.OnParseErrorRaised(string.Format("属性名として不正な文字を検出しました。: {0}", c));
+						goto default;
 					case null:
-						t.Parser.OnParseErrorRaised(string.Format("DOCTYPE nameの解析中に終端に達しました。"));
-						((DoctypeToken)t.CurrentToken).ForceQuirks = true;
+						t.Parser.OnParseErrorRaised(string.Format("属性名の解析中に終端に達しました。"));
 						t.UnConsume(1);
 						t.ChangeTokenState<DataState>();
-						t.EmitToken();
 						return;
 					default:{
-						DoctypeToken result = (DoctypeToken)t.CurrentToken;
 						if(c.IsLatinCapitalLetter()){
-							result.Name += c.ToLower();
+							((TagToken)t.CurrentToken).CurrentAttribute.Name += c.ToLower();
 						} else {
-							result.Name += c;
+							((TagToken)t.CurrentToken).CurrentAttribute.Name += c;
 						}
 						return;
 					}
