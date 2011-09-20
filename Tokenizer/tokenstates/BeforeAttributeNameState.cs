@@ -24,8 +24,12 @@ namespace Bakera.RedFace{
 						t.EmitToken();
 						return;
 					case Chars.NULL:
+						if(t.CurrentTagToken.FixAttribute() == false){
+							t.Parser.OnParseErrorRaised(string.Format("属性名が重複しています。:", t.CurrentTagToken.CurrentAttribute.Name));
+							t.CurrentTagToken.CurrentAttribute = null;
+						}
 						t.Parser.OnParseErrorRaised(string.Format("属性名にNUL文字が含まれています。"));
-						((TagToken)t.CurrentToken).CreateAttribute(Chars.REPLACEMENT_CHARACTER, "");
+						t.CurrentTagToken.CreateAttribute(Chars.REPLACEMENT_CHARACTER, "");
 						t.ChangeTokenState<AttributeNameState>();
 						return;
 					case null:
@@ -40,10 +44,14 @@ namespace Bakera.RedFace{
 						t.Parser.OnParseErrorRaised(string.Format("属性名に使用できない文字です。{0}", c));
 						goto default;
 					default:
+						if(t.CurrentTagToken.FixAttribute() == false){
+							t.Parser.OnParseErrorRaised(string.Format("属性名が重複しています。:", t.CurrentTagToken.CurrentAttribute.Name));
+							t.CurrentTagToken.CurrentAttribute = null;
+						}
 						if(c.IsLatinCapitalLetter()){
-							((TagToken)t.CurrentToken).CreateAttribute(c.ToLower(), "");
+							t.CurrentTagToken.CreateAttribute(c.ToLower(), "");
 						} else {
-							((TagToken)t.CurrentToken).CreateAttribute(c, "");
+							t.CurrentTagToken.CreateAttribute(c, "");
 						}
 						t.ChangeTokenState<AttributeNameState>();
 						return;

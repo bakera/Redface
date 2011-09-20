@@ -8,7 +8,6 @@ namespace Bakera.RedFace{
 		public class BeforeAttributeValueState : TokenizationState{
 
 			public override void Read(Tokenizer t){
-				throw new Exception("not implemented");
 				char? c = t.ConsumeChar();
 
 				switch(c){
@@ -18,28 +17,37 @@ namespace Bakera.RedFace{
 					case Chars.SPACE:
 						return;
 					case Chars.QUOTATION_MARK:
-						t.ChangeTokenState<DoctypePublicIdentifierState<DoubleQuoted>>();
+						t.ChangeTokenState<AttributeValueState<DoubleQuoted>>();
+						return;
+					case Chars.AMPERSAND:
+						t.ChangeTokenState<AttributeValueUnQuotedState>();
 						return;
 					case Chars.APOSTROPHE:
-						t.ChangeTokenState<DoctypePublicIdentifierState<SingleQuoted>>();
+						t.ChangeTokenState<AttributeValueState<SingleQuoted>>();
+						return;
+					case Chars.NULL:
+						t.Parser.OnParseErrorRaised(string.Format("属性値にNUL文字が含まれています。"));
+						t.CurrentTagToken.CurrentAttribute.Value += Chars.REPLACEMENT_CHARACTER;
+						t.ChangeTokenState<AttributeValueUnQuotedState>();
 						return;
 					case Chars.GREATER_THAN_SIGN:
-						t.Parser.OnParseErrorRaised(string.Format("DOCTYPE の PUBLIC キーワードの後に識別子がありません。"));
-						((DoctypeToken)t.CurrentToken).ForceQuirks = true;
+						t.Parser.OnParseErrorRaised(string.Format("属性値がありません。"));
 						t.ChangeTokenState<DataState>();
 						t.EmitToken();
 						return;
+					case Chars.LESS_THAN_SIGN:
+					case Chars.EQUALS_SIGN:
+					case Chars.GRAVE_ACCENT:
+						t.Parser.OnParseErrorRaised(string.Format("属性値に不正な文字を検出しました。: {0}", c));
+						goto default;
 					case null:
-						t.Parser.OnParseErrorRaised(string.Format("DOCTYPE の PUBLIC キーワードの後で終端に達しました。"));
-						((DoctypeToken)t.CurrentToken).ForceQuirks = true;
+						t.Parser.OnParseErrorRaised(string.Format("属性値の解析中に終端に達しました。"));
 						t.UnConsume(1);
 						t.ChangeTokenState<DataState>();
-						t.EmitToken();
 						return;
 					default:
-						t.Parser.OnParseErrorRaised(string.Format("DOCTYPEの解析中に不明な文字を検出しました。"));
-						((DoctypeToken)t.CurrentToken).ForceQuirks = true;
-						t.ChangeTokenState<BogusDoctypeState>();
+						t.CurrentTagToken.CurrentAttribute.Value += c;
+						t.ChangeTokenState<AttributeValueUnQuotedState>();
 						return;
 				}
 			}

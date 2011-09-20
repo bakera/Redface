@@ -18,6 +18,7 @@ namespace Bakera.RedFace{
 
 		public AttributeToken CurrentAttribute{
 			get{return myCurrentAttribute;}
+			set{myCurrentAttribute = value;}
 		}
 
 		public TagToken(){
@@ -36,7 +37,15 @@ namespace Bakera.RedFace{
 		public AttributeToken CreateAttribute(char? c){
 			return CreateAttribute(c, null);
 		}
+
+		// 属性を追加します
+		// CurrentAttributeをnullにしてから呼ぶ必要があります。
+		// このメソッドを呼ぶ前に FixAttribute を呼んで属性重複エラーがないかチェックしてください。
 		public AttributeToken CreateAttribute(char? c, string s){
+			if(myCurrentAttribute != null){
+				throw new Exception("属性がfixされていません。");
+			}
+			
 			myCurrentAttribute = new AttributeToken();
 			if(c != null){
 				myCurrentAttribute.Name = c.ToString();
@@ -46,12 +55,15 @@ namespace Bakera.RedFace{
 		}
 
 
-		// CurrentAttributeを確定してこのトークンに追加します。成功するとtrueを返します。
-		// 既存の属性と名前がかぶっている場合は失敗し、falseを返します。
+		// CurrentAttributeを確定してこのトークンに追加します。成功するとtrueを返して CurrentAttribute を null にします。
+		// 既存の属性と名前がかぶっている場合は失敗し、falseを返します。このとき CurrentAttribute はそのまま残ります。
+		// CurrentAttributeがnullのときに呼ぶと true を返します (いつでも呼んで良い)。
 		public bool FixAttribute(){
 			if(myCurrentAttribute == null) return true;
+
 			string attrName = myCurrentAttribute.Name;
 			if(myAttributes.ContainsKey(attrName)) return false;
+
 			myAttributes.Add(attrName, myCurrentAttribute);
 			myCurrentAttribute = null;
 			return true;

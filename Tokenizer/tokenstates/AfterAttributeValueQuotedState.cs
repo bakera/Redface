@@ -5,7 +5,7 @@ namespace Bakera.RedFace{
 
 	public partial class RedFaceParser{
 
-		public class TagNameState : TokenizationState{
+		public class AfterAttributeValueQuotedState : TokenizationState{
 
 			public override void Read(Tokenizer t){
 				char? c = t.ConsumeChar();
@@ -24,24 +24,16 @@ namespace Bakera.RedFace{
 						t.ChangeTokenState<DataState>();
 						t.EmitToken();
 						return;
-					case Chars.NULL:
-						t.Parser.OnParseErrorRaised(string.Format("開始タグの解析中にNULL文字を検出しました。"));
-						t.CurrentTagToken.Name += Chars.REPLACEMENT_CHARACTER;
-						return;
 					case null:
-						t.Parser.OnParseErrorRaised(string.Format("開始タグの解析中に終端に達しました。"));
+						t.Parser.OnParseErrorRaised(string.Format("属性値の解析中に終端に達しました。"));
 						t.UnConsume(1);
 						t.ChangeTokenState<DataState>();
 						return;
-					default:{
-						TagToken result = (TagToken)t.CurrentToken;
-						if(c.IsLatinCapitalLetter()){
-							result.Name += c.ToLower();
-						} else {
-							result.Name += c;
-						}
+					default:
+						t.Parser.OnParseErrorRaised(string.Format("属性値の解析中に不明な文字を検出しました。: {0}", c));
+						t.UnConsume(1);
+						t.ChangeTokenState<BeforeAttributeNameState>();
 						return;
-					}
 				}
 			}
 		}

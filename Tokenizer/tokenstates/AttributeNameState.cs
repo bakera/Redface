@@ -29,7 +29,7 @@ namespace Bakera.RedFace{
 						return;
 					case Chars.NULL:
 						t.Parser.OnParseErrorRaised(string.Format("属性名の解析中にNULL文字を検出しました。"));
-						((TagToken)t.CurrentToken).CurrentAttribute.Name += Chars.REPLACEMENT_CHARACTER;
+						t.CurrentTagToken.CurrentAttribute.Name += Chars.REPLACEMENT_CHARACTER;
 						return;
 					case Chars.QUOTATION_MARK:
 					case Chars.APOSTROPHE:
@@ -43,9 +43,9 @@ namespace Bakera.RedFace{
 						return;
 					default:{
 						if(c.IsLatinCapitalLetter()){
-							((TagToken)t.CurrentToken).CurrentAttribute.Name += c.ToLower();
+							t.CurrentTagToken.CurrentAttribute.Name += c.ToLower();
 						} else {
-							((TagToken)t.CurrentToken).CurrentAttribute.Name += c;
+							t.CurrentTagToken.CurrentAttribute.Name += c;
 						}
 						return;
 					}

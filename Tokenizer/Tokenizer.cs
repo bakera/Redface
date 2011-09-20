@@ -38,6 +38,11 @@ namespace Bakera.RedFace{
 				set{myCurrentToken = value;}
 			}
 
+			public TagToken CurrentTagToken{
+				get{return (TagToken)CurrentToken;}
+			}
+
+
 
 	// コンストラクタ
 
