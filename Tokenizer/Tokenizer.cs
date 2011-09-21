@@ -20,6 +20,11 @@ namespace Bakera.RedFace{
 					return myInputStream.CurrentInputChar;
 				}
 			}
+			public char? NextInputChar {
+				get{
+					return myInputStream.NextInputChar;
+				}
+			}
 
 			public RedFaceParser Parser {
 				get{
@@ -41,7 +46,7 @@ namespace Bakera.RedFace{
 			public TagToken CurrentTagToken{
 				get{return (TagToken)CurrentToken;}
 			}
-
+			public char? AdditionalAllowedCharacter{get; set;}
 
 
 	// コンストラクタ
@@ -75,8 +80,9 @@ namespace Bakera.RedFace{
 				// TagTokenがEmitされた場合、CurrentAtrtributeを処理する必要がある
 				if(t is TagToken){
 					TagToken tt = (TagToken)t;
+					bool alreadyAttrErrorRaised = tt.IsDroppedAttribute;
 					bool attrFixResult = tt.FixAttribute();
-					if(!attrFixResult){
+					if(!attrFixResult && !alreadyAttrErrorRaised){
 						this.Parser.OnParseErrorRaised(string.Format("属性が重複しています。{0}", tt.Name));
 					}
 				}
@@ -92,6 +98,10 @@ namespace Bakera.RedFace{
 				myTokenStateManager.SetState<T>();
 				Parser.OnTokenStateChanged();
 			}
+			// トークン走査状態をひとつ前のものに戻します。
+			public void BackTokenState(){
+				myTokenStateManager.BackState();
+			}
 
 	// 文字の読み取り
 			// 一つ読み進みます。
@@ -106,6 +116,18 @@ namespace Bakera.RedFace{
 				for(int i=0; i < n; i++){
 					ConsumeChar();
 					result.Append(CurrentInputChar);
+				}
+				return result.ToString();
+			}
+
+			// もっとも長い名前字句を取得します。
+			public string ConsumeLongestNametokens(){
+				StringBuilder result = new StringBuilder();
+				result.Append(CurrentInputChar);
+				for(;;){
+					char? c = ConsumeChar();
+					if(!c.IsNameToken()) break;
+					result.Append(c);
 				}
 				return result.ToString();
 			}

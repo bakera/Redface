@@ -28,8 +28,21 @@ namespace Bakera.RedFace{
 	// プロパティ
 			public char? CurrentInputChar{
 				get {
-					char? result =  GetCharByPosition(CurrentPosition);
+					char? result = GetCharByPosition(CurrentPosition);
 					return result;
+				}
+			}
+
+			public char? NextInputChar{
+				get {
+					if(Offset > 0) return GetCharByPosition(CurrentPosition + 1);
+					if(Offset == 0) {
+						if(ConsumeNextInputChar()){
+							myOffset--;
+							return GetCharByPosition(CurrentPosition + 1);
+						}
+					}
+					return null;
 				}
 			}
 

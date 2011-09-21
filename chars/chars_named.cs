@@ -1,9 +1,19 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Bakera.RedFace{
 
 	public static partial class Chars{
+
+		private static readonly int myNameMaxLength;
+		static Chars(){
+			int result = 0;
+			foreach(string s in myNamedCharacterReferences.Keys){
+				if(result < s.Length) result = s.Length;
+			}
+			myNameMaxLength = result;
+		}
 
 		public static string GetNamedChar(string name){
 			return myNamedCharacterReferences[name];
@@ -13,7 +23,9 @@ namespace Bakera.RedFace{
 			return myNamedCharacterReferences.ContainsKey(name);
 		}
 
-		private const int NameMaxLength = 32; // CounterClockwiseContourIntegral;
+		public static int NameMaxLength{
+			get{return myNameMaxLength;}
+		}
 
 		private static readonly Dictionary<string, string> myNamedCharacterReferences = new Dictionary<string, string>(){
 			{"AElig;", "\U000000C6"},

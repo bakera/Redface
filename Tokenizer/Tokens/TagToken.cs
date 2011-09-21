@@ -14,6 +14,7 @@ namespace Bakera.RedFace{
 		public string Name{get; set;}
 		public bool SelfClosing{get; set;}
 		private Dictionary<string, AttributeToken> myAttributes = new Dictionary<string, AttributeToken>();
+		private List<AttributeToken> myDroppedAttributes = new List<AttributeToken>();
 		private AttributeToken myCurrentAttribute;
 
 		public AttributeToken CurrentAttribute{
@@ -26,7 +27,6 @@ namespace Bakera.RedFace{
 			SelfClosing = false;
 		}
 
-
 		public bool HasAttribute(string key){
 			return myAttributes.ContainsKey(key);
 		}
@@ -36,6 +36,26 @@ namespace Bakera.RedFace{
 		}
 		public AttributeToken CreateAttribute(char? c){
 			return CreateAttribute(c, null);
+		}
+
+		// CurrentAttributeがDroppedとしてチェックされているか確認します。
+		// DroppedとしてチェックされたAttributeはFix時にDroppedAttributeに追加されます。
+		public bool IsDroppedAttribute{
+			get{
+				if(myCurrentAttribute == null) return false;
+				return myCurrentAttribute.Dropped;
+			}
+		}
+
+		// CurrentAttributeの名前が既存の属性と重複しているかどうかチェックします。
+		// 重複していればtrueを返します。
+		public bool IsDuplicateAttribute{
+			get{
+				if(myCurrentAttribute == null) return false;
+				string attrName = myCurrentAttribute.Name;
+				if(myAttributes.ContainsKey(attrName)) return true;
+				return false;
+			}
 		}
 
 		// 属性を追加します
@@ -60,13 +80,23 @@ namespace Bakera.RedFace{
 		// CurrentAttributeがnullのときに呼ぶと true を返します (いつでも呼んで良い)。
 		public bool FixAttribute(){
 			if(myCurrentAttribute == null) return true;
-
-			string attrName = myCurrentAttribute.Name;
-			if(myAttributes.ContainsKey(attrName)) return false;
-
-			myAttributes.Add(attrName, myCurrentAttribute);
+			if(IsDuplicateAttribute){
+				DropAttribute();
+				myDroppedAttributes.Add(myCurrentAttribute);
+				myCurrentAttribute = null;
+				return false;
+			}
+			myAttributes.Add(myCurrentAttribute.Name, myCurrentAttribute);
 			myCurrentAttribute = null;
 			return true;
+		}
+
+
+		// CurrentAttributeをDroppedとしてチェックします。
+		// DroppedとしてチェックされたAttributeはFix時にDroppedAttributeに追加されます。
+		public void DropAttribute(){
+			if(myCurrentAttribute == null) return;
+			myCurrentAttribute.Dropped = true;
 		}
 
 		public override string ToString(){

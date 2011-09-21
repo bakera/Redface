@@ -55,6 +55,18 @@ namespace Bakera.RedFace{
 			return (char)(c + 0x20);
 		}
 
+/*
+If the character reference is being consumed as part of an attribute, and the last character matched is not a U+003B SEMICOLON character (;), and the next character is either a U+003D EQUALS SIGN character (=) or in the range U+0030 DIGIT ZERO (0) to U+0039 DIGIT NINE (9), U+0041 LATIN CAPITAL LETTER A to U+005A LATIN CAPITAL LETTER Z, or U+0061 LATIN SMALL LETTER A to U+007A LATIN SMALL LETTER Z, then, for historical reasons, all the characters that were matched after the U+0026 AMPERSAND character (&) must be unconsumed, and nothing is returned.
+*/
+		public static bool IsSuffixOfIgnoreCharacterReferenceInAttribute(this char? c){
+			if(c == null) return false;
+			if(c == EQUALS_SIGN) return true;
+			if('\u0030' <= c && c <= '\u0039') return true;
+			if('\u0041' <= c && c <= '\u005a') return true;
+			if('\u0061' <= c && c <= '\u007a') return true;
+			return false;
+		}
+
 
 	}
 }

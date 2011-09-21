@@ -7,6 +7,7 @@ namespace Bakera.RedFace{
 	public class StateManager<T> : KeyedByTypeCollection<T> where T : RedFaceParserState{
 
 		public T CurrentState{get; private set;}
+		public T PreviousState{get; private set;}
 		private RedFaceParser myParser = null;
 
 		public StateManager(RedFaceParser parser){
@@ -18,8 +19,17 @@ namespace Bakera.RedFace{
 			if(!this.Contains(t)){
 				this.Add(new U());
 			}
+			PreviousState = CurrentState;
 			CurrentState = this[t];
 		}
+
+		// ひとつ前のステータスに戻します。
+		public void BackState(){
+			T temp = CurrentState;
+			CurrentState = PreviousState;
+			PreviousState = temp;
+		}
+
 
 	}
 

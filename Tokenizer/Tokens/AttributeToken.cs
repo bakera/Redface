@@ -7,6 +7,7 @@ namespace Bakera.RedFace{
 
 		public string Name{get; set;}
 		public string Value{get; set;}
+		public bool Dropped{get; set;}
 
 	}
 }

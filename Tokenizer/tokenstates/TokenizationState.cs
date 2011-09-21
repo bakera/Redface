@@ -45,12 +45,8 @@ namespace Bakera.RedFace{
 
 			// 参照されている文字を取得します。失敗したときはnullを返します。
 			protected ReferencedCharacterToken ConsumeCharacterReference(Tokenizer t){
-				return ConsumeCharacterReference(t, null);
-			}
-			protected ReferencedCharacterToken ConsumeCharacterReference(Tokenizer t, char? additional_allowed_character){
 				char? c = t.ConsumeChar();
-				
-				if(additional_allowed_character != null && c == additional_allowed_character){
+				if(t.AdditionalAllowedCharacter != null && c == t.AdditionalAllowedCharacter){
 					t.UnConsume(1);
 					return null;
 				}
@@ -73,6 +69,10 @@ namespace Bakera.RedFace{
 
 
 
+/*
+If the character reference is being consumed as part of an attribute, and the last character matched is not a U+003B SEMICOLON character (;), and the next character is either a U+003D EQUALS SIGN character (=) or in the range U+0030 DIGIT ZERO (0) to U+0039 DIGIT NINE (9), U+0041 LATIN CAPITAL LETTER A to U+005A LATIN CAPITAL LETTER Z, or U+0061 LATIN SMALL LETTER A to U+007A LATIN SMALL LETTER Z, then, for historical reasons, all the characters that were matched after the U+0026 AMPERSAND character (&) must be unconsumed, and nothing is returned.
+*/
+
 			// 名前による文字参照を展開します。
 			protected ReferencedCharacterToken ConsumeNamedCharacterReference(Tokenizer t){
 				StringBuilder matchResult = new StringBuilder();
@@ -82,28 +82,41 @@ namespace Bakera.RedFace{
 				while(c.IsNameToken()){
 					matchResult.Append(c);
 					c = t.ConsumeChar();
+					if(matchResult.Length > Chars.NameMaxLength) break;
 				}
 				if(c == Chars.SEMICOLON){
 					matchResult.Append(c);
 					semicolonFound = true;
+				} else {
+					// CurrentInputCharをmatchResultの末尾にそろえる
+					t.UnConsume(1);
 				}
 				string originalString = matchResult.ToString();
-				string result = null;
 
+				string result = null;
 				while(matchResult.Length > 0){
 					if(Chars.ExistsNamedChar(matchResult.ToString())){
 						result = Chars.GetNamedChar(matchResult.ToString());
 						break;
 					}
 					matchResult.Remove(matchResult.Length-1, 1);
+					// CurrentInputCharをmatchResultの末尾にそろえる
+					t.UnConsume(1);
 				}
+
 				if(result == null){
 					t.Parser.OnParseErrorRaised(string.Format("文字参照 {0} を参照しようとしましたが、みつかりませんでした。", originalString));
-					t.UnConsume(originalString.Length);
+					t.UnConsume(matchResult.Length);
+					return null;
 				} else if(!semicolonFound){
-					t.Parser.OnParseErrorRaised(string.Format("文字参照 &{0}; の末尾のセミコロンがありません。", matchResult));
-					int diff = originalString.Length - matchResult.Length;
-					t.UnConsume(diff+1);
+					if(t.CurrentTokenState is CharacterReferenceInAttributeState && t.NextInputChar.IsSuffixOfIgnoreCharacterReferenceInAttribute()){
+						t.UnConsume(matchResult.Length);
+						t.Parser.OnParseErrorRaised(string.Format("属性値中の文字参照 &{0}; の末尾のセミコロンがありません。歴史的理由により、この文字参照は無視されます。", matchResult));
+						return null;
+					} else {
+						t.Parser.OnParseErrorRaised(string.Format("文字参照 &{0}; の末尾のセミコロンがありません。", matchResult));
+						int diff = originalString.Length - matchResult.Length;
+					}
 				}
 				ReferencedCharacterToken resultToken = new ReferencedCharacterToken();
 				resultToken.Data = result;

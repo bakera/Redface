@@ -19,7 +19,8 @@ namespace Bakera.RedFace{
 
 				switch(c){
 					case Chars.AMPERSAND:
-//						t.ChangeTokenState<CharacterReferenceInAttributeState>();
+						t.AdditionalAllowedCharacter = quote;
+						t.ChangeTokenState<CharacterReferenceInAttributeState>();
 						return;
 					case Chars.NULL:
 						t.Parser.OnParseErrorRaised(string.Format("属性値にNUL文字が含まれています。"));
