@@ -11,7 +11,8 @@ namespace Bakera.RedFace{
 		public abstract class TokenizationState : RedFaceParserState{
 
 			public const string DoctypeId = "DOCTYPE";
-			public const string CDATASectionId = "[CDATA[";
+			public const string CDATASectionStartId = "[CDATA[";
+			public const string CDATASectionEndId = "]]>";
 			public const string CommentId = "--";
 			public const string DoctypePublicId = "PUBLIC";
 			public const string DoctypeSystemId = "SYSTEM";

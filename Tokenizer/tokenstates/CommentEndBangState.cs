@@ -35,7 +35,6 @@ namespace Bakera.RedFace{
 						t.ChangeTokenState<DataState>();
 						return;
 					default:
-						t.Parser.OnParseErrorRaised(string.Format("コメント終了区切り子の後に文字が出現しました。"));
 						t.CurrentCommentToken.Append(Chars.HYPHEN_MINUS);
 						t.CurrentCommentToken.Append(Chars.HYPHEN_MINUS);
 						t.CurrentCommentToken.Append(Chars.EXCLAMATION_MARK);

@@ -10,7 +10,6 @@ namespace Bakera.RedFace{
 			public override void Read(Tokenizer t){
 				char? c = t.ConsumeChar();
 				if(IsStringMatch(t, CommentId)){
-					// ToDo: Comment
 					t.CurrentToken = new CommentToken();
 					t.ChangeTokenState<CommentStartState>();
 					return;
@@ -19,8 +18,8 @@ namespace Bakera.RedFace{
 					t.ChangeTokenState<DoctypeState>();
 					return;
 				}
-				if(IsStringMatchCaseSensitive(t, CDATASectionId)){
-					// toDo: CDATA;
+				if(IsStringMatchCaseSensitive(t, CDATASectionStartId)){
+					t.ChangeTokenState<CDATASectionState>();
 					return;
 				}
 				t.Parser.OnParseErrorRaised(string.Format("マーク宣言開始区切り子の後に識別子でない文字が出現しました。"));
