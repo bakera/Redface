@@ -7,7 +7,7 @@ namespace Bakera.RedFace{
 */
 
 	public class ReferencedCharacterToken : CharacterToken{
-		public ReferencedCharacterToken(): base(){}
+
 		public ReferencedCharacterToken(string data) : base(data){}
 
 		public string OriginalString{get; set;}

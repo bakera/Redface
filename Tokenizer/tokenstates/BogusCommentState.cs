@@ -19,7 +19,7 @@ If the end of the file was reached, reconsume the EOF character.
 			public override void Read(Tokenizer t){
 				if(!(t.CurrentToken is CommentToken)){
 					t.CurrentToken = new CommentToken();
-					((CommentToken)t.CurrentToken).Data = t.CurrentInputChar.ToString();
+					t.CurrentCommentToken.Append(t.CurrentInputChar);
 				}
 				char? c = t.ConsumeChar();
 				switch(c){
@@ -34,7 +34,7 @@ If the end of the file was reached, reconsume the EOF character.
 						t.ChangeTokenState<DataState>();
 						return;
 					default:
-						((CommentToken)t.CurrentToken).Data += c;
+						t.CurrentCommentToken.Append(c);
 						return;
 				}
 			}

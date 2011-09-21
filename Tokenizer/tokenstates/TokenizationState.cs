@@ -11,6 +11,8 @@ namespace Bakera.RedFace{
 		public abstract class TokenizationState : RedFaceParserState{
 
 			public const string DoctypeId = "DOCTYPE";
+			public const string CDATASectionId = "[CDATA[";
+			public const string CommentId = "--";
 			public const string DoctypePublicId = "PUBLIC";
 			public const string DoctypeSystemId = "SYSTEM";
 
@@ -31,9 +33,17 @@ namespace Bakera.RedFace{
 			// マッチすればそのまま true を返し、マッチしなければUnConsumeしてfalseを返します。
 			// UnConsumeした場合は CurrentInputChar は変更されません。
 			protected bool IsStringMatch(Tokenizer t, string testString){
+				return IsStringMatch(t, testString, StringComparison.InvariantCultureIgnoreCase);
+			}
+
+			protected bool IsStringMatchCaseSensitive(Tokenizer t, string testString){
+				return IsStringMatch(t, testString, StringComparison.InvariantCulture);
+			}
+
+			protected bool IsStringMatch(Tokenizer t, string testString, StringComparison sc){
 				char? c = t.CurrentInputChar;
 				string inputString = c.ToString() + t.ConsumeChar(testString.Length - 1);
-				if(inputString.Equals(testString, StringComparison.InvariantCultureIgnoreCase)){
+				if(inputString.Equals(testString, sc)){
 					return true;
 				}
 				t.UnConsume(testString.Length - 1);
@@ -118,8 +128,7 @@ If the character reference is being consumed as part of an attribute, and the la
 						int diff = originalString.Length - matchResult.Length;
 					}
 				}
-				ReferencedCharacterToken resultToken = new ReferencedCharacterToken();
-				resultToken.Data = result;
+				ReferencedCharacterToken resultToken = new ReferencedCharacterToken(result);
 				resultToken.OriginalString = matchResult.ToString();
 				return resultToken;
 			}
@@ -160,8 +169,7 @@ If the character reference is being consumed as part of an attribute, and the la
 				}
 				string originalString = prefix + numberString + suffix;
 
-				ReferencedCharacterToken resultToken = new ReferencedCharacterToken();
-				resultToken.Data = result;
+				ReferencedCharacterToken resultToken = new ReferencedCharacterToken(result);
 				resultToken.OriginalString = originalString;
 				return resultToken;
 			}

@@ -43,9 +43,10 @@ namespace Bakera.RedFace{
 				set{myCurrentToken = value;}
 			}
 
-			public TagToken CurrentTagToken{
-				get{return (TagToken)CurrentToken;}
-			}
+			public TagToken CurrentTagToken{get{return (TagToken)CurrentToken;}}
+			public CommentToken CurrentCommentToken{get{return (CommentToken)CurrentToken;}}
+			public DoctypeToken CurrentDoctypeToken{get{return (DoctypeToken)CurrentToken;}}
+
 			public char? AdditionalAllowedCharacter{get; set;}
 
 
