@@ -10,7 +10,7 @@ namespace Bakera.RedFace{
 				string f = "data/test.html";
 				FileInfo file = new FileInfo(f);
 				RedFaceParser p = new RedFaceParser();
-				p.TokenStateChanged += Write;
+//				p.TokenStateChanged += Write;
 				p.ParseErrorRaised += WriteError;
 				p.TokenCreated += WriteToken;
 
@@ -25,6 +25,10 @@ namespace Bakera.RedFace{
 
 				Console.WriteLine("パース開始: {0}", p.StartTime);
 				Console.WriteLine("パース終了: {0}", p.EndTime);
+
+				Console.WriteLine();
+				Console.WriteLine("========");
+				Console.WriteLine(p.Tree.OuterXml);
 
 				return 0;
 			} catch(Exception e){

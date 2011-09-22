@@ -12,7 +12,7 @@ namespace Bakera.RedFace{
 
 			private StateManager<InsertionMode> myInsertionModeManager = null;
 
-			private XmlDocument myDocumentTree = new XmlDocument(){XmlResolver=null};
+			private Document myDocument = new Document();
 			private Stack<XmlElement> myStackOfOpenlement = null;
 			private RedFaceParser myParser = null;
 			public RedFaceParser Parser {
@@ -20,8 +20,13 @@ namespace Bakera.RedFace{
 					return myParser;
 				}
 			}
+
 			public InsertionMode CurrentInsertionMode{
 				get{return myInsertionModeManager.CurrentState;}
+			}
+
+			public Document Document{
+				get{return myDocument;}
 			}
 
 

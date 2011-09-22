@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 
 namespace Bakera.RedFace{
 
@@ -28,6 +29,12 @@ namespace Bakera.RedFace{
 		public bool IsStopped{
 			get{
 				return myStopFlag;
+			}
+		}
+
+		public XmlDocument Tree{
+			get{
+				return myTreeConstruction.Document;
 			}
 		}
 
@@ -62,7 +69,7 @@ namespace Bakera.RedFace{
 
 			while(!myStopFlag){
 				Token t = myTokenizer.GetToken();
-				if(t == null) break;
+				if(t == null) continue;
 				OnTokenCreated(t);
 				myTreeConstruction.AppendToken(t);
 				if(t is EndOfFileToken) break;
