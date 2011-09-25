@@ -2,7 +2,7 @@ using System;
 
 namespace Bakera.RedFace{
 
-	public class DoctypeToken : Token{
+	public partial class DoctypeToken : Token{
 
 /*
  DOCTYPE tokens have a name, a public identifier, a system identifier, and a force-quirks flag.
@@ -36,62 +36,6 @@ namespace Bakera.RedFace{
 			}
 			return result;
 		}
-
-		public DocumentMode GetDocumentMode(){
-			/* HTML5, HTML4.0strict, HTML4.01strict, XHTML1.0 strict, XHTML1.1 */
-
-			// HTML5
-
-			return DocumentMode.UnKnown;
-		}
-
-
-// Doctype判定
-		public bool IsHtml{
-			get{
-				return this.Name.Equals("html", StringComparison.InvariantCulture);
-			}
-		}
-
-		public bool IsHtml5{
-			get{
-				if(!IsHtml) return false;
-				if(this.PublicIdentifier != null) return false;
-				if(this.SystemIdentifier != null && !this.SystemIdentifier.Equals("about:legacy-compat", StringComparison.InvariantCulture)) return false;
-				return true;
-			}
-		}
-
-		public bool IsHtml40Strict{
-			get{
-				if(!IsHtml) return false;
-				if(this.PublicIdentifier == null) return false;
-				if(!this.PublicIdentifier.Equals("-//W3C//DTD HTML 4.0//EN", StringComparison.InvariantCulture)) return false;
-				if(this.SystemIdentifier != null && !this.SystemIdentifier.Equals("http://www.w3.org/TR/REC-html40/strict.dtd", StringComparison.InvariantCulture)) return false;
-				return true;
-			}
-		}
-
-		public bool IsHtml401Strict{
-			get{
-				if(!IsHtml) return false;
-				if(this.PublicIdentifier == null) return false;
-				if(!this.PublicIdentifier.Equals("-//W3C//DTD HTML 4.01//EN", StringComparison.InvariantCulture)) return false;
-				if(this.SystemIdentifier != null && !this.SystemIdentifier.Equals("http://www.w3.org/TR/html4/strict.dtd", StringComparison.InvariantCulture)) return false;
-				return true;
-			}
-		}
-
-		public bool IsXhtml10Strict{
-			get{
-				if(!IsHtml) return false;
-				if(this.PublicIdentifier == null) return false;
-				if(!this.PublicIdentifier.Equals("-//W3C//DTD HTML 4.01//EN", StringComparison.InvariantCulture)) return false;
-				if(this.SystemIdentifier != null && !this.SystemIdentifier.Equals("http://www.w3.org/TR/html4/strict.dtd", StringComparison.InvariantCulture)) return false;
-				return true;
-			}
-		}
-
 
 
 

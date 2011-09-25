@@ -16,6 +16,8 @@ namespace Bakera.RedFace{
 				}
 
 				if(token is DoctypeToken){
+					tree.Document.AppendDoctype((DoctypeToken)token);
+
 /*
 If the DOCTYPE token's name is not a case-sensitive match for the string "html",
  or the token's public identifier is not missing,
