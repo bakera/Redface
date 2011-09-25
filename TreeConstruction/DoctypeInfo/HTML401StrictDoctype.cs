@@ -3,14 +3,10 @@ using System.Xml;
 
 namespace Bakera.RedFace{
 
-	public class HTML401StrictDoctype : DoctypeInfo{
+	public class HTML401StrictDoctype : NoQuirksDoctype{
 
 		public const string PublicIdentifier = "-//W3C//DTD HTML 4.01//EN";
 		public const string SystemIdentifier = "http://www.w3.org/TR/html4/strict.dtd";
-
-		public override DocumentMode DocumentMode{
-			get{return DocumentMode.NoQuirks;}
-		}
 
 		public static bool IsMatch(DoctypeToken t){
 			if(!IsHtml(t)) return false;

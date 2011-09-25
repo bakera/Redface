@@ -3,7 +3,7 @@ using System.Xml;
 
 namespace Bakera.RedFace{
 
-	public class UnKnownDoctype : DoctypeInfo{
+	public abstract class NoQuirksDoctype : DoctypeInfo{
 
 		public override DocumentMode DocumentMode{
 			get{return DocumentMode.NoQuirks;}
@@ -12,4 +12,6 @@ namespace Bakera.RedFace{
 	}
 
 }
+
+
 

@@ -3,13 +3,9 @@ using System.Xml;
 
 namespace Bakera.RedFace{
 
-	public class HTML5Doctype : DoctypeInfo{
+	public class HTML5Doctype : NoQuirksDoctype{
 
 		public const string LegacyCompatSystemIdentifier = "about:legacy-compat";
-
-		public override DocumentMode DocumentMode{
-			get{return DocumentMode.NoQuirks;}
-		}
 
 		public static bool IsMatch(DoctypeToken t){
 			if(!IsHtml(t)) return false;

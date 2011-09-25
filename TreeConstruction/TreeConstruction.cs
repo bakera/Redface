@@ -35,7 +35,7 @@ namespace Bakera.RedFace{
 			public TreeConstruction(RedFaceParser p){
 				myParser = p;
 				myInsertionModeManager = new StateManager<InsertionMode>(p);
-				myInsertionModeManager.SetState<InitialMode>();
+				myInsertionModeManager.SetState<InitialInsertionMode>();
 			}
 
 

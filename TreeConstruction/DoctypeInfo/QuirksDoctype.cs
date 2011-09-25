@@ -81,14 +81,18 @@ namespace Bakera.RedFace{
 		public static bool IsMatch(DoctypeToken t){
 			if(t.ForceQuirks) return true;
 			if(!IsHtml(t)) return true;
-			foreach(string s in QuirksPublicIdentifiersPrefix){
-				if(t.PublicIdentifier.StartsWith(s, StringComparison.InvariantCultureIgnoreCase)) return true;
+			if(t.PublicIdentifier != null){
+				foreach(string s in QuirksPublicIdentifiersPrefix){
+					if(t.PublicIdentifier.StartsWith(s, StringComparison.InvariantCultureIgnoreCase)) return true;
+				}
+				foreach(string s in QuirksPublicIdentifiers){
+					if(t.PublicIdentifier.Equals(s, StringComparison.InvariantCultureIgnoreCase)) return true;
+				}
 			}
-			foreach(string s in QuirksPublicIdentifiers){
-				if(t.PublicIdentifier.Equals(s, StringComparison.InvariantCultureIgnoreCase)) return true;
-			}
-			foreach(string s in QuirksSystemIdentifiers){
-				if(t.SystemIdentifier.StartsWith(s, StringComparison.InvariantCultureIgnoreCase)) return true;
+			if(t.SystemIdentifier != null){
+				foreach(string s in QuirksSystemIdentifiers){
+					if(t.SystemIdentifier.StartsWith(s, StringComparison.InvariantCultureIgnoreCase)) return true;
+				}
 			}
 			if(t.SystemIdentifier == null && t.PublicIdentifier.StartsWith(HTML401TransitionalPublicIdentifierPrefix, StringComparison.InvariantCultureIgnoreCase)) return true;
 			if(t.SystemIdentifier == null && t.PublicIdentifier.StartsWith(HTML401FramesetPublicIdentifierPrefix, StringComparison.InvariantCultureIgnoreCase)) return true;

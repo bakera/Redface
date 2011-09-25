@@ -3,7 +3,7 @@ using System.Xml;
 
 namespace Bakera.RedFace{
 
-	public class XHTML11Doctype : DoctypeInfo{
+	public class XHTML11Doctype : NoQuirksDoctype{
 
 		public const string PublicIdentifier = "-//W3C//DTD XHTML 1.1//EN";
 		public const string SystemIdentifier = "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd";
