@@ -14,6 +14,7 @@ namespace Bakera.RedFace{
 		private bool myStopFlag = false;
 		private Tokenizer myTokenizer = null;
 		private TreeConstruction myTreeConstruction = null;
+		private bool myFramesetOK = true;
 
 
 
@@ -41,6 +42,15 @@ namespace Bakera.RedFace{
 			get{
 				return myTreeConstruction.Document;
 			}
+		}
+
+		public bool FramesetOK{
+			get{return myFramesetOK;}
+			set{myFramesetOK = value;}
+		}
+
+		public bool Scripting{
+			get{return false;}
 		}
 
 

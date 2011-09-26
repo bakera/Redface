@@ -41,7 +41,6 @@ namespace Bakera.RedFace{
 			public XmlNode HeadElementPointer{get; set;}
 			public XmlNode FormElementPointer{get; set;}
 
-
 			public bool ReprocessFlag{get; set;}
 
 

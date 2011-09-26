@@ -49,12 +49,48 @@ namespace Bakera.RedFace{
 				}
 
 				if(token.IsStartTag("title")){
+					GenericRCDATAElementParsingAlgorithm(tree, token);
+					return;
+				}
+
+				// RedFaceParserは常にScriptingDisabled
+				if(token.IsStartTag("noframes", "style")){
 					GenericRawtextElementParsingAlgorithm(tree, token);
 					return;
 				}
 
-				Console.WriteLine("========\nnot implemented: {0} - {1}", this.Name, token);
-				tree.Parser.Stop();
+				// RedFaceParserは常にScriptingDisabled
+				if(token.IsStartTag("noscript")){
+					tree.InsertElementForToken((TagToken)token);
+					tree.ChangeInsertionMode<InHeadNoscriptInsertionMode>();
+					return;
+				}
+
+				if(token.IsStartTag("script")){
+					//ToDo:
+				}
+
+				if(token.IsEndTag("head")){
+					tree.PopFromStack();
+					tree.ChangeInsertionMode<AfterHeadInsertionMode>();
+					return;
+				}
+
+				if(token is EndTagToken && !token.IsEndTag("body", "html", "br")){
+					tree.Parser.OnParseErrorRaised(string.Format("不明な終了タグがあります。"));
+					return;
+				}
+
+				if(token.IsStartTag("head")){
+					tree.Parser.OnParseErrorRaised(string.Format("head要素の開始タグが重複しています。"));
+					return;
+				}
+
+				tree.PopFromStack();
+				tree.ChangeInsertionMode<AfterHeadInsertionMode>();
+				tree.ReprocessFlag = true;
+				return;
+
 			}
 
 		}
