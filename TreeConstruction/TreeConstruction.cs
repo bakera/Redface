@@ -80,6 +80,10 @@ namespace Bakera.RedFace{
 				return myStackOfOpenlement.Pop();
 			}
 
+
+
+	// ノード作成
+
 			public void AppendChild(XmlNode x){
 				CurrentNode.AppendChild(x);
 			}

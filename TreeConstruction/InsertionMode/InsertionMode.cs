@@ -20,7 +20,7 @@ namespace Bakera.RedFace{
 
 			protected void GenericRawtextElementParsingAlgorithm(TreeConstruction tree, Token token){
 				tree.InsertElementForToken((TagToken)token);
-// ToDo:				tree.Parser.ChangeTokenState<RCDATAState>();
+				tree.Parser.ChangeTokenState<RAWTEXTState>();
 				tree.OriginalInsertionMode = tree.CurrentInsertionMode;
 				tree.ChangeInsertionMode<TextInsertionMode>();
 			}

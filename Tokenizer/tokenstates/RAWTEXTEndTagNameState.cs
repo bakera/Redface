@@ -5,7 +5,7 @@ namespace Bakera.RedFace{
 
 	public partial class RedFaceParser{
 
-		public class RCDATAEndTagNameState : TokenizationState{
+		public class RAWTEXTEndTagNameState : TokenizationState{
 
 			public override void Read(Tokenizer t){
 				char? c = t.ConsumeChar();
@@ -46,7 +46,7 @@ namespace Bakera.RedFace{
 					default:{
 						t.EmitToken(new CharacterToken("</" + t.TemporaryBuffer));
 						t.UnConsume(1);
-						t.ChangeTokenState<RCDATAState>();
+						t.ChangeTokenState<RAWTEXTState>();
 						return;
 					}
 				}
