@@ -5,13 +5,11 @@ namespace Bakera.RedFace{
 
 	public partial class Document : XmlDocument{
 
-		public DoctypeInfo DoctypeInfo{get; private set;}
-		public DocumentMode DocumentMode{
-			get{
-				if(this.DoctypeInfo == null) return DocumentMode.UnKnown;
-				return this.DoctypeInfo.DocumentMode;
-			}
+		public DoctypeInfo DoctypeInfo{
+			get;
+			private set;
 		}
+		public DocumentMode DocumentMode{ get; set; }
 
 
 // コンストラクタ
@@ -29,6 +27,9 @@ namespace Bakera.RedFace{
 			this.DoctypeInfo = DoctypeInfo.CreateDoctypeInfo(token);
 			XmlNode result = this.CreateDocumentType(token.Name, token.PublicIdentifier, token.SystemIdentifier, null);
 			this.AppendChild(result);
+			if(this.DocumentMode == DocumentMode.UnKnown){
+				this.DocumentMode = this.DoctypeInfo.DocumentMode;
+			}
 		}
 
 

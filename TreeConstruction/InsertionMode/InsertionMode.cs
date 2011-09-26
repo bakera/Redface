@@ -10,6 +10,11 @@ namespace Bakera.RedFace{
 	// メソッド
 			public abstract void AppendToken(TreeConstruction tc, Token t);
 
+	// プロパティ
+			public virtual string Name{
+				get{return this.GetType().Name;}
+			}
+
 		}
 	}
 }

@@ -11,6 +11,8 @@ namespace Bakera.RedFace{
 				FileInfo file = new FileInfo(f);
 				RedFaceParser p = new RedFaceParser();
 //				p.TokenStateChanged += Write;
+				p.InsertionModeChanged += WriteInsertionMode;
+				p.DocumentModeChanged += WriteDocumentMode;
 				p.ParseErrorRaised += WriteError;
 				p.TokenCreated += WriteToken;
 
@@ -28,7 +30,7 @@ namespace Bakera.RedFace{
 
 				Console.WriteLine();
 				Console.WriteLine("========");
-				Console.WriteLine(p.Tree.OuterXml);
+				Console.WriteLine(p.Document.OuterXml);
 
 				return 0;
 			} catch(Exception e){
@@ -37,9 +39,19 @@ namespace Bakera.RedFace{
 			}
 		}
 
-		public static void Write(Object sender, EventArgs e){
+		public static void WriteTokenState(Object sender, EventArgs e){
 			RedFaceParser p = sender as RedFaceParser;
 			Console.WriteLine(p.CurrentTokenState);
+		}
+
+		public static void WriteInsertionMode(Object sender, EventArgs e){
+			RedFaceParser p = sender as RedFaceParser;
+			Console.WriteLine(p.CurrentInsertionMode);
+		}
+
+		public static void WriteDocumentMode(Object sender, EventArgs e){
+			RedFaceParser p = sender as RedFaceParser;
+			Console.WriteLine("DocumentMode: {0}", p.Document.DocumentMode);
 		}
 
 		public static void WriteError(Object sender, EventArgs e){

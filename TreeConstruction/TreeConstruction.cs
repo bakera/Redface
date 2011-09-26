@@ -29,6 +29,8 @@ namespace Bakera.RedFace{
 				get{return myDocument;}
 			}
 
+			public bool ReprocessFlag{get; set;}
+
 
 	// コンストラクタ
 

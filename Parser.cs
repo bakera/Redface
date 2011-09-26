@@ -25,6 +25,11 @@ namespace Bakera.RedFace{
 				return myTokenizer.CurrentTokenState.Name;
 			}
 		}
+		public string CurrentInsertionMode{
+			get{
+				return myTreeConstruction.CurrentInsertionMode.Name;
+			}
+		}
 
 		public bool IsStopped{
 			get{
@@ -32,7 +37,7 @@ namespace Bakera.RedFace{
 			}
 		}
 
-		public XmlDocument Tree{
+		public Document Document{
 			get{
 				return myTreeConstruction.Document;
 			}
@@ -71,14 +76,21 @@ namespace Bakera.RedFace{
 				Token t = myTokenizer.GetToken();
 				if(t == null) continue;
 				OnTokenCreated(t);
-				myTreeConstruction.AppendToken(t);
+
+				// AppendTokenを実行。
+				// 実行後にReprocessフラグが立てられている場合は同じトークンを再処理する
+				do{
+					myTreeConstruction.ReprocessFlag = false;
+					myTreeConstruction.AppendToken(t);
+				} while(myTreeConstruction.ReprocessFlag);
+
 				if(t is EndOfFileToken) break;
 			}
 			EndTime = DateTime.Now;
 		}
 
 		// パース停止フラグをONにします。
-		// 次の文字の読み取りを止めて停止します。
+		// 次のトークンの読み取りを止めて停止します。
 		public void Stop(){
 			myStopFlag = true;
 		}

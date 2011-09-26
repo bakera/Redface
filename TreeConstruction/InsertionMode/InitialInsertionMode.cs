@@ -9,7 +9,10 @@ namespace Bakera.RedFace{
 
 			public override void AppendToken(TreeConstruction tree, Token token){
 
-				if(token.IsWhiteSpace) return;
+				if(token.IsWhiteSpace){
+					return;
+				}
+
 				if(token is CommentToken){
 					tree.Document.AppendComment((CommentToken)token);
 					return;
@@ -17,9 +20,8 @@ namespace Bakera.RedFace{
 
 				if(token is DoctypeToken){
 					tree.Document.AppendDoctype((DoctypeToken)token);
-					
 					// NoQuirks以外の文書型はパースエラー
-					// UnKnownDoctypeの場合はパースエラーだがNoQuirksになることに注意
+					// UnKnownDoctypeの場合はNoQuirksでパースエラーになることに注意
 					if(tree.Document.DoctypeInfo is UnKnownDoctype){
 						tree.Parser.OnParseErrorRaised(string.Format("未知の文書型宣言です。"));
 					} else if(tree.Document.DoctypeInfo is QuirksDoctype){
@@ -28,16 +30,17 @@ namespace Bakera.RedFace{
 						tree.Parser.OnParseErrorRaised(string.Format("Limited Quirksモードとなる文書型宣言が指定されています。"));
 					}
 					tree.ChangeInsertionMode<BeforeHtmlInsertionMode>();
+					tree.Parser.OnDocumentModeChanged();
 					return;
 				}
 
-				// ToDo:iframe srcdoc document.
-/*
-If the document is not an iframesrcdoc document, then this is a parse error; set the Document to quirks mode.
-In any case, switch the insertion mode to "before html", then reprocess the current token.
-*/
-
-				
+				// 文書型宣言以外が出現
+				// ToDo:iframe srcdoc documentに対応する?
+				tree.Parser.OnParseErrorRaised(string.Format("文書型宣言がありません。"));
+				tree.Document.DocumentMode = DocumentMode.Quirks;
+				tree.Parser.OnDocumentModeChanged();
+				tree.ChangeInsertionMode<BeforeHtmlInsertionMode>();
+				tree.ReprocessFlag = true;
 				return;
 			}
 

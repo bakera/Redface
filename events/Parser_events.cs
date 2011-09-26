@@ -10,6 +10,7 @@ namespace Bakera.RedFace{
 		public event ParserEventHandler ParseErrorRaised;
 		public event ParserEventHandler WillfulViolationRaised;
 		public event ParserEventHandler TokenCreated;
+		public event ParserEventHandler DocumentModeChanged;
 
 		// TokenStateChangedイベントを発生します。
 		protected virtual void OnTokenStateChanged(){
@@ -43,6 +44,13 @@ namespace Bakera.RedFace{
 		protected virtual void OnWillfulViolationRaised(string s){
 			if(WillfulViolationRaised != null){
 				WillfulViolationRaised(this, new ParseErrorEventArgs(this){Message = s});
+			}
+		}
+
+		// DocumentModeChangedイベントを発生します。
+		protected virtual void OnDocumentModeChanged(){
+			if(DocumentModeChanged != null){
+				DocumentModeChanged(this, new ParseErrorEventArgs(this));
 			}
 		}
 
