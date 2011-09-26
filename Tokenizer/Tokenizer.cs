@@ -44,10 +44,21 @@ namespace Bakera.RedFace{
 			}
 
 			public TagToken CurrentTagToken{get{return (TagToken)CurrentToken;}}
+			public EndTagToken CurrentEndTagToken{get{return (EndTagToken)CurrentToken;}}
 			public CommentToken CurrentCommentToken{get{return (CommentToken)CurrentToken;}}
 			public DoctypeToken CurrentDoctypeToken{get{return (DoctypeToken)CurrentToken;}}
 
 			public char? AdditionalAllowedCharacter{get; set;}
+			public string TemporaryBuffer{get; set;}
+			public StartTagToken LastStartTag{get; set;}
+
+			// CurrentTokenがAppropriateEndTagTokenならtrueを返します。
+			public bool IsAppropriateEndTagToken{
+				get{
+					if(!(CurrentToken is EndTagToken)) return false;
+					return CurrentEndTagToken.Name.Equals(LastStartTag.Name, StringComparison.InvariantCulture);
+				}
+			}
 
 
 	// コンストラクタ
@@ -86,6 +97,7 @@ namespace Bakera.RedFace{
 					if(!attrFixResult && !alreadyAttrErrorRaised){
 						this.Parser.OnParseErrorRaised(string.Format("属性が重複しています。{0}", tt.Name));
 					}
+					if(t is StartTagToken) LastStartTag = (StartTagToken)t;
 				}
 			}
 			// CurrentTokenをEmitします。

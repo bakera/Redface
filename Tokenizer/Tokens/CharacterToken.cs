@@ -20,7 +20,7 @@ namespace Bakera.RedFace{
 			if(this.IsWhiteSpace){
 				result += " (white space)";
 			} else {
-				result = string.Format(" / Data: \"{0}\"", this.Data);
+				result += string.Format(" / Data: \"{0}\"", this.Data);
 			}
 			return result;
 		}

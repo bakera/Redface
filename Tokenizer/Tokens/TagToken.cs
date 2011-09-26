@@ -22,6 +22,15 @@ namespace Bakera.RedFace{
 			set{myCurrentAttribute = value;}
 		}
 
+		public AttributeToken[] Attributes{
+			get{
+				AttributeToken[] result = new AttributeToken[myAttributes.Values.Count];
+				myAttributes.Values.CopyTo(result, 0);
+				return result;
+			}
+		}
+
+
 		public TagToken(){
 			Name = null;
 			SelfClosing = false;

@@ -5,6 +5,13 @@ namespace Bakera.RedFace{
 
 	public partial class Document : XmlDocument{
 
+		public const string HtmlNamespace = "http://www.w3.org/1999/xhtml";
+		public const string MathMLNamespace = "http://www.w3.org/1998/Math/MathML";
+		public const string SVGNamespace = "http://www.w3.org/2000/svg";
+		public const string XLinkNamespace = "http://www.w3.org/1999/xlink";
+		public const string XmlNamespace = "http://www.w3.org/XML/1998/namespace";
+		public const string XmlnsNnamespace = "http://www.w3.org/2000/xmlns/";
+
 		public DoctypeInfo DoctypeInfo{
 			get;
 			private set;
@@ -32,6 +39,10 @@ namespace Bakera.RedFace{
 			}
 		}
 
+		public new XmlElement CreateElement(string name){
+			XmlElement result = base.CreateElement(name, HtmlNamespace);
+			return result;
+		}
 
 	}
 

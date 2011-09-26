@@ -8,5 +8,20 @@ namespace Bakera.RedFace{
  Comment and character tokens have data.
 */
 
-	public class EndTagToken : TagToken{}
+	public class EndTagToken : TagToken{
+
+		// EndTagTokenでかつNameが指定文字列の場合true
+		public override bool IsEndTag(string name){
+			return this.Name.Equals(name, StringComparison.InvariantCulture);
+		}
+
+		// EndTagTokenでかつNameが指定文字列の場合true
+		public override bool IsEndTag(params string[] names){
+			foreach(string s in names){
+				if(this.Name.Equals(s, StringComparison.InvariantCulture)) return true;
+			}
+			return false;
+		}
+
+	}
 }

@@ -95,7 +95,9 @@ namespace Bakera.RedFace{
 			myStopFlag = true;
 		}
 
-
+		public void ChangeTokenState<T>() where T : TokenizationState, new(){
+			myTokenizer.ChangeTokenState<T>();
+		}
 
 // エラー記録
 

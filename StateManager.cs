@@ -23,6 +23,14 @@ namespace Bakera.RedFace{
 			CurrentState = this[t];
 		}
 
+		public void SetState(T state){
+			if(!this.Contains(state)){
+				this.Add(state);
+			}
+			PreviousState = CurrentState;
+			CurrentState = state;
+		}
+
 		// ひとつ前のステータスに戻します。
 		public void BackState(){
 			T temp = CurrentState;
