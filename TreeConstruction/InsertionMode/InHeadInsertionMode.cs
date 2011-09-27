@@ -26,10 +26,7 @@ namespace Bakera.RedFace{
 				}
 
 				if(token.IsStartTag("html")){
-					// ToDo:
-					// Process the token using the rules for the "in body" insertion mode.
-					Console.WriteLine("not implemented:" + this.GetType().Name);
-					tree.Parser.Stop();
+					tree.AppendToken<InBodyInsertionMode>(token);
 					return;
 				}
 
@@ -67,7 +64,13 @@ namespace Bakera.RedFace{
 				}
 
 				if(token.IsStartTag("script")){
-					//ToDo:
+					XmlElement scriptElement = tree.CreateElementForToken((TagToken)token);
+					tree.AppendChild(scriptElement);
+					tree.PutToStack(scriptElement);
+					tree.Parser.ChangeTokenState<ScriptDataState>();
+					tree.OriginalInsertionMode = tree.CurrentInsertionMode;
+					tree.ChangeInsertionMode<TextInsertionMode>();
+					return;
 				}
 
 				if(token.IsEndTag("head")){

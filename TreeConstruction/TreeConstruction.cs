@@ -38,8 +38,8 @@ namespace Bakera.RedFace{
 				}
 			}
 
-			public XmlNode HeadElementPointer{get; set;}
-			public XmlNode FormElementPointer{get; set;}
+			public XmlElement HeadElementPointer{get; set;}
+			public XmlElement FormElementPointer{get; set;}
 
 			public bool ReprocessFlag{get; set;}
 
@@ -56,6 +56,10 @@ namespace Bakera.RedFace{
 	// メソッド
 			public void AppendToken(Token t){
 				CurrentInsertionMode.AppendToken(this, t);
+			}
+			public void AppendToken<T>(Token t) where T : InsertionMode, new() {
+				InsertionMode mode = myInsertionModeManager.GetState<T>();
+				mode.AppendToken(this, t);
 			}
 
 			// InsertionModeを変更します。

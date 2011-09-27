@@ -15,12 +15,7 @@ namespace Bakera.RedFace{
 		}
 
 		public void SetState<U>() where U : T, new(){
-			Type t = typeof(U);
-			if(!this.Contains(t)){
-				this.Add(new U());
-			}
-			PreviousState = CurrentState;
-			CurrentState = this[t];
+			CurrentState = GetState<U>();
 		}
 
 		public void SetState(T state){
@@ -29,6 +24,14 @@ namespace Bakera.RedFace{
 			}
 			PreviousState = CurrentState;
 			CurrentState = state;
+		}
+
+		public T GetState<U>() where U : T, new(){
+			Type t = typeof(U);
+			if(!this.Contains(t)){
+				this.Add(new U());
+			}
+			return this[t];
 		}
 
 		// ひとつ前のステータスに戻します。

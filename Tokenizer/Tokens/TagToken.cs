@@ -11,7 +11,6 @@ namespace Bakera.RedFace{
 
 	public abstract class TagToken : Token{
 
-		public string Name{get; set;}
 		public bool SelfClosing{get; set;}
 		private Dictionary<string, AttributeToken> myAttributes = new Dictionary<string, AttributeToken>();
 		private List<AttributeToken> myDroppedAttributes = new List<AttributeToken>();

@@ -8,7 +8,6 @@ namespace Bakera.RedFace{
  DOCTYPE tokens have a name, a public identifier, a system identifier, and a force-quirks flag.
 */
 
-		public string Name{get; set;}
 		public string PublicIdentifier{get; set;}
 		public string SystemIdentifier{get; set;}
 		public bool ForceQuirks{get; set;}

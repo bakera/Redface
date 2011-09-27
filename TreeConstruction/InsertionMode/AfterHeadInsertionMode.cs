@@ -40,6 +40,24 @@ namespace Bakera.RedFace{
 					return;
 				}
 
+				if(token.IsStartTag("frameset")){
+					tree.InsertElementForToken((TagToken)token);
+					tree.ChangeInsertionMode<InFramesetInsertionMode>();
+					return;
+				}
+
+				if(token.IsStartTag("base", "basefont", "bgsound", "link", "meta", "noframes", "script", "style", "title")){
+					tree.Parser.OnParseErrorRaised(string.Format("head要素以外の箇所に要素があります。: {0}", token.Name));
+
+					tree.PutToStack(tree.HeadElementPointer);
+					tree.AppendToken<InHeadInsertionMode>(token);
+
+//Process the token using the rules for the "in head" insertion mode.
+
+
+					return;
+				}
+
 
 
 
