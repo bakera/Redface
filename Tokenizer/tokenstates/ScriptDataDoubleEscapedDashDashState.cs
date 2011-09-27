@@ -5,23 +5,26 @@ namespace Bakera.RedFace{
 
 	public partial class RedFaceParser{
 
-		public class ScriptDataDoubleEscapedState : TokenizationState{
+		public class ScriptDataDoubleEscapedDashDashState : TokenizationState{
 
 			public override void Read(Tokenizer t){
 				char? c = t.ConsumeChar();
-
 				switch(c){
 					case Chars.HYPHEN_MINUS:
-						t.ChangeTokenState<ScriptDataDoubleEscapedDashState>();
 						t.EmitToken(new CharacterToken(Chars.HYPHEN_MINUS));
 						return;
 					case Chars.LESS_THAN_SIGN:
-						t.ChangeTokenState<ScriptDataDoubleEscapedLessThanSignState>();
 						t.EmitToken(new CharacterToken(Chars.LESS_THAN_SIGN));
+						t.ChangeTokenState<ScriptDataDoubleEscapedLessThanSignState>();
+						return;
+					case Chars.GREATER_THAN_SIGN:
+						t.EmitToken(new CharacterToken(Chars.GREATER_THAN_SIGN));
+						t.ChangeTokenState<ScriptDataState>();
 						return;
 					case Chars.NULL:
 						t.Parser.OnParseErrorRaised(string.Format("NULL文字が検出されました。"));
 						t.EmitToken(new CharacterToken(Chars.REPLACEMENT_CHARACTER));
+						t.ChangeTokenState<ScriptDataDoubleEscapedState>();
 						return;
 					case null:
 						t.Parser.OnParseErrorRaised(string.Format("script要素の内容を解析中に終端に達しました。"));
@@ -30,8 +33,10 @@ namespace Bakera.RedFace{
 						return;
 					default:
 						t.EmitToken(new CharacterToken(c));
+						t.ChangeTokenState<ScriptDataDoubleEscapedState>();
 						return;
 				}
+
 			}
 		}
 	}
