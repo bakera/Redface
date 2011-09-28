@@ -47,7 +47,7 @@ namespace Bakera.RedFace{
 
 		public static void WriteInsertionMode(Object sender, EventArgs e){
 			RedFaceParser p = sender as RedFaceParser;
-			Console.WriteLine("{0} ({1})", p.CurrentInsertionMode, GetPath(p));
+			Console.WriteLine("{0} ({1})", p.CurrentInsertionMode, p.StackOfOpenElements);
 		}
 
 		public static void WriteDocumentMode(Object sender, EventArgs e){
@@ -59,7 +59,7 @@ namespace Bakera.RedFace{
 			RedFaceParser p = sender as RedFaceParser;
 			ParseErrorEventArgs pe = e as ParseErrorEventArgs;
 			Console.WriteLine(pe.Message);
-			Console.WriteLine(GetPath(p));
+			Console.WriteLine( p.StackOfOpenElements);
 		}
 
 		public static void WriteToken(Object sender, EventArgs e){
@@ -67,16 +67,6 @@ namespace Bakera.RedFace{
 			ParserTokenEventArgs pte = e as ParserTokenEventArgs;
 			Token t = pte.Token;
 			Console.WriteLine("Token: {0}", t);
-		}
-
-		private static string GetPath(RedFaceParser p){
-			XmlElement[] path = p.StackOfOpenElements;
-			Array.Reverse(path);
-			string result = "";
-			foreach(XmlNode x in path){
-				result += string.Format("{0} > ", x.Name);
-			}
-			return result;
 		}
 
 	}

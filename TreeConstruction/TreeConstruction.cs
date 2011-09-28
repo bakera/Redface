@@ -12,7 +12,7 @@ namespace Bakera.RedFace{
 
 			private StateManager<InsertionMode> myInsertionModeManager = null;
 			private Document myDocument = new Document();
-			private Stack<XmlElement> myStackOfOpenlement = new Stack<XmlElement>();
+			private StackOfOpenElements myStackOfOpenElements = new StackOfOpenElements();
 			private RedFaceParser myParser = null;
 			public RedFaceParser Parser {
 				get{
@@ -33,14 +33,14 @@ namespace Bakera.RedFace{
 
 			public XmlNode CurrentNode{
 				get{
-					if(myStackOfOpenlement.Count == 0) return myDocument;
-					return myStackOfOpenlement.Peek();
+					if(myStackOfOpenElements.Count == 0) return myDocument;
+					return myStackOfOpenElements.Peek();
 				}
 			}
 
-			public XmlElement[] StackOfOpenElements{
+			public StackOfOpenElements StackOfOpenElements{
 				get{
-					return myStackOfOpenlement.ToArray();
+					return myStackOfOpenElements;
 				}
 			}
 
@@ -85,10 +85,10 @@ namespace Bakera.RedFace{
 
 	// Stack操作
 			public void PutToStack(XmlElement e){
-				myStackOfOpenlement.Push(e);
+				myStackOfOpenElements.Push(e);
 			}
 			public XmlElement PopFromStack(){
-				return myStackOfOpenlement.Pop();
+				return myStackOfOpenElements.Pop();
 			}
 
 
@@ -126,6 +126,12 @@ namespace Bakera.RedFace{
 				XmlText result = Document.CreateTextNode(t.Data);
 				AppendChild(result);
 				return result;
+			}
+
+			public void MergeAttribute(XmlElement e, TagToken t){
+				foreach(AttributeToken at in t.Attributes){
+					if(e.Attributes[at.Name] == null) e.SetAttribute(at.Name, at.Value);
+				}
 			}
 
 

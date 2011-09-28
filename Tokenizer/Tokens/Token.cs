@@ -15,6 +15,11 @@ The output of the tokenization step is a series of zero or more of the following
 			get{ return false; }
 		}
 
+		// CharacterTokenでかつNUL文字の場合true
+		public virtual bool IsNULL{
+			get{ return false; }
+		}
+
 		// StartTagTokenでかつNameが指定文字列の場合true
 		public virtual bool IsStartTag(string name){
 			return false;

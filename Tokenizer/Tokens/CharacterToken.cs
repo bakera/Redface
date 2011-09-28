@@ -46,5 +46,15 @@ namespace Bakera.RedFace{
 			}
 		}
 
+		// CharacterTokenでかつNUL文字の場合true
+		public override bool IsNULL{
+			get{
+				foreach(char c in this.Data){
+					if(c == Chars.NULL) return true;
+				}
+				return false;
+			}
+		}
+
 	}
 }
