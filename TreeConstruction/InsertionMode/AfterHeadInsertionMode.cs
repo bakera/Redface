@@ -26,10 +26,7 @@ namespace Bakera.RedFace{
 				}
 
 				if(token.IsStartTag("html")){
-					// ToDo:
-					// Process the token using the rules for the "in body" insertion mode.
-					Console.WriteLine("not implemented:" + this.GetType().Name);
-					tree.Parser.Stop();
+					tree.AppendToken<InBodyInsertionMode>(token);
 					return;
 				}
 
@@ -51,26 +48,33 @@ namespace Bakera.RedFace{
 
 					tree.PutToStack(tree.HeadElementPointer);
 					tree.AppendToken<InHeadInsertionMode>(token);
-
-//Process the token using the rules for the "in head" insertion mode.
-
+					tree.PopFromStack();
 
 					return;
 				}
 
+				if(token.IsEndTag("body", "html", "br")){
+					AnythingElse(tree, token);
+					return;
+				}
 
+				if(token.IsStartTag("head") || token is EndTagToken){
+					tree.Parser.OnParseErrorRaised(string.Format("この場所には出現できないトークンです。: {0}", token.Name));
+					return;
+				}
 
-
-
-
-
-
-
-				Console.WriteLine("========\nnot implemented: {0} - {1}", this.Name, token);
-				tree.Parser.Stop();
+				AnythingElse(tree, token);
 				return;
 			}
 
+			private void AnythingElse(TreeConstruction tree, Token token){
+				XmlElement defaultBodyElement = tree.Document.CreateElement("body");
+				tree.InsertElement(defaultBodyElement);
+				tree.Parser.FramesetOK = true;
+				tree.ChangeInsertionMode<InBodyInsertionMode>();
+				tree.ReprocessFlag = true;
+				return;
+			}
 		}
 	}
 }

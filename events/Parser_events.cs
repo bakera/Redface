@@ -11,6 +11,7 @@ namespace Bakera.RedFace{
 		public event ParserEventHandler WillfulViolationRaised;
 		public event ParserEventHandler TokenCreated;
 		public event ParserEventHandler DocumentModeChanged;
+		public event ParserEventHandler ElementInserted;
 
 		// TokenStateChangedイベントを発生します。
 		protected virtual void OnTokenStateChanged(){
@@ -54,6 +55,12 @@ namespace Bakera.RedFace{
 			}
 		}
 
+		// ElementInsertedイベントを発生します。
+		protected virtual void OnElementInserted(){
+			if(ElementInserted != null){
+				ElementInserted(this, new ParserEventArgs(this));
+			}
+		}
 
 	}
 }

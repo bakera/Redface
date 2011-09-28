@@ -38,6 +38,12 @@ namespace Bakera.RedFace{
 				}
 			}
 
+			public XmlElement[] StackOfOpenElements{
+				get{
+					return myStackOfOpenlement.ToArray();
+				}
+			}
+
 			public XmlElement HeadElementPointer{get; set;}
 			public XmlElement FormElementPointer{get; set;}
 
@@ -76,6 +82,8 @@ namespace Bakera.RedFace{
 				Parser.OnInsertionModeChanged();
 			}
 
+
+	// Stack操作
 			public void PutToStack(XmlElement e){
 				myStackOfOpenlement.Push(e);
 			}
@@ -108,6 +116,7 @@ namespace Bakera.RedFace{
 
 			// XmlElementをCurrentNodeに挿入します。
 			public XmlElement InsertElement(XmlElement e){
+				Parser.OnElementInserted();
 				AppendChild(e);
 				PutToStack(e);
 				return e;

@@ -9,6 +9,7 @@ namespace Bakera.RedFace{
 	public class CharacterToken : Token{
 
 		public string Data{get; set;}
+		public override string Name{get{return Data;}}
 
 		public CharacterToken(char? data) : this(data.ToString()){}
 		public CharacterToken(string data){
