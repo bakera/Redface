@@ -67,6 +67,18 @@ namespace Bakera.RedFace{
 		}
 
 
+// Include?
+
+		// 渡された名前にマッチしない要素があったらその要素名を返します。
+		// なければnullを返します。
+		public string NotEither(params string[] elementNames){
+			foreach(XmlElement e in this){
+				if(Array.IndexOf(elementNames, e.Name) < 0) return e.Name;
+			}
+			return null;
+		}
+
+
 
 // Scope
 

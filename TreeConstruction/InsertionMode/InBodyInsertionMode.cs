@@ -8,6 +8,11 @@ namespace Bakera.RedFace{
 
 		public class InBodyInsertionMode : InsertionMode{
 
+
+			private string[] myEndOfFilePermitOpenTags = new string[]{"dd", "dt", "li", "p", "tbody", "td", "tfoot", "th", "thead", "tr", "body", "html"};
+			private string[] myBodyEndTagPermitOpenTags = new string[]{"dd", "dt", "li", "optgroup", "option", "p", "rp", "rt", "tbody", "td", "tfoot", "th", "thead", "tr", "body", "html"};
+
+
 			public override void AppendToken(TreeConstruction tree, Token token){
 
 				if(token.IsNULL){
@@ -70,19 +75,63 @@ namespace Bakera.RedFace{
 					while(tree.StackOfOpenElements.Count > 1) tree.StackOfOpenElements.Pop();
 					tree.InsertElementForToken((TagToken)token);
 					tree.ChangeInsertionMode<InFramesetInsertionMode>();
+					return;
+				}
 
+				if(token is EndOfFileToken){
+					string invalidOpenTag = tree.StackOfOpenElements.NotEither(myEndOfFilePermitOpenTags);
+
+					if(invalidOpenTag != null){
+						tree.Parser.OnParseErrorRaised(string.Format("{0}の終了タグが不足しています。", invalidOpenTag));
+					}
+					tree.Parser.Stop();
 					return;
 				}
 
 				if(token.IsEndTag("body")){
-
+					EndTagBodyHadBeSeen(tree, token);
+					return;
 				}
 
+				if(token.IsEndTag("html")){
+					EndTagBodyHadBeSeen(tree, token);
+					tree.ReprocessFlag = true;
+					return;
+				}
+
+				if(token.IsStartTag("address", "article", "aside", "blockquote", "center", "details", "dir", "div", "dl", "fieldset", "figcaption", "figure", "footer", "header", "hgroup", "menu", "nav", "ol", "p", "section", "summary", "ul")){
+					if(!tree.StackOfOpenElements.HaveElementInButtonScope("p")){
+						EndTagPHadBeSeen(tree, token);
+					}
+					tree.InsertElementForToken((TagToken)token);
+					return;
+				}
 
 				Console.WriteLine("========\nnot implemented: {0} - {1}", this.Name, token);
 				tree.Parser.Stop();
 				return;
 			}
+
+
+// private
+
+			private void EndTagBodyHadBeSeen(TreeConstruction tree, Token token){
+				if(!tree.StackOfOpenElements.HaveElementInScope("body")){
+					tree.Parser.OnParseErrorRaised(string.Format("予期せぬ箇所で終了タグが出現しました。: {0}", token.Name));
+					return;
+				}
+				string invalidOpenTag = tree.StackOfOpenElements.NotEither(myBodyEndTagPermitOpenTags);
+				if(invalidOpenTag != null){
+					tree.Parser.OnParseErrorRaised(string.Format("{0}の終了タグが不足しています。", invalidOpenTag));
+				}
+				tree.ChangeInsertionMode<AfterBodyInsertionMode>();
+				return;
+			}
+
+			private void EndTagPHadBeSeen(TreeConstruction tree, Token token){
+
+			}
+
 
 		}
 	}

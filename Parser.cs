@@ -106,6 +106,7 @@ namespace Bakera.RedFace{
 		// パース停止フラグをONにします。
 		// 次のトークンの読み取りを止めて停止します。
 		public void Stop(){
+			// ToDo: Stop処理実装
 			myStopFlag = true;
 		}
 
