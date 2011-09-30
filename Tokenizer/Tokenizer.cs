@@ -37,6 +37,11 @@ namespace Bakera.RedFace{
 					return myTokenStateManager.CurrentState;
 				}
 			}
+			public TokenizationState PreviousTokenState {
+				get{
+					return myTokenStateManager.PreviousState;
+				}
+			}
 
 			public Token CurrentToken {
 				get{return myCurrentToken;}

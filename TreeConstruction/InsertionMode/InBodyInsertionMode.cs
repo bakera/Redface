@@ -11,7 +11,7 @@ namespace Bakera.RedFace{
 
 			private string[] myEndOfFilePermitOpenTags = new string[]{"dd", "dt", "li", "p", "tbody", "td", "tfoot", "th", "thead", "tr", "body", "html"};
 			private string[] myBodyEndTagPermitOpenTags = new string[]{"dd", "dt", "li", "optgroup", "option", "p", "rp", "rt", "tbody", "td", "tfoot", "th", "thead", "tr", "body", "html"};
-
+			private string[] myHeadingElements = new string[]{"h1", "h2", "h3", "h4", "h5", "h6"};
 
 			public override void AppendToken(TreeConstruction tree, Token token){
 
@@ -21,13 +21,13 @@ namespace Bakera.RedFace{
 				}
 
 				if(token.IsWhiteSpace){
-					// ToDo: Reconstruct the active formatting elements, if any.
+					Reconstruct(tree, token);
 					tree.InsertCharacter((CharacterToken)token);
 					return;
 				}
 
 				if(token is CharacterToken){
-					// ToDo: Reconstruct the active formatting elements, if any.
+					Reconstruct(tree, token);
 					tree.InsertCharacter((CharacterToken)token);
 					tree.Parser.FramesetOK = false;
 					return;
@@ -100,10 +100,225 @@ namespace Bakera.RedFace{
 				}
 
 				if(token.IsStartTag("address", "article", "aside", "blockquote", "center", "details", "dir", "div", "dl", "fieldset", "figcaption", "figure", "footer", "header", "hgroup", "menu", "nav", "ol", "p", "section", "summary", "ul")){
-					if(!tree.StackOfOpenElements.HaveElementInButtonScope("p")){
+					if(tree.StackOfOpenElements.HaveElementInButtonScope("p")){
 						EndTagPHadBeSeen(tree, token);
 					}
 					tree.InsertElementForToken((TagToken)token);
+					return;
+				}
+
+				if(token.IsStartTag(myHeadingElements)){
+					if(tree.StackOfOpenElements.HaveElementInButtonScope("p")){
+						EndTagPHadBeSeen(tree, token);
+					}
+					if(tree.StackOfOpenElements.IsCurrentNameMatch(myHeadingElements)){
+						tree.Parser.OnParseErrorRaised(string.Format("見出し要素の終了タグがありません。: {0}", tree.CurrentNode.Name));
+						tree.StackOfOpenElements.Pop();
+					}
+					tree.InsertElementForToken((TagToken)token);
+					return;
+				}
+
+				if(token.IsStartTag("pre", "listing")){
+					if(tree.StackOfOpenElements.HaveElementInButtonScope("p")){
+						EndTagPHadBeSeen(tree, token);
+					}
+					tree.InsertElementForToken((TagToken)token);
+					tree.Parser.FramesetOK = false;
+					tree.IgnoreNextWhiteSpace = true;
+					return;
+				}
+
+				if(token.IsStartTag("form")){
+					if(tree.FormElementPointer != null){
+						tree.Parser.OnParseErrorRaised(string.Format("form要素が入れ子になっています。"));
+						return;
+					}
+					if(tree.StackOfOpenElements.HaveElementInButtonScope("p")){
+						EndTagPHadBeSeen(tree, token);
+					}
+					XmlElement form = tree.InsertElementForToken((TagToken)token);
+					tree.FormElementPointer = form;
+					return;
+				}
+
+				if(token.IsStartTag("li")){
+					tree.Parser.FramesetOK = false;
+					foreach(XmlElement e in tree.StackOfOpenElements){
+						if(StackOfElements.IsNameMatch(e, "li")){
+							EndTagLiHadBeSeen(tree, token);
+							break;
+						}
+						if(StackOfElements.IsSpecialElement(e)){
+							if(!StackOfElements.IsNameMatch(e, "address", "div", "p")){
+								break;
+							}
+						}
+					}
+					if(tree.StackOfOpenElements.HaveElementInButtonScope("p")){
+						EndTagPHadBeSeen(tree, token);
+					}
+					tree.InsertElementForToken((TagToken)token);
+					return;
+				}
+
+				if(token.IsStartTag("dd", "dt")){
+					tree.Parser.FramesetOK = false;
+					foreach(XmlElement e in tree.StackOfOpenElements){
+						if(StackOfElements.IsNameMatch(e, "dd", "dt")){
+							EndTagLiHadBeSeen(tree, token);
+							break;
+						}
+						if(StackOfElements.IsSpecialElement(e)){
+							if(!StackOfElements.IsNameMatch(e, "address", "div", "p")){
+								break;
+							}
+						}
+					}
+					if(tree.StackOfOpenElements.HaveElementInButtonScope("p")){
+						EndTagPHadBeSeen(tree, token);
+					}
+					tree.InsertElementForToken((TagToken)token);
+					return;
+				}
+
+				if(token.IsStartTag("plaintext")){
+					if(tree.StackOfOpenElements.HaveElementInButtonScope("p")){
+						EndTagPHadBeSeen(tree, token);
+					}
+					tree.InsertElementForToken((TagToken)token);
+					tree.Parser.ChangeTokenState<PLAINTEXTState>();
+					return;
+				}
+
+				if(token.IsStartTag("button")){
+					if(tree.StackOfOpenElements.HaveElementInScope("button")){
+						tree.Parser.OnParseErrorRaised(string.Format("button要素の終了タグが不足しています。"));
+						EndTagButtonHadBeSeen(tree, token);
+						tree.ReprocessFlag = true;
+						return;
+					}
+					// ToDo: Reconstruct the active formatting elements, if any.
+					tree.InsertElementForToken((TagToken)token);
+					tree.Parser.FramesetOK = false;
+					return;
+				}
+
+				if(token.IsEndTag("address", "article", "aside", "blockquote", "button", "center", "details", "dir", "div", "dl", "fieldset", "figcaption", "figure", "footer", "header", "hgroup", "listing", "menu", "nav", "ol", "pre", "section", "summary", "ul")){
+					if(!tree.StackOfOpenElements.HaveElementInScope(token.Name)){
+						tree.Parser.OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+						return;
+					}
+					GenerateImpliedEndTags(tree, token);
+					if(!tree.StackOfOpenElements.IsCurrentNameMatch(token.Name)){
+						tree.Parser.OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					}
+					tree.StackOfOpenElements.PopUntilSameTagName(token.Name);
+					return;
+				}
+
+
+				if(token.IsEndTag("form")){
+					XmlElement node = tree.FormElementPointer;
+					tree.FormElementPointer = null;
+					if(node == null || !tree.StackOfOpenElements.Contains(node)){
+						tree.Parser.OnParseErrorRaised(string.Format("formの終了タグが出現しましたが、対応するform要素がありません。"));
+						return;
+					}
+					GenerateImpliedEndTags(tree, token);
+					if(tree.CurrentNode != node){
+						tree.Parser.OnParseErrorRaised(string.Format("formの終了タグが出現しましたが、対応するform要素がありません。"));
+					} else {
+						tree.StackOfOpenElements.Pop();
+					}
+					return;
+				}
+
+				if(token.IsEndTag("p")){
+					EndTagPHadBeSeen(tree, token);
+					return;
+				}
+
+				if(token.IsEndTag("li")){
+					if(!tree.StackOfOpenElements.HaveElementInListItemScope(token.Name)){
+						tree.Parser.OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+						return;
+					}
+					GenerateImpliedEndTags(tree, token, token.Name);
+					if(!tree.StackOfOpenElements.IsCurrentNameMatch(token.Name)){
+						tree.Parser.OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					}
+					tree.StackOfOpenElements.PopUntilSameTagName(token.Name);
+					return;
+				}
+
+				if(token.IsEndTag("dd", "dt")){
+					if(!tree.StackOfOpenElements.HaveElementInScope(token.Name)){
+						tree.Parser.OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+						return;
+					}
+					GenerateImpliedEndTags(tree, token, token.Name);
+					if(!tree.StackOfOpenElements.IsCurrentNameMatch(token.Name)){
+						tree.Parser.OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					}
+					tree.StackOfOpenElements.PopUntilSameTagName(token.Name);
+					return;
+				}
+
+				if(token.IsEndTag(myHeadingElements)){
+					if(!tree.StackOfOpenElements.HaveElementInScope(token.Name)){
+						tree.Parser.OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+						return;
+					}
+					GenerateImpliedEndTags(tree, token);
+					if(!tree.StackOfOpenElements.IsCurrentNameMatch(token.Name)){
+						tree.Parser.OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					}
+					tree.StackOfOpenElements.PopUntilSameTagName(myHeadingElements);
+					return;
+				}
+
+				if(token.IsEndTag("sarcasm")){
+					tree.Parser.OnDeepBreath();
+					AnyOtherEndTag(tree, token);
+					return;
+				}
+
+				if(token.IsStartTag("a")){
+					// ToDo: If the list of active formatting elements contains an element whose tag name is "a" between the end of the list and the last marker on the list (or the start of the list if there is no marker on the list), then this is a parse error; act as if an end tag with the tag name "a" had been seen, then remove that element from the list of active formatting elements and the stack of open elements if the end tag didn't already remove it (it might not have if the element is not in table scope).
+					Reconstruct(tree, token);
+					XmlElement e = tree.InsertElementForToken((TagToken)token);
+					tree.ListOfActiveFormatElements.Push(e, token);
+					return;
+				}
+
+				if(token.IsStartTag("b", "big", "code", "em", "font", "i", "s", "small", "strike", "strong", "tt", "u")){
+					Reconstruct(tree, token);
+					XmlElement e = tree.InsertElementForToken((TagToken)token);
+					tree.ListOfActiveFormatElements.Push(e, token);
+					return;
+				}
+
+				if(token.IsStartTag("nobr")){
+					Reconstruct(tree, token);
+					if(!tree.StackOfOpenElements.HaveElementInScope(token.Name)){
+						tree.Parser.OnParseErrorRaised(string.Format("nobr開始タグが出現しましたが、以前のnobrが終了していません。"));
+						FormatEndTagHadBeSeen(tree, token, "nobr");
+						Reconstruct(tree, token);
+						return;
+					}
+					XmlElement e = tree.InsertElementForToken((TagToken)token);
+					tree.ListOfActiveFormatElements.Push(e, token);
+					return;
+				}
+
+				if(token.IsEndTag("a", "b", "big", "code", "em", "font", "i", "nobr", "s", "small", "strike", "strong", "tt", "u")){
+					FormatEndTagHadBeSeen(tree, token, token.Name);
+					return;
+				}
+
+				if(token is EndTagToken){
+					AnyOtherEndTag(tree, token);
 					return;
 				}
 
@@ -114,6 +329,71 @@ namespace Bakera.RedFace{
 
 
 // private
+
+			// 補える終了タグを全部補う処理
+			// 補えないタイプの終了タグが出現したときにのみ呼ばれる
+			private void GenerateImpliedEndTags(TreeConstruction tree, Token token){
+				GenerateImpliedEndTags(tree, token, new string[0]);
+				return;
+			}
+
+			// 補える終了タグを補う処理
+			// 例外を指定
+			private void GenerateImpliedEndTags(TreeConstruction tree, Token token, params string[] except){
+				while(tree.StackOfOpenElements.IsImpliedEndTagElement()){
+					if(tree.StackOfOpenElements.IsCurrentNameMatch(except)) break;
+					XmlElement e = tree.StackOfOpenElements.Pop();
+					tree.Parser.OnImpliedEndTagInserted(e, token);
+				}
+				return;
+			}
+
+
+// start tags 
+
+			private void StartTagPHadBeSeen(TreeConstruction tree, Token token){
+				if(tree.StackOfOpenElements.HaveElementInButtonScope("p")){
+					EndTagPHadBeSeen(tree, token);
+				}
+				XmlElement p = tree.Document.CreateElement("p");
+				tree.InsertElement(p);
+				return;
+			}
+
+
+
+// end tags
+
+			private void AnyOtherEndTag(TreeConstruction tree, Token token){
+				foreach(XmlElement node in tree.StackOfOpenElements){
+					if(StackOfElements.IsNameMatch(node, token.Name)){
+						GenerateImpliedEndTags(tree, token, token.Name);
+						if(!tree.StackOfOpenElements.IsCurrentNameMatch(token.Name)){
+							tree.Parser.OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+						}
+						tree.StackOfOpenElements.PopUntilSameElement(node);
+						break;
+					} else {
+						if(StackOfElements.IsSpecialElement(node)){
+							tree.Parser.OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+							return;
+						}
+					}
+				}
+				return;
+			}
+
+			private void FormatEndTagHadBeSeen(TreeConstruction tree, Token token, string tagName){
+				int outerLoopCounter = 0;
+				while(outerLoopCounter < 8){
+					outerLoopCounter++;
+
+				// ToDo:
+
+				}
+				return;
+			}
+
 
 			private void EndTagBodyHadBeSeen(TreeConstruction tree, Token token){
 				if(!tree.StackOfOpenElements.HaveElementInScope("body")){
@@ -129,9 +409,41 @@ namespace Bakera.RedFace{
 			}
 
 			private void EndTagPHadBeSeen(TreeConstruction tree, Token token){
+				EndTagHadBeSeen(tree, token, "p");
+			}
+
+			private void EndTagHadBeSeen(TreeConstruction tree, Token token, string tagName){
+				if(!tree.StackOfOpenElements.HaveElementInButtonScope(tagName)){
+					tree.Parser.OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", tagName));
+					StartTagPHadBeSeen(tree, token);
+					tree.ReprocessFlag = true;
+					return;
+				}
+				GenerateImpliedEndTags(tree, token, tagName);
+				if(!tree.StackOfOpenElements.IsCurrentNameMatch(tagName)){
+					tree.Parser.OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", tagName));
+				}
+				tree.StackOfOpenElements.PopUntilSameTagName(tagName);
+				return;
+			}
+
+
+			private void EndTagLiHadBeSeen(TreeConstruction tree, Token token){
 
 			}
 
+			private void EndTagButtonHadBeSeen(TreeConstruction tree, Token token){
+
+			}
+
+
+// reconstruct 
+
+			public void Reconstruct(TreeConstruction tree, Token token){
+				if(tree.ListOfActiveFormatElements.Count == 0) return;
+				// ToDo: Reconstructの仕組みを作る
+				return;
+			}
 
 		}
 	}

@@ -7,10 +7,11 @@ namespace Bakera.RedFace{
 	public class App{
 		public static int Main(){
 
+			RedFaceParser p = new RedFaceParser();
+
 			try{
 				string f = "data/test.html";
 				FileInfo file = new FileInfo(f);
-				RedFaceParser p = new RedFaceParser();
 				p.TokenStateChanged += WriteTokenState;
 				p.InsertionModeChanged += WriteInsertionMode;
 				p.DocumentModeChanged += WriteDocumentMode;
@@ -28,7 +29,7 @@ namespace Bakera.RedFace{
 
 				Console.WriteLine("パース開始: {0}", p.StartTime);
 				Console.WriteLine("パース終了: {0}", p.EndTime);
-
+				Console.WriteLine("パース時間: {0}", p.EndTime - p.StartTime);
 				Console.WriteLine();
 				Console.WriteLine("========");
 				Console.WriteLine(p.Document.OuterXml);

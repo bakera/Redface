@@ -15,6 +15,7 @@ namespace Bakera.RedFace{
 		}
 
 		public void SetState<U>() where U : T, new(){
+			PreviousState = CurrentState;
 			CurrentState = GetState<U>();
 		}
 

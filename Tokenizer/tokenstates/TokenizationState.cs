@@ -129,6 +129,7 @@ If the character reference is being consumed as part of an attribute, and the la
 						int diff = originalString.Length - matchResult.Length;
 					}
 				}
+
 				ReferencedCharacterToken resultToken = new ReferencedCharacterToken(result);
 				resultToken.OriginalString = matchResult.ToString();
 				return resultToken;

@@ -12,7 +12,9 @@ namespace Bakera.RedFace{
 
 			private StateManager<InsertionMode> myInsertionModeManager = null;
 			private Document myDocument = new Document();
-			private StackOfOpenElements myStackOfOpenElements = new StackOfOpenElements();
+			private StackOfElements myStackOfOpenElements = new StackOfElements();
+			private ListOfElements myListOfActiveFormatElements = new ListOfElements();
+
 			private RedFaceParser myParser = null;
 			public RedFaceParser Parser {
 				get{
@@ -38,9 +40,15 @@ namespace Bakera.RedFace{
 				}
 			}
 
-			public StackOfOpenElements StackOfOpenElements{
+			public StackOfElements StackOfOpenElements{
 				get{
 					return myStackOfOpenElements;
+				}
+			}
+
+			public ListOfElements ListOfActiveFormatElements{
+				get{
+					return myListOfActiveFormatElements;
 				}
 			}
 
@@ -48,6 +56,7 @@ namespace Bakera.RedFace{
 			public XmlElement FormElementPointer{get; set;}
 
 			public bool ReprocessFlag{get; set;}
+			public bool IgnoreNextWhiteSpace{get; set;}
 
 
 	// コンストラクタ
@@ -61,6 +70,11 @@ namespace Bakera.RedFace{
 
 	// メソッド
 			public void AppendToken(Token t){
+				// 開始タグ直後の改行を無視するケース
+				if(IgnoreNextWhiteSpace){
+					if(t.IsLineFeed) return;
+					IgnoreNextWhiteSpace = false;
+				}
 				CurrentInsertionMode.AppendToken(this, t);
 			}
 			public void AppendToken<T>(Token t) where T : InsertionMode, new() {

@@ -1,4 +1,5 @@
 using System;
+using System.Xml;
 
 namespace Bakera.RedFace{
 
@@ -12,6 +13,8 @@ namespace Bakera.RedFace{
 		public event ParserEventHandler TokenCreated;
 		public event ParserEventHandler DocumentModeChanged;
 		public event ParserEventHandler ElementInserted;
+		public event ParserEventHandler ImpliedEndTagInserted;
+		public event ParserEventHandler DeepBreath;
 
 		// TokenStateChangedイベントを発生します。
 		protected virtual void OnTokenStateChanged(){
@@ -59,6 +62,20 @@ namespace Bakera.RedFace{
 		protected virtual void OnElementInserted(){
 			if(ElementInserted != null){
 				ElementInserted(this, new ParserEventArgs(this));
+			}
+		}
+
+		// ImpliedEndTagInsertedイベントを発生します。
+		protected virtual void OnImpliedEndTagInserted(XmlElement e, Token t){
+			if(ImpliedEndTagInserted != null){
+				ImpliedEndTagInserted(this, new ParserTokenEventArgs(this, t));
+			}
+		}
+
+		// DeepBreathイベントを発生します。
+		protected virtual void OnDeepBreath(){
+			if(DeepBreath != null){
+				DeepBreath(this, new ParserEventArgs(this));
 			}
 		}
 

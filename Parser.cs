@@ -53,7 +53,7 @@ namespace Bakera.RedFace{
 			get{return false;}
 		}
 
-		public StackOfOpenElements StackOfOpenElements{
+		public StackOfElements StackOfOpenElements{
 			get{
 				return myTreeConstruction.StackOfOpenElements;
 			}

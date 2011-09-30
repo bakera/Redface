@@ -56,5 +56,12 @@ namespace Bakera.RedFace{
 			}
 		}
 
+		// CharacterTokenでかつLFの場合true
+		public override bool IsLineFeed{
+			get{
+				return this.Data.Length == 1 && this.Data[0] == Chars.LINE_FEED;
+			}
+		}
+
 	}
 }
