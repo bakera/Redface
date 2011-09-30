@@ -34,7 +34,7 @@ namespace Bakera.RedFace{
 				}
 
 				if(token is CommentToken){
-					tree.Document.AppendComment((CommentToken)token);
+					tree.AppendCommentForToken((CommentToken)token);
 					return;
 				}
 
@@ -314,6 +314,12 @@ namespace Bakera.RedFace{
 
 				if(token.IsEndTag("a", "b", "big", "code", "em", "font", "i", "nobr", "s", "small", "strike", "strong", "tt", "u")){
 					FormatEndTagHadBeSeen(tree, token, token.Name);
+					return;
+				}
+
+				if(token is StartTagToken){
+					Reconstruct(tree, token);
+					tree.InsertElementForToken((TagToken)token);
 					return;
 				}
 

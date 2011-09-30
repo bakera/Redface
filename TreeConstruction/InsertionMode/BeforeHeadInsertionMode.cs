@@ -15,7 +15,7 @@ namespace Bakera.RedFace{
 				}
 
 				if(token is CommentToken){
-					tree.Document.AppendComment((CommentToken)token);
+					tree.AppendCommentForToken((CommentToken)token);
 					return;
 				}
 

@@ -113,6 +113,18 @@ namespace Bakera.RedFace{
 				CurrentNode.AppendChild(x);
 			}
 
+			// CommentTokenに対応するコメントを作ります。
+			public XmlComment CreateCommentForToken(CommentToken token){
+				XmlComment result = Document.CreateComment(token.Data);
+				return result;
+			}
+
+			// CommentTokenに対応するコメントを作って挿入します。
+			public void AppendCommentForToken(CommentToken token){
+				XmlNode result = this.CreateCommentForToken(token);
+				AppendChild(result);
+			}
+
 			// TagTokenに対応する要素を作ります。
 			public XmlElement CreateElementForToken(TagToken t){
 				XmlElement result = Document.CreateElement(t.Name);

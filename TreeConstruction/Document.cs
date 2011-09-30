@@ -25,10 +25,6 @@ namespace Bakera.RedFace{
 			this.XmlResolver = null;
 		}
 
-		public void AppendComment(CommentToken token){
-			XmlNode result = this.CreateComment(token.Data);
-			this.AppendChild(result);
-		}
 
 		public void AppendDoctype(DoctypeToken token){
 			this.DoctypeInfo = DoctypeInfo.CreateDoctypeInfo(token);
