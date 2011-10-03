@@ -44,7 +44,10 @@ namespace Bakera.RedFace{
 						}
 						goto default;
 					default:{
-						t.EmitToken(new CharacterToken("</" + t.TemporaryBuffer));
+						t.EmitToken(Chars.LESS_THAN_SIGN);
+						t.EmitToken(Chars.SOLIDUS);
+
+						t.EmitToken(t.TemporaryBuffer);
 						t.UnConsume(1);
 						t.ChangeTokenState<ScriptDataEscapedState>();
 						return;

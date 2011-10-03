@@ -15,11 +15,12 @@ namespace Bakera.RedFace{
 					return;
 				}
 				if(c == Chars.EXCLAMATION_MARK){
-					t.EmitToken(new CharacterToken("<!"));
+					t.EmitToken(Chars.LESS_THAN_SIGN);
+					t.EmitToken(Chars.EXCLAMATION_MARK);
 					t.ChangeTokenState<ScriptDataEscapeStartState>();
 					return;
 				}
-				t.EmitToken(new CharacterToken(Chars.LESS_THAN_SIGN));
+				t.EmitToken(Chars.LESS_THAN_SIGN);
 				t.UnConsume(1);
 				t.ChangeTokenState<ScriptDataState>();
 				return;

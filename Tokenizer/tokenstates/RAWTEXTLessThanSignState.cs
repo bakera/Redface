@@ -14,7 +14,7 @@ namespace Bakera.RedFace{
 					t.ChangeTokenState<RAWTEXTEndTagOpenState>();
 					return;
 				}
-				t.EmitToken(new CharacterToken(Chars.LESS_THAN_SIGN));
+				t.EmitToken(Chars.LESS_THAN_SIGN);
 				t.UnConsume(1);
 				t.ChangeTokenState<RAWTEXTState>();
 				return;

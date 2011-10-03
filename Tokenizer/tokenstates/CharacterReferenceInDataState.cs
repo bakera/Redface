@@ -11,7 +11,7 @@ namespace Bakera.RedFace{
 				ReferencedCharacterToken result = ConsumeCharacterReference(t);
 				t.ChangeTokenState<DataState>();
 				if(result == null){
-					t.EmitToken(new CharacterToken(Chars.AMPERSAND));
+					t.EmitToken(Chars.AMPERSAND);
 				} else {
 					t.EmitToken(result);
 				}

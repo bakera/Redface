@@ -12,11 +12,11 @@ namespace Bakera.RedFace{
 
 				if(c.IsLatinCapitalLetter()){
 					t.TemporaryBuffer += c.ToLower();
-					t.EmitToken(new CharacterToken(c));
+					t.EmitToken(c);
 					return;
 				} else if(c.IsLatinSmallLetter()){
 					t.TemporaryBuffer += c;
-					t.EmitToken(new CharacterToken(c));
+					t.EmitToken(c);
 					return;
  				}
 
@@ -32,7 +32,7 @@ namespace Bakera.RedFace{
 						} else {
 							t.ChangeTokenState<ScriptDataEscapedState>();
 						}
-						t.EmitToken(new CharacterToken(c));
+						t.EmitToken(c);
 						return;
 					default:
 						t.UnConsume(1);

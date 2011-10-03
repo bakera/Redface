@@ -18,13 +18,13 @@ namespace Bakera.RedFace{
 						break;
 					case Chars.NULL:
 						t.Parser.OnParseErrorRaised(string.Format("NULL文字が検出されました。"));
-						t.EmitToken(new CharacterToken(c));
+						t.EmitToken(c);
 						return;
 					case null:
 						t.EmitToken(new EndOfFileToken());
 						return;
 					default:
-						t.EmitToken(new CharacterToken(c));
+						t.EmitToken(c);
 						return;
 				}
 			}

@@ -17,7 +17,8 @@ namespace Bakera.RedFace{
 						return;
 					case null:
 						t.Parser.OnParseErrorRaised(string.Format("終了タグの解析中に終端に達しました。"));
-						t.EmitToken(new CharacterToken("</"));
+						t.EmitToken(Chars.LESS_THAN_SIGN);
+						t.EmitToken(Chars.SOLIDUS);
 						t.UnConsume(1);
 						t.ChangeTokenState<DataState>();
 						return;

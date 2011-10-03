@@ -11,19 +11,19 @@ namespace Bakera.RedFace{
 				char? c = t.ConsumeChar();
 				switch(c){
 					case Chars.HYPHEN_MINUS:
-						t.EmitToken(new CharacterToken(Chars.HYPHEN_MINUS));
+						t.EmitToken(Chars.HYPHEN_MINUS);
 						return;
 					case Chars.LESS_THAN_SIGN:
-						t.EmitToken(new CharacterToken(Chars.LESS_THAN_SIGN));
+						t.EmitToken(Chars.LESS_THAN_SIGN);
 						t.ChangeTokenState<ScriptDataDoubleEscapedLessThanSignState>();
 						return;
 					case Chars.GREATER_THAN_SIGN:
-						t.EmitToken(new CharacterToken(Chars.GREATER_THAN_SIGN));
+						t.EmitToken(Chars.GREATER_THAN_SIGN);
 						t.ChangeTokenState<ScriptDataState>();
 						return;
 					case Chars.NULL:
 						t.Parser.OnParseErrorRaised(string.Format("NULL文字が検出されました。"));
-						t.EmitToken(new CharacterToken(Chars.REPLACEMENT_CHARACTER));
+						t.EmitToken(Chars.REPLACEMENT_CHARACTER);
 						t.ChangeTokenState<ScriptDataDoubleEscapedState>();
 						return;
 					case null:
@@ -32,7 +32,7 @@ namespace Bakera.RedFace{
 						t.ChangeTokenState<DataState>();
 						return;
 					default:
-						t.EmitToken(new CharacterToken(c));
+						t.EmitToken(c);
 						t.ChangeTokenState<ScriptDataDoubleEscapedState>();
 						return;
 				}

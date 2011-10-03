@@ -14,13 +14,15 @@ namespace Bakera.RedFace{
 				if(c.IsLatinCapitalLetter()){
 					t.TemporaryBuffer = "";
 					t.TemporaryBuffer += c.ToLower();
-					t.EmitToken(new CharacterToken("<" + c));
+					t.EmitToken(Chars.LESS_THAN_SIGN);
+					t.EmitToken(c);
 					t.ChangeTokenState<ScriptDataDoubleEscapeStartState>();
 					return;
 				} else if(c.IsLatinSmallLetter()){
 					t.TemporaryBuffer = "";
 					t.TemporaryBuffer += c;
-					t.EmitToken(new CharacterToken("<" + c));
+					t.EmitToken(Chars.LESS_THAN_SIGN);
+					t.EmitToken(c);
 					t.ChangeTokenState<ScriptDataDoubleEscapeStartState>();
 					return;
  				}
@@ -31,7 +33,7 @@ namespace Bakera.RedFace{
 						t.ChangeTokenState<ScriptDataEscapedEndTagOpenState>();
 						return;
 					default:
-						t.EmitToken(new CharacterToken("<"));
+						t.EmitToken(Chars.LESS_THAN_SIGN);
 						t.UnConsume(1);
 						t.ChangeTokenState<ScriptDataEscapedState>();
 						return;

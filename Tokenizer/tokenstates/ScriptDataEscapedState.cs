@@ -11,7 +11,7 @@ namespace Bakera.RedFace{
 				char? c = t.ConsumeChar();
 				switch(c){
 					case Chars.HYPHEN_MINUS:
-						t.EmitToken(new CharacterToken(Chars.HYPHEN_MINUS));
+						t.EmitToken(Chars.HYPHEN_MINUS);
 						t.ChangeTokenState<ScriptDataEscapedDashState>();
 						return;
 					case Chars.LESS_THAN_SIGN:
@@ -19,7 +19,7 @@ namespace Bakera.RedFace{
 						return;
 					case Chars.NULL:
 						t.Parser.OnParseErrorRaised(string.Format("NULL文字が検出されました。"));
-						t.EmitToken(new CharacterToken(Chars.REPLACEMENT_CHARACTER));
+						t.EmitToken(Chars.REPLACEMENT_CHARACTER);
 						return;
 					case null:
 						t.Parser.OnParseErrorRaised(string.Format("script要素の内容を解析中に終端に達しました。"));
@@ -27,7 +27,7 @@ namespace Bakera.RedFace{
 						t.ChangeTokenState<DataState>();
 						return;
 					default:
-						t.EmitToken(new CharacterToken(c));
+						t.EmitToken(c);
 						return;
 				}
 

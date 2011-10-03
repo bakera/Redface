@@ -21,7 +21,7 @@ namespace Bakera.RedFace{
 						t.ChangeTokenState<DataState>();
 						return;
 				}
-				t.EmitToken(new CharacterToken(c));
+				t.EmitToken(c);
 			}
 
 		}

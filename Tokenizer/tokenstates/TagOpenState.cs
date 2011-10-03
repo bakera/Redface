@@ -34,7 +34,7 @@ namespace Bakera.RedFace{
 				t.Parser.OnParseErrorRaised(string.Format("LESS THAN SIGNの後の文字がTag Nameではありません。"));
 				t.UnConsume(1);
 				t.ChangeTokenState<DataState>();
-				t.EmitToken(new CharacterToken(Chars.LESS_THAN_SIGN));
+				t.EmitToken(Chars.LESS_THAN_SIGN);
 				return;
 			}
 		}

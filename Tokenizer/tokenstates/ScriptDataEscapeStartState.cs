@@ -11,7 +11,7 @@ namespace Bakera.RedFace{
 				char? c = t.ConsumeChar();
 				switch(c){
 					case Chars.HYPHEN_MINUS:
-						t.EmitToken(new CharacterToken(Chars.HYPHEN_MINUS));
+						t.EmitToken(Chars.HYPHEN_MINUS);
 						t.ChangeTokenState<ScriptDataEscapeStartDashState>();
 						return;
 					default:

@@ -10,7 +10,7 @@ namespace Bakera.RedFace{
 				t.AdditionalAllowedCharacter = null;
 				ReferencedCharacterToken result = ConsumeCharacterReference(t);
 				if(result == null){
-					t.EmitToken(new CharacterToken(Chars.AMPERSAND));
+					t.EmitToken(Chars.AMPERSAND);
 				} else {
 					t.EmitToken(result);
 				}

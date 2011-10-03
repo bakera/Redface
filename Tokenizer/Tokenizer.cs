@@ -12,7 +12,7 @@ namespace Bakera.RedFace{
 			private StateManager<TokenizationState> myTokenStateManager = null;
 			private RedFaceParser myParser = null;
 			private Token myCurrentToken;
-			private Token myEmittedToken;
+			private Queue<Token> myEmittedTokenQueue = new Queue<Token>();
 			private InputStream myInputStream;
 
 			public char? CurrentInputChar {
@@ -79,20 +79,16 @@ namespace Bakera.RedFace{
 	// トークンの取得
 			public Token GetToken(){
 				while(!Parser.IsStopped){
-					CurrentTokenState.Read(this);
-					if(myEmittedToken != null){
-						Token result = myEmittedToken;
-						myEmittedToken = null;
-						return result;
+					if(myEmittedTokenQueue.Count > 0){
+						return myEmittedTokenQueue.Dequeue();
 					}
+					CurrentTokenState.Read(this);
 				}
 				return null;
 			}
 
-
 			// TokenをEmitします。
 			public void EmitToken(Token t){
-				myEmittedToken = t;
 				myCurrentToken = null;
 				// TagTokenがEmitされた場合、CurrentAtrtributeを処理する必要がある
 				if(t is TagToken){
@@ -104,7 +100,22 @@ namespace Bakera.RedFace{
 					}
 					if(t is StartTagToken) LastStartTag = (StartTagToken)t;
 				}
+				myEmittedTokenQueue.Enqueue(t);
 			}
+
+			// charをEmitします。
+			public void EmitToken(char? c){
+				if(c == null) return;
+				EmitToken(new CharacterToken(c));
+			}
+
+			// stringをEmitします。
+			// ToDo: 
+			public void EmitToken(string s){
+				if(s == null) return;
+				EmitToken(new CharacterToken(s));
+			}
+
 			// CurrentTokenをEmitします。
 			public void EmitToken(){
 				EmitToken(myCurrentToken);

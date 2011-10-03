@@ -20,7 +20,8 @@ namespace Bakera.RedFace{
 					t.ChangeTokenState<ScriptDataEndTagNameState>();
 					return;
  				}
-				t.EmitToken(new CharacterToken("</"));
+				t.EmitToken(Chars.LESS_THAN_SIGN);
+				t.EmitToken(Chars.SOLIDUS);
 				t.UnConsume(1);
 				t.ChangeTokenState<ScriptDataState>();
 				return;
