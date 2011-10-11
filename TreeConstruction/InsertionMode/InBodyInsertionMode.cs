@@ -288,14 +288,14 @@ namespace Bakera.RedFace{
 					// ToDo: If the list of active formatting elements contains an element whose tag name is "a" between the end of the list and the last marker on the list (or the start of the list if there is no marker on the list), then this is a parse error; act as if an end tag with the tag name "a" had been seen, then remove that element from the list of active formatting elements and the stack of open elements if the end tag didn't already remove it (it might not have if the element is not in table scope).
 					Reconstruct(tree, token);
 					XmlElement e = tree.InsertElementForToken((TagToken)token);
-					tree.ListOfActiveFormatElements.Push(e, token);
+					tree.ListOfActiveFormatElements.Push(e, (TagToken)token);
 					return;
 				}
 
 				if(token.IsStartTag("b", "big", "code", "em", "font", "i", "s", "small", "strike", "strong", "tt", "u")){
 					Reconstruct(tree, token);
 					XmlElement e = tree.InsertElementForToken((TagToken)token);
-					tree.ListOfActiveFormatElements.Push(e, token);
+					tree.ListOfActiveFormatElements.Push(e, (TagToken)token);
 					return;
 				}
 
@@ -308,7 +308,7 @@ namespace Bakera.RedFace{
 						return;
 					}
 					XmlElement e = tree.InsertElementForToken((TagToken)token);
-					tree.ListOfActiveFormatElements.Push(e, token);
+					tree.ListOfActiveFormatElements.Push(e, (TagToken)token);
 					return;
 				}
 
@@ -389,10 +389,18 @@ namespace Bakera.RedFace{
 				return;
 			}
 
+
 			private void FormatEndTagHadBeSeen(TreeConstruction tree, Token token, string tagName){
+
+				// 1.Let outer loop counter be zero.
 				int outerLoopCounter = 0;
+
+				// 2.Outer loop: If outer loop counter is greater than or equal to eight, then abort these steps.
 				while(outerLoopCounter < 8){
+					// 3.Increment outer loop counter by one.
 					outerLoopCounter++;
+					// 4.Let the formatting element be the last element in the list of active formatting elements that:
+
 
 				// ToDo:
 

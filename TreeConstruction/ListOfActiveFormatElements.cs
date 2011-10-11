@@ -6,7 +6,7 @@ using System.Xml;
 
 namespace Bakera.RedFace{
 
-	public class ListOfElements : List<XmlElement>{
+	public class ListOfElements : List<ActiveFormatElementItem>{
 		private static readonly ElementInfo[] FormatElements = new ElementInfo[]{
 			new HtmlElementInfo("a"),
 			new HtmlElementInfo("b"),
@@ -25,9 +25,33 @@ namespace Bakera.RedFace{
 		};
 
 
-		public void Push(XmlElement e, Token t){
-			// ToDo: Push の仕組みを作る
+		public void Push(XmlElement e, TagToken t){
+			Add(new ActiveFormatElement(e, t));
+
+			// Note: This is the Noah's Ark clause. But with three per family instead of two.
+//			Console.WriteLine("Pushed: {0}", e.Name);
 		}
+
+		public void Reconstruct(XmlElement e, Token t){
+			// ToDo: Reconstruct の仕組みを作る
+		}
+
+
+		// 渡された名前にマッチし、スコープマーカーよりも後ろにある最後の要素を取得する
+		// 見つからなければ null を返す
+		// Let the formatting element be the last element in the list of active formatting elements that:
+		//  is between the end of the list and the last scope marker in the list, if any, or the start of the list otherwise, and
+		//  has the same tag name as the token.
+		public XmlElement GetLastElement(string name){
+			return null;
+		}
+
+		// リストの最後のマーカーの位置を返します。
+		public int GetLastMarkerIndex(){
+			return this.FindLastIndex( i => i.IsMarker );
+		
+		}
+
 
 	}
 

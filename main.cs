@@ -11,9 +11,14 @@ namespace Bakera.RedFace{
 
 			try{
 
-				
 				string f = "data/test.html";
 				FileInfo file = new FileInfo(f);
+
+/*
+				XmlDocument x = new XmlDocument(){XmlResolver=null};
+				x.Load(f);
+*/
+
 //				p.TokenStateChanged += WriteTokenState;
 //				p.InsertionModeChanged += WriteInsertionMode;
 				p.DocumentModeChanged += WriteDocumentMode;
