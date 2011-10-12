@@ -26,10 +26,14 @@ namespace Bakera.RedFace{
 
 
 		public void Push(XmlElement e, TagToken t){
-			Add(new ActiveFormatElement(e, t));
 
 			// Note: This is the Noah's Ark clause. But with three per family instead of two.
 //			Console.WriteLine("Pushed: {0}", e.Name);
+
+//			Document.IsSamePairElement();
+			Add(new ActiveFormatElement(e, t));
+
+
 		}
 
 		public void Reconstruct(XmlElement e, Token t){
@@ -52,6 +56,11 @@ namespace Bakera.RedFace{
 		
 		}
 
+		// リストの最後のマーカーから後ろにある要素を取得します。
+		public int GetItemsAfterMarker(){
+			return this.FindLastIndex( i => i.IsMarker );
+		
+		}
 
 	}
 
