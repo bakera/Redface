@@ -35,10 +35,11 @@ namespace Bakera.RedFace{
 			}
 		}
 
-		public new XmlElement CreateElement(string name){
+		public XmlElement CreateHtmlElement(string name){
 			XmlElement result = base.CreateElement(name, HtmlNamespace);
 			return result;
 		}
+
 
 	}
 

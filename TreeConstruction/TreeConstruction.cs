@@ -127,7 +127,7 @@ namespace Bakera.RedFace{
 
 			// TagTokenに対応する要素を作ります。
 			public XmlElement CreateElementForToken(TagToken t){
-				XmlElement result = Document.CreateElement(t.Name);
+				XmlElement result = Document.CreateHtmlElement(t.Name);
 				foreach(AttributeToken at in t.Attributes){
 					result.SetAttribute(at.Name, at.Value);
 				}

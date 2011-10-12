@@ -68,7 +68,7 @@ namespace Bakera.RedFace{
 			}
 
 			private void AnythingElse(TreeConstruction tree, Token token){
-				XmlElement defaultBodyElement = tree.Document.CreateElement("body");
+				XmlElement defaultBodyElement = tree.Document.CreateHtmlElement("body");
 				tree.InsertElement(defaultBodyElement);
 				tree.Parser.FramesetOK = true;
 				tree.ChangeInsertionMode<InBodyInsertionMode>();

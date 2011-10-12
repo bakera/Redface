@@ -44,7 +44,7 @@ namespace Bakera.RedFace{
 					return;
 				}
 
-				XmlElement defaultHeadElement = tree.Document.CreateElement("head");
+				XmlElement defaultHeadElement = tree.Document.CreateHtmlElement("head");
 				tree.InsertElement(defaultHeadElement);
 				tree.HeadElementPointer = defaultHeadElement;
 				tree.ReprocessFlag = true;

@@ -37,7 +37,7 @@ namespace Bakera.RedFace{
 					return;
 				}
 
-				XmlElement defaultHtmlElement = tree.Document.CreateElement("html");
+				XmlElement defaultHtmlElement = tree.Document.CreateHtmlElement("html");
 				tree.AppendChild(defaultHtmlElement);
 				tree.PutToStack(defaultHtmlElement);
 				tree.ChangeInsertionMode<BeforeHeadInsertionMode>();

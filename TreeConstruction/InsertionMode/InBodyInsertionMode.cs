@@ -361,7 +361,7 @@ namespace Bakera.RedFace{
 				if(tree.StackOfOpenElements.HaveElementInButtonScope("p")){
 					EndTagPHadBeSeen(tree, token);
 				}
-				XmlElement p = tree.Document.CreateElement("p");
+				XmlElement p = tree.Document.CreateHtmlElement("p");
 				tree.InsertElement(p);
 				return;
 			}
