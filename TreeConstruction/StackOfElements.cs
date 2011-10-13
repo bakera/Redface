@@ -214,6 +214,16 @@ namespace Bakera.RedFace{
 		}
 
 
+		// 渡されたXmlElementがStackに含まれていればtrueを返します。
+		public bool IsInclude(XmlElement e){
+			XmlElement[] elements = this.ToArray();
+			foreach(XmlElement e2 in elements){
+				if(e == e2) return true;
+			}
+			return false;
+		}
+
+
 
 
 // Scope

@@ -454,8 +454,20 @@ namespace Bakera.RedFace{
 // reconstruct 
 
 			public void Reconstruct(TreeConstruction tree, Token token){
-				if(tree.ListOfActiveFormatElements.Count == 0) return;
-				// ToDo: Reconstructの仕組みを作る
+				ListOfElements list = tree.ListOfActiveFormatElements;
+				StackOfElements stack = tree.StackOfOpenElements;
+				if(list.Length == 0) return;
+
+				ActiveFormatElementItem lastEntry = list[list.Length];
+				if(lastEntry.IsMarker) return;
+				if(stack.IsInclude(lastEntry.Element)) return;
+
+				// 3.Let entry be the last (most recently added) element in the list of active formatting elements.
+				int index = list.Length-1;
+				ActiveFormatElementItem entry = list[index];
+
+				
+
 				return;
 			}
 

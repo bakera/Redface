@@ -6,7 +6,7 @@ using System.Xml;
 
 namespace Bakera.RedFace{
 
-	public class ListOfElements : List<ActiveFormatElementItem>{
+	public class ListOfElements{
 		private static readonly ElementInfo[] FormatElements = new ElementInfo[]{
 			new HtmlElementInfo("a"),
 			new HtmlElementInfo("b"),
@@ -24,42 +24,39 @@ namespace Bakera.RedFace{
 			new HtmlElementInfo("u"),
 		};
 
+		private List<ActiveFormatElementItem> myBeforeMarkerList = new List<ActiveFormatElementItem>();
+		private List<ActiveFormatElementItem> myAfterMarkerList = new List<ActiveFormatElementItem>();
+
 
 		public void Push(XmlElement e, TagToken t){
 
-			// Note: This is the Noah's Ark clause. But with three per family instead of two.
-//			Console.WriteLine("Pushed: {0}", e.Name);
-
-//			Document.IsSamePairElement();
-			Add(new ActiveFormatElement(e, t));
-
-
+			if(myAfterMarkerList.Count > 3){
+				for(int i=0; i < myAfterMarkerList.Count; i++){
+					ActiveFormatElementItem afei = myAfterMarkerList[i];
+					if(afei.IsSamePairElement(e)){
+						myAfterMarkerList.RemoveAt(i);
+						break;
+					}
+				}
+			}
+			myAfterMarkerList.Add(new ActiveFormatElement(e, t));
 		}
 
-		public void Reconstruct(XmlElement e, Token t){
-			// ToDo: Reconstruct の仕組みを作る
+		public int Length{
+			get{return myBeforeMarkerList.Count + myAfterMarkerList.Count;}
 		}
 
-
-		// 渡された名前にマッチし、スコープマーカーよりも後ろにある最後の要素を取得する
-		// 見つからなければ null を返す
-		// Let the formatting element be the last element in the list of active formatting elements that:
-		//  is between the end of the list and the last scope marker in the list, if any, or the start of the list otherwise, and
-		//  has the same tag name as the token.
-		public XmlElement GetLastElement(string name){
-			return null;
+		public ActiveFormatElementItem[] AfterMarkerItems{
+			get{return myAfterMarkerList.ToArray();}
 		}
 
-		// リストの最後のマーカーの位置を返します。
-		public int GetLastMarkerIndex(){
-			return this.FindLastIndex( i => i.IsMarker );
-		
-		}
-
-		// リストの最後のマーカーから後ろにある要素を取得します。
-		public int GetItemsAfterMarker(){
-			return this.FindLastIndex( i => i.IsMarker );
-		
+		public ActiveFormatElementItem this[int i]{
+			get{
+				if(i <= myBeforeMarkerList.Count - 1){
+					return myBeforeMarkerList[i];
+				}
+				return myAfterMarkerList[i-myBeforeMarkerList.Count];
+			}
 		}
 
 	}
