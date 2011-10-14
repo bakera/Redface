@@ -213,7 +213,6 @@ namespace Bakera.RedFace{
 			return IsElementInElementInfos(e, ImpliedEndTagElements);
 		}
 
-
 		// 渡されたXmlElementがStackに含まれていればtrueを返します。
 		public bool IsInclude(XmlElement e){
 			XmlElement[] elements = this.ToArray();
@@ -223,11 +222,31 @@ namespace Bakera.RedFace{
 			return false;
 		}
 
+		// 渡された要素よりも浅い階層にあるspecialに属する要素をすべて取得します。
+		public XmlElement GetFurthestBlock(XmlElement e){
+			XmlElement[] elements = this.ToArray();
+			List<XmlElement> result = new List<XmlElement>();
+
+			for(int i = 0; i < elements.Length; i++){
+				if(elements[i] == e) break;
+				if(IsElementInElementInfos(elements[i], SpecialElements)) result.Add(elements[i]);
+			}
+			if(result.Count == 0) return null;
+			return result[result.Count-1];
+		}
+
+		// 渡されたXmlElementの親を取得します。
+		public XmlElement GetAncestor(XmlElement e){
+			XmlElement[] elements = this.ToArray();
+			for(int i=0; i < elements.Length-1; i++){
+				if(e == elements[i]) return elements[i+1];
+			}
+			return null;
+		}
 
 
 
 // Scope
-
 		public bool HaveElementInScope(string elementName){
 			return IsMatchElementInfos(elementName, DefaultScopeFilterElements);
 		}

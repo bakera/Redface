@@ -391,18 +391,62 @@ namespace Bakera.RedFace{
 
 
 			private void FormatEndTagHadBeSeen(TreeConstruction tree, Token token, string tagName){
-
-				// 1.Let outer loop counter be zero.
+				ListOfElements list = tree.ListOfActiveFormatElements;
+				StackOfElements stack = tree.StackOfOpenElements;
 				int outerLoopCounter = 0;
 
-				// 2.Outer loop: If outer loop counter is greater than or equal to eight, then abort these steps.
 				while(outerLoopCounter < 8){
-					// 3.Increment outer loop counter by one.
 					outerLoopCounter++;
-					// 4.Let the formatting element be the last element in the list of active formatting elements that:
+					int formattingElementItemIndex = list.GetAfterMarkerIndexByName(token.Name);
+					if(formattingElementItemIndex < 0){
+						EndTagHadBeSeen(tree, token, token.Name);
+						return;
+					}
 
+					ActiveFormatElementItem formattingElementItem = list.GetAfterMarkerByAfterIndex(formattingElementItemIndex);
 
-				// ToDo:
+					XmlElement element = formattingElementItem.Element;
+
+					if(!stack.IsInclude(element)){
+						tree.Parser.OnParseErrorRaised(string.Format("終了タグが出現しました。対応する要素はListOfActiveFormatElementsに含まれていますが、StackOfOpenElementsに含まれていません。: {0}", token.Name));
+						list.RemoveAfterMarkerByAfterIndex(formattingElementItemIndex);
+						return;
+					}
+
+					if(!stack.HaveElementInScope(element.Name)){
+						tree.Parser.OnParseErrorRaised(string.Format("終了タグが出現しました。対応する要素はListOfActiveFormatElementsに含まれていますが、StackOfOpenElementsのscope内に含まれていません。: {0}", token.Name));
+						return;
+					}
+
+					if(tree.CurrentNode != element){
+						tree.Parser.OnParseErrorRaised(string.Format("終了タグが出現しました。対応する要素はListOfActiveFormatElementsに含まれており、StackOfOpenElementsのscope内にありますが、CurrentNodeではありません。: {0}", token.Name));
+						// エラーだが処理は続行
+					}
+
+					XmlElement furthestBlock = stack.GetFurthestBlock(element);
+					if(furthestBlock == null){
+						stack.PopUntilSameElement(element);
+						list.RemoveAfterMarkerByAfterIndex(formattingElementItemIndex);
+						return;
+					}
+
+					XmlElement commonAncestor = stack.GetAncestor(element);
+
+					XmlElement node = furthestBlock;
+					XmlElement lastNode = furthestBlock;
+
+					int innerLoopCounter = 0;
+					while(innerLoopCounter < 3){
+						innerLoopCounter++;
+						node = stack.GetAncestor(node);
+						int idx = list.GetIndexByElement(node);
+						if(idx < 0){
+							
+
+						}
+
+					}
+
 
 				}
 				return;
@@ -458,7 +502,7 @@ namespace Bakera.RedFace{
 				StackOfElements stack = tree.StackOfOpenElements;
 				if(list.Length == 0) return;
 
-				ActiveFormatElementItem lastEntry = list[list.Length];
+				ActiveFormatElementItem lastEntry = list[list.Length - 1];
 				if(lastEntry.IsMarker) return;
 				if(stack.IsInclude(lastEntry.Element)) return;
 

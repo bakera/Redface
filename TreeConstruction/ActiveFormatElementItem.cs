@@ -9,7 +9,8 @@ namespace Bakera.RedFace{
 		public virtual bool IsMarker{get{return false;}}
 
 		public ActiveFormatElementItem(XmlElement e, TagToken t){
-			
+			this.Element = e;
+			this.Token = t;
 		}
 
 

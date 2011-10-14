@@ -24,6 +24,7 @@ namespace Bakera.RedFace{
 				p.DocumentModeChanged += WriteDocumentMode;
 				p.ParseErrorRaised += WriteError;
 //				p.TokenCreated += WriteToken;
+				p.ImpliedEndTagInserted += WriteImpliedEndTagInserted;
 
 				using(FileStream fs = file.Open(FileMode.Open, FileAccess.Read, FileShare.Read)){
 					p.Parse(fs);
@@ -75,6 +76,12 @@ namespace Bakera.RedFace{
 			ParserTokenEventArgs pte = e as ParserTokenEventArgs;
 			Token t = pte.Token;
 			Console.WriteLine("Token: {0}", t);
+		}
+
+		public static void WriteImpliedEndTagInserted(Object sender, EventArgs e){
+			RedFaceParser p = sender as RedFaceParser;
+			ParserElementEventArgs pee = e as ParserElementEventArgs;
+			Console.WriteLine("ImpliedEndTagInserted: {0}", pee.Element.Name);
 		}
 
 	}

@@ -68,7 +68,7 @@ namespace Bakera.RedFace{
 		// ImpliedEndTagInsertedイベントを発生します。
 		protected virtual void OnImpliedEndTagInserted(XmlElement e, Token t){
 			if(ImpliedEndTagInserted != null){
-				ImpliedEndTagInserted(this, new ParserTokenEventArgs(this, t));
+				ImpliedEndTagInserted(this, new ParserElementEventArgs(this, t, e));
 			}
 		}
 

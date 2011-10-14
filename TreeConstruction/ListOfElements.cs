@@ -7,6 +7,7 @@ using System.Xml;
 namespace Bakera.RedFace{
 
 	public class ListOfElements{
+/*
 		private static readonly ElementInfo[] FormatElements = new ElementInfo[]{
 			new HtmlElementInfo("a"),
 			new HtmlElementInfo("b"),
@@ -23,7 +24,7 @@ namespace Bakera.RedFace{
 			new HtmlElementInfo("tt"),
 			new HtmlElementInfo("u"),
 		};
-
+*/
 		private List<ActiveFormatElementItem> myBeforeMarkerList = new List<ActiveFormatElementItem>();
 		private List<ActiveFormatElementItem> myAfterMarkerList = new List<ActiveFormatElementItem>();
 
@@ -50,6 +51,20 @@ namespace Bakera.RedFace{
 			get{return myAfterMarkerList.ToArray();}
 		}
 
+		// マーカーの後ろに渡された名前に相当する要素があれば、そのインデクス番号を返します。
+		public int GetAfterMarkerIndexByName(string name){
+			return myAfterMarkerList.FindLastIndex((e) => e.Element.Name == name);
+		}
+
+		public ActiveFormatElementItem GetAfterMarkerByAfterIndex(int index){
+			return myAfterMarkerList[index];
+		}
+
+		public void RemoveAfterMarkerByAfterIndex(int index){
+			myAfterMarkerList.RemoveAt(index);
+		}
+
+
 		public ActiveFormatElementItem this[int i]{
 			get{
 				if(i <= myBeforeMarkerList.Count - 1){
@@ -59,6 +74,13 @@ namespace Bakera.RedFace{
 			}
 		}
 
+
+		public int GetIndexByElement(XmlElement element){
+			int afterResult = myAfterMarkerList.FindLastIndex((e) => e.Element == element);
+			if(afterResult >= 0) return myBeforeMarkerList.Count + afterResult;
+			int beforeResult = myBeforeMarkerList.FindLastIndex((e) => e.Element == element);
+			return beforeResult;
+		}
 	}
 
 }
