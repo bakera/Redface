@@ -462,12 +462,27 @@ namespace Bakera.RedFace{
 				if(lastEntry.IsMarker) return;
 				if(stack.IsInclude(lastEntry.Element)) return;
 
-				// 3.Let entry be the last (most recently added) element in the list of active formatting elements.
+				// step4～7は要するに「stackに含まれる要素やmarkerを除いた、最も先祖にあるentryを取得」という処理をする。
+				// index = 0 なら最上位なので、そのentryを使用する。
+				// 一つ上を見て、そのentryがstackもしくはmarkerなら、そのentryを使用する。
+				// step7が別の目的にも使いまわされているのが読みにくい原因。
 				int index = list.Length-1;
-				ActiveFormatElementItem entry = list[index];
+				while(index > 0){
+					ActiveFormatElementItem parentEntry = list[index-1];
+					if(parentEntry.IsMarker || stack.IsInclude(parentEntry.Element)){
+						break;
+					}
+					index--;
+				}
 
-				
-
+				ActiveFormatElementItem entry = null;
+				while(index < list.Length){
+					entry = list[index];
+					XmlElement e = tree.CreateElementForToken(entry.Token);
+					tree.InsertElement(e);
+					entry.Element = e;
+					index++;
+				}
 				return;
 			}
 
