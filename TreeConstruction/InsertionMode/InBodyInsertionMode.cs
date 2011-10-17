@@ -317,6 +317,60 @@ namespace Bakera.RedFace{
 					return;
 				}
 
+				if(token.IsStartTag("applet", "marquee", "object")){
+					Reconstruct(tree, token);
+					tree.InsertElementForToken((TagToken)token);
+					tree.Parser.FramesetOK = false;
+					tree.ListOfActiveFormatElements.InsertMarker();
+					return;
+				}
+
+				if(token.IsEndTag("applet", "marquee", "object")){
+					if(!tree.StackOfOpenElements.HaveElementInScope(token.Name)){
+						tree.Parser.OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+						return;
+					}
+					GenerateImpliedEndTags(tree, token);
+					if(!tree.StackOfOpenElements.IsCurrentNameMatch(token.Name)){
+						tree.Parser.OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					}
+					tree.StackOfOpenElements.PopUntilSameTagName(token.Name);
+					tree.ListOfActiveFormatElements.ClearUpToTheLastMarker();
+					return;
+				}
+
+				if(token.IsStartTag("table")){
+					if(tree.Document.DocumentMode == DocumentMode.Quirks && tree.StackOfOpenElements.HaveElementInButtonScope("p")){
+						EndTagPHadBeSeen(tree, token);
+					}
+					tree.InsertElementForToken((TagToken)token);
+					tree.Parser.FramesetOK = false;
+					tree.ChangeInsertionMode<InTableInsertionMode>();
+					return;
+				}
+
+				if(token.IsStartTag("area", "br", "embed", "img", "keygen", "wbr")){
+					Reconstruct(tree, token);
+					tree.InsertElementForToken((TagToken)token);
+					tree.PopFromStack();
+					tree.AcknowledgeSelfClosingFlag((TagToken)token);
+					tree.Parser.FramesetOK = false;
+					return;
+				}
+
+				if(token.IsStartTag("input")){
+					Reconstruct(tree, token);
+					tree.InsertElementForToken((TagToken)token);
+					tree.PopFromStack();
+					tree.AcknowledgeSelfClosingFlag((TagToken)token);
+
+
+					tree.Parser.FramesetOK = false;
+					return;
+				}
+
+
+
 				if(token is StartTagToken){
 					Reconstruct(tree, token);
 					tree.InsertElementForToken((TagToken)token);

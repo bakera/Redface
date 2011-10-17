@@ -29,6 +29,11 @@ namespace Bakera.RedFace{
 			}
 		}
 
+		public string GetAttributeValue(string name){
+			if(!myAttributes.ContainsKey(name)) return null;
+			return myAttributes[name].Value;
+		}
+
 
 		public TagToken(){
 			Name = null;
