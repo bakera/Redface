@@ -142,6 +142,30 @@ namespace Bakera.RedFace{
 			new HtmlElementInfo("rp"),
 			new HtmlElementInfo("rt"),
 		};
+		private static readonly ElementInfo[] FormattingElements = new ElementInfo[]{
+			new HtmlElementInfo("a"),
+			new HtmlElementInfo("b"),
+			new HtmlElementInfo("big"),
+			new HtmlElementInfo("code"),
+			new HtmlElementInfo("em"),
+			new HtmlElementInfo("font"),
+			new HtmlElementInfo("i"),
+			new HtmlElementInfo("nobr"),
+			new HtmlElementInfo("s"),
+			new HtmlElementInfo("small"),
+			new HtmlElementInfo("strike"),
+			new HtmlElementInfo("strong"),
+			new HtmlElementInfo("tt"),
+			new HtmlElementInfo("u"),
+		};
+		private static readonly ElementInfo[] TableRealtedElements = new ElementInfo[]{
+			new HtmlElementInfo("table"),
+			new HtmlElementInfo("tbody"),
+			new HtmlElementInfo("tfoot"),
+			new HtmlElementInfo("thead"),
+			new HtmlElementInfo("tr"),
+		};
+		private static readonly ElementInfo TableElement = new HtmlElementInfo("table");
 
 		// 上からn番目の要素を取得します。
 		public XmlElement this[int n]{
@@ -212,6 +236,14 @@ namespace Bakera.RedFace{
 		public static bool IsImpliedEndTagElement(XmlElement e){
 			return IsElementInElementInfos(e, ImpliedEndTagElements);
 		}
+		// XmlElementがFormattingElementに属する要素ならtrueを返します。
+		public bool IsFormattingElement(XmlElement e){
+			return IsElementInElementInfos(e, FormattingElements);
+		}
+		// XmlElementがTableRealtedElementsに属する要素ならtrueを返します。
+		public bool IsTableRealtedElement(XmlElement e){
+			return IsElementInElementInfos(e, TableRealtedElements);
+		}
 
 		// 渡されたXmlElementがStackに含まれていればtrueを返します。
 		public bool IsInclude(XmlElement e){
@@ -221,6 +253,10 @@ namespace Bakera.RedFace{
 			}
 			return false;
 		}
+
+
+
+// Get 
 
 		// 渡された要素よりも浅い階層にあるspecialに属する要素をすべて取得します。
 		public XmlElement GetFurthestBlock(XmlElement e){
@@ -244,7 +280,73 @@ namespace Bakera.RedFace{
 			return null;
 		}
 
+		// FosterParentElementを取得します。
+		// The foster parent element is the parent element of the last table element in the stack of open elements, if there is a table element and it has such a parent element.
+		public XmlElement GetFosterParentElement(){
+			XmlElement[] elements = this.ToArray();
+			for(int i=0; i < elements.Length-1; i++){
+				if(TableElement.IsMatch(elements[i])){
+					return elements[i+1];
+				}
+			}
+			return elements[elements.Length-1];
+		}
 
+// Remove・Replace
+
+		// 指定されたnodeをRemoveし、その上の要素を返します。
+		// 指定された要素が含まれていないときは例外が発生します。
+		// if node is no longer in the stack of open elements (e.g. because it got removed by the next step), the element that was immediately above node in the stack of open elements before node was removed.
+		public XmlElement Remove(XmlElement e){
+			Stack<XmlElement> tempStack = new Stack<XmlElement>();
+			XmlElement result = null;
+			while(this.Count > 0){
+				XmlElement x = this.Pop();
+				if(x == e){
+					if(this.Count == 0){
+						throw new Exception(string.Format("Stack最上位の要素をRemoveしようとしました。Element: {0}", e.Name));
+					}
+					result = this.Peek();
+					break;
+				}
+				tempStack.Push(x);
+			}
+			while(tempStack.Count > 0){
+				this.Push(tempStack.Pop());
+			}
+			return result;
+		}
+
+
+		// 要素を置換します。
+		public void Replace(XmlElement oldElement, XmlElement newElement){
+			Stack<XmlElement> tempStack = new Stack<XmlElement>();
+			while(this.Count > 0){
+				XmlElement x = this.Pop();
+				if(x == oldElement) break;
+				tempStack.Push(x);
+			}
+			this.Push(newElement);
+			while(tempStack.Count > 0){
+				this.Push(tempStack.Pop());
+			}
+		}
+
+		// 最初に指定された要素のすぐ下に、次に指定された要素を挿入します。
+		public void InsertBelow(XmlElement parentElement, XmlElement insertedElement){
+			Stack<XmlElement> tempStack = new Stack<XmlElement>();
+			while(this.Count > 0){
+				XmlElement x = this.Peek();
+				if(x == parentElement){
+					this.Push(insertedElement);
+					break;
+				}
+				tempStack.Push(this.Pop());
+			}
+			while(tempStack.Count > 0){
+				this.Push(tempStack.Pop());
+			}
+		}
 
 // Scope
 		public bool HaveElementInScope(string elementName){

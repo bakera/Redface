@@ -14,6 +14,7 @@ namespace Bakera.RedFace{
 			private Document myDocument = new Document();
 			private StackOfElements myStackOfOpenElements = new StackOfElements();
 			private ListOfElements myListOfActiveFormatElements = new ListOfElements();
+			private Dictionary<XmlElement, TagToken> myCreatedElementToken = new Dictionary<XmlElement, TagToken>();
 
 			private RedFaceParser myParser = null;
 			public RedFaceParser Parser {
@@ -125,12 +126,14 @@ namespace Bakera.RedFace{
 				AppendChild(result);
 			}
 
-			// TagTokenに対応する要素を作ります。
+			// TagTokenに対応する要素を作って返します。
+			// XmlElement と TagToken の対応関係をDictionaryに記録します。
 			public XmlElement CreateElementForToken(TagToken t){
 				XmlElement result = Document.CreateHtmlElement(t.Name);
 				foreach(AttributeToken at in t.Attributes){
 					result.SetAttribute(at.Name, at.Value);
 				}
+				myCreatedElementToken.Add(result, t);
 				return result;
 			}
 
@@ -160,11 +163,17 @@ namespace Bakera.RedFace{
 				}
 			}
 
-
 			public void AcknowledgeSelfClosingFlag(TagToken t){
 				//ToDo:
 				Console.WriteLine("AcknowledgeSelfClosingFlag: {0}", t.Name);
 
+			}
+
+// Tokenの参照
+
+			// 渡されたXmlElementに対応するTagTokenを返します。
+			public TagToken GetToken(XmlElement e){
+				return myCreatedElementToken[e];
 			}
 
 		}

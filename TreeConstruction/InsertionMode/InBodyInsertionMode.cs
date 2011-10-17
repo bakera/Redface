@@ -403,34 +403,35 @@ namespace Bakera.RedFace{
 						return;
 					}
 
-					ActiveFormatElementItem formattingElementItem = list.GetAfterMarkerByAfterIndex(formattingElementItemIndex);
+					XmlElement formattingElement = list.GetAfterMarkerByAfterIndex(formattingElementItemIndex);
 
-					XmlElement element = formattingElementItem.Element;
-
-					if(!stack.IsInclude(element)){
+					if(!stack.IsInclude(formattingElement)){
 						tree.Parser.OnParseErrorRaised(string.Format("終了タグが出現しました。対応する要素はListOfActiveFormatElementsに含まれていますが、StackOfOpenElementsに含まれていません。: {0}", token.Name));
 						list.RemoveAfterMarkerByAfterIndex(formattingElementItemIndex);
 						return;
 					}
 
-					if(!stack.HaveElementInScope(element.Name)){
+					if(!stack.HaveElementInScope(formattingElement.Name)){
 						tree.Parser.OnParseErrorRaised(string.Format("終了タグが出現しました。対応する要素はListOfActiveFormatElementsに含まれていますが、StackOfOpenElementsのscope内に含まれていません。: {0}", token.Name));
 						return;
 					}
 
-					if(tree.CurrentNode != element){
+					if(tree.CurrentNode != formattingElement){
 						tree.Parser.OnParseErrorRaised(string.Format("終了タグが出現しました。対応する要素はListOfActiveFormatElementsに含まれており、StackOfOpenElementsのscope内にありますが、CurrentNodeではありません。: {0}", token.Name));
 						// エラーだが処理は続行
 					}
 
-					XmlElement furthestBlock = stack.GetFurthestBlock(element);
+					XmlElement furthestBlock = stack.GetFurthestBlock(formattingElement);
 					if(furthestBlock == null){
-						stack.PopUntilSameElement(element);
+						stack.PopUntilSameElement(formattingElement);
 						list.RemoveAfterMarkerByAfterIndex(formattingElementItemIndex);
 						return;
 					}
 
-					XmlElement commonAncestor = stack.GetAncestor(element);
+					XmlElement commonAncestor = stack.GetAncestor(formattingElement);
+
+					// bookmark
+					int bookmarkPosition = list.GetIndexByElement(formattingElement);
 
 					XmlElement node = furthestBlock;
 					XmlElement lastNode = furthestBlock;
@@ -441,12 +442,42 @@ namespace Bakera.RedFace{
 						node = stack.GetAncestor(node);
 						int idx = list.GetIndexByElement(node);
 						if(idx < 0){
-							
-
+							node = stack.Remove(node);
+							continue;
 						}
-
+						if(stack.IsFormattingElement(node)){
+							break;
+						}
+						TagToken creator = tree.GetToken(node);
+						XmlElement newNode = tree.CreateElementForToken(creator);
+						list[idx] = newNode;
+						stack.Replace(node, newNode);
+						node = newNode;
+						if(lastNode == furthestBlock){
+							bookmarkPosition = idx+1;
+						}
+						node.AppendChild(lastNode);
+						lastNode = node;
+					}
+					if(stack.IsTableRealtedElement(commonAncestor)){
+						XmlElement fosterParentElement = stack.GetFosterParentElement();
+						fosterParentElement.AppendChild(lastNode);
+					} else {
+						commonAncestor.AppendChild(lastNode);
 					}
 
+					TagToken formatElementCreator = tree.GetToken(node);
+					XmlElement newFormattingElement = tree.CreateElementForToken(formatElementCreator);
+					foreach(XmlNode x in furthestBlock.ChildNodes){
+						newFormattingElement.AppendChild(x);
+					}
+					furthestBlock.AppendChild(newFormattingElement);
+
+					list.Remove(formattingElement);
+					list.Insert(bookmarkPosition, newFormattingElement);
+
+					stack.Remove(formattingElement);
+					stack.InsertBelow(furthestBlock, newFormattingElement);
 
 				}
 				return;
@@ -502,9 +533,9 @@ namespace Bakera.RedFace{
 				StackOfElements stack = tree.StackOfOpenElements;
 				if(list.Length == 0) return;
 
-				ActiveFormatElementItem lastEntry = list[list.Length - 1];
-				if(lastEntry.IsMarker) return;
-				if(stack.IsInclude(lastEntry.Element)) return;
+				XmlElement lastEntry = list[list.Length - 1];
+				if(lastEntry == null) return;
+				if(stack.IsInclude(lastEntry)) return;
 
 				// step4～7は要するに「stackに含まれる要素やmarkerを除いた、最も先祖にあるentryを取得」という処理をする。
 				// index = 0 なら最上位なので、そのentryを使用する。
@@ -512,19 +543,20 @@ namespace Bakera.RedFace{
 				// step7が別の目的にも使いまわされているのが読みにくい原因。
 				int index = list.Length-1;
 				while(index > 0){
-					ActiveFormatElementItem parentEntry = list[index-1];
-					if(parentEntry.IsMarker || stack.IsInclude(parentEntry.Element)){
+					XmlElement parentEntry = list[index-1];
+					if(parentEntry == null || stack.IsInclude(parentEntry)){
 						break;
 					}
 					index--;
 				}
 
-				ActiveFormatElementItem entry = null;
+				XmlElement entry = null;
 				while(index < list.Length){
 					entry = list[index];
-					XmlElement e = tree.CreateElementForToken(entry.Token);
+					TagToken creator = tree.GetToken(entry);
+					XmlElement e = tree.CreateElementForToken(creator);
 					tree.InsertElement(e);
-					entry.Element = e;
+					list[index] = e;
 					index++;
 				}
 				return;

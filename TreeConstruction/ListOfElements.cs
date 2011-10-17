@@ -7,56 +7,37 @@ using System.Xml;
 namespace Bakera.RedFace{
 
 	public class ListOfElements{
-/*
-		private static readonly ElementInfo[] FormatElements = new ElementInfo[]{
-			new HtmlElementInfo("a"),
-			new HtmlElementInfo("b"),
-			new HtmlElementInfo("big"),
-			new HtmlElementInfo("code"),
-			new HtmlElementInfo("em"),
-			new HtmlElementInfo("font"),
-			new HtmlElementInfo("i"),
-			new HtmlElementInfo("nobr"),
-			new HtmlElementInfo("s"),
-			new HtmlElementInfo("small"),
-			new HtmlElementInfo("strike"),
-			new HtmlElementInfo("strong"),
-			new HtmlElementInfo("tt"),
-			new HtmlElementInfo("u"),
-		};
-*/
-		private List<ActiveFormatElementItem> myBeforeMarkerList = new List<ActiveFormatElementItem>();
-		private List<ActiveFormatElementItem> myAfterMarkerList = new List<ActiveFormatElementItem>();
+		private List<XmlElement> myBeforeMarkerList = new List<XmlElement>();
+		private List<XmlElement> myAfterMarkerList = new List<XmlElement>();
 
 
 		public void Push(XmlElement e, TagToken t){
-
 			if(myAfterMarkerList.Count > 3){
 				for(int i=0; i < myAfterMarkerList.Count; i++){
-					ActiveFormatElementItem afei = myAfterMarkerList[i];
-					if(afei.IsSamePairElement(e)){
+					XmlElement afei = myAfterMarkerList[i];
+					if(Document.IsSamePairElement(afei, e)){
 						myAfterMarkerList.RemoveAt(i);
 						break;
 					}
 				}
 			}
-			myAfterMarkerList.Add(new ActiveFormatElement(e, t));
+			myAfterMarkerList.Add(e);
 		}
 
 		public int Length{
 			get{return myBeforeMarkerList.Count + myAfterMarkerList.Count;}
 		}
 
-		public ActiveFormatElementItem[] AfterMarkerItems{
+		public XmlElement[] AfterMarkerItems{
 			get{return myAfterMarkerList.ToArray();}
 		}
 
 		// マーカーの後ろに渡された名前に相当する要素があれば、そのインデクス番号を返します。
 		public int GetAfterMarkerIndexByName(string name){
-			return myAfterMarkerList.FindLastIndex((e) => e.Element.Name == name);
+			return myAfterMarkerList.FindLastIndex((e) => e.Name == name);
 		}
 
-		public ActiveFormatElementItem GetAfterMarkerByAfterIndex(int index){
+		public XmlElement GetAfterMarkerByAfterIndex(int index){
 			return myAfterMarkerList[index];
 		}
 
@@ -65,22 +46,44 @@ namespace Bakera.RedFace{
 		}
 
 
-		public ActiveFormatElementItem this[int i]{
+		public XmlElement this[int i]{
 			get{
 				if(i <= myBeforeMarkerList.Count - 1){
 					return myBeforeMarkerList[i];
 				}
 				return myAfterMarkerList[i-myBeforeMarkerList.Count];
 			}
+			set{
+				if(i <= myBeforeMarkerList.Count - 1){
+					myBeforeMarkerList[i] = value;
+					return;
+				}
+				myAfterMarkerList[i-myBeforeMarkerList.Count] = value;
+			}
 		}
-
 
 		public int GetIndexByElement(XmlElement element){
-			int afterResult = myAfterMarkerList.FindLastIndex((e) => e.Element == element);
+			int afterResult = myAfterMarkerList.LastIndexOf(element);
 			if(afterResult >= 0) return myBeforeMarkerList.Count + afterResult;
-			int beforeResult = myBeforeMarkerList.FindLastIndex((e) => e.Element == element);
+			int beforeResult = myBeforeMarkerList.LastIndexOf(element);
 			return beforeResult;
 		}
+
+		public bool Remove(XmlElement e){
+			bool result = myAfterMarkerList.Remove(e);
+			if(result) return true;
+			return myBeforeMarkerList.Remove(e);
+		}
+
+		public void Insert(int i, XmlElement e){
+			if(i <= myBeforeMarkerList.Count - 1){
+				myBeforeMarkerList.Insert(i, e);
+				return;
+			}
+			myAfterMarkerList.Insert(i-myBeforeMarkerList.Count, e);
+		}
+
+
 	}
 
 }
