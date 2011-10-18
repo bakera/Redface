@@ -15,6 +15,7 @@ namespace Bakera.RedFace{
 			private StackOfElements myStackOfOpenElements = new StackOfElements();
 			private ListOfElements myListOfActiveFormatElements = new ListOfElements();
 			private Dictionary<XmlElement, TagToken> myCreatedElementToken = new Dictionary<XmlElement, TagToken>();
+			private TagToken myAcknowledgedSelfClosingTag = null;
 
 			private RedFaceParser myParser = null;
 			public RedFaceParser Parser {
@@ -77,7 +78,19 @@ namespace Bakera.RedFace{
 					IgnoreNextLineFeed = false;
 				}
 				CurrentInsertionMode.AppendToken(this, t);
+				if(t is StartTagToken && t.SelfClosing && t != myAcknowledgedSelfClosingTag){
+					Parser.OnParseErrorRaised(string.Format("空要素でない要素に空要素タグを使用することはできません。: {0}", t.Name));
+				}
+				if(t is EndTagToken && t.Attributes.Length > 0){
+					Parser.OnParseErrorRaised(string.Format("終了タグに属性を指定することはできません。: {0}", t.Name));
+
+				}
+				if(t is EndTagToken && t.SelfClosing){
+					Parser.OnParseErrorRaised(string.Format("終了タグに空要素タグを使用することはできません。: {0}", t.Name));
+				}
+				myAcknowledgedSelfClosingTag = null;
 			}
+
 			public void AppendToken<T>(Token t) where T : InsertionMode, new() {
 				InsertionMode mode = myInsertionModeManager.GetState<T>();
 				mode.AppendToken(this, t);
@@ -181,9 +194,7 @@ namespace Bakera.RedFace{
 			}
 
 			public void AcknowledgeSelfClosingFlag(TagToken t){
-				//ToDo:
-				Console.WriteLine("AcknowledgeSelfClosingFlag: {0}", t.Name);
-
+				myAcknowledgedSelfClosingTag = t;
 			}
 
 // Tokenの参照

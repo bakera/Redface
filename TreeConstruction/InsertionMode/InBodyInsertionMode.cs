@@ -146,7 +146,7 @@ namespace Bakera.RedFace{
 					tree.Parser.FramesetOK = false;
 					foreach(XmlElement e in tree.StackOfOpenElements){
 						if(StackOfElements.IsNameMatch(e, "li")){
-							EndTagLiHadBeSeen(tree, token);
+							EndTagHadBeSeen(tree, "li");
 							break;
 						}
 						if(StackOfElements.IsSpecialElement(e)){
@@ -166,7 +166,7 @@ namespace Bakera.RedFace{
 					tree.Parser.FramesetOK = false;
 					foreach(XmlElement e in tree.StackOfOpenElements){
 						if(StackOfElements.IsNameMatch(e, "dd", "dt")){
-							EndTagLiHadBeSeen(tree, token);
+							EndTagHadBeSeen(tree, token.Name);
 							break;
 						}
 						if(StackOfElements.IsSpecialElement(e)){
@@ -721,9 +721,6 @@ namespace Bakera.RedFace{
 			}
 
 
-			private void EndTagLiHadBeSeen(TreeConstruction tree, Token token){
-
-			}
 
 			private void EndTagButtonHadBeSeen(TreeConstruction tree, Token token){
 

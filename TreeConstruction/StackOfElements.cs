@@ -209,7 +209,7 @@ namespace Bakera.RedFace{
 		// なければnullを返します。
 		public string NotEither(params string[] elementNames){
 			foreach(XmlElement e in this){
-				if(IsNameMatch(e, elementNames)) return e.Name;
+				if(!IsNameMatch(e, elementNames)) return e.Name;
 			}
 			return null;
 		}

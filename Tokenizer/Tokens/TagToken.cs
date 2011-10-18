@@ -11,7 +11,6 @@ namespace Bakera.RedFace{
 
 	public abstract class TagToken : Token{
 
-		public bool SelfClosing{get; set;}
 		private Dictionary<string, AttributeToken> myAttributes = new Dictionary<string, AttributeToken>();
 		private List<AttributeToken> myDroppedAttributes = new List<AttributeToken>();
 		private AttributeToken myCurrentAttribute;
@@ -40,6 +39,7 @@ namespace Bakera.RedFace{
 			SelfClosing = false;
 		}
 
+		// 指定された名前の属性があればtrueを返します。
 		public bool HasAttribute(string key){
 			return myAttributes.ContainsKey(key);
 		}
