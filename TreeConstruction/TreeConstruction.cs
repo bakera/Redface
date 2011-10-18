@@ -57,7 +57,7 @@ namespace Bakera.RedFace{
 			public XmlElement FormElementPointer{get; set;}
 
 			public bool ReprocessFlag{get; set;}
-			public bool IgnoreNextWhiteSpace{get; set;}
+			public bool IgnoreNextLineFeed{get; set;}
 
 
 	// コンストラクタ
@@ -72,9 +72,9 @@ namespace Bakera.RedFace{
 	// メソッド
 			public void AppendToken(Token t){
 				// 開始タグ直後の改行を無視するケース
-				if(IgnoreNextWhiteSpace){
+				if(IgnoreNextLineFeed){
 					if(t.IsLineFeed) return;
-					IgnoreNextWhiteSpace = false;
+					IgnoreNextLineFeed = false;
 				}
 				CurrentInsertionMode.AppendToken(this, t);
 			}
@@ -143,6 +143,15 @@ namespace Bakera.RedFace{
 				return InsertElement(result);
 			}
 
+			// 渡された名前の要素を作って挿入します。
+			// tagTokenをねつ造し、XmlElement と TagToken の対応関係を記録します。
+			// isindex要素の処理に使われます。
+			public XmlElement InsertElementForToken(string s){
+				StartTagToken token = new StartTagToken();
+				token.Name = s;
+				return InsertElementForToken(token);
+			}
+
 			// XmlElementをCurrentNodeに挿入します。
 			public XmlElement InsertElement(XmlElement e){
 				Parser.OnElementInserted();
@@ -153,6 +162,14 @@ namespace Bakera.RedFace{
 
 			public XmlNode InsertCharacter(CharacterToken t){
 				XmlText result = Document.CreateTextNode(t.Data);
+				AppendChild(result);
+				return result;
+			}
+
+			// 文字列をカレントノードに挿入します。
+			// isindexの処理に使われます。
+			public XmlNode InsertText(string s){
+				XmlText result = Document.CreateTextNode(s);
 				AppendChild(result);
 				return result;
 			}

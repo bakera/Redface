@@ -24,6 +24,17 @@ namespace Bakera.RedFace{
 			myAfterMarkerList.Add(e);
 		}
 
+		public void InsertMarker(){
+			myBeforeMarkerList.Add(null);
+			myBeforeMarkerList.AddRange(myAfterMarkerList);
+			myAfterMarkerList.Clear();
+		}
+
+		public void ClearUpToTheLastMarker(){
+			myAfterMarkerList.Clear();
+			myBeforeMarkerList.RemoveAt(myBeforeMarkerList.Count-1);
+		}
+
 		public int Length{
 			get{return myBeforeMarkerList.Count + myAfterMarkerList.Count;}
 		}

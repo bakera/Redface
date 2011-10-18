@@ -125,7 +125,7 @@ namespace Bakera.RedFace{
 					}
 					tree.InsertElementForToken((TagToken)token);
 					tree.Parser.FramesetOK = false;
-					tree.IgnoreNextWhiteSpace = true;
+					tree.IgnoreNextLineFeed = true;
 					return;
 				}
 
@@ -363,9 +363,123 @@ namespace Bakera.RedFace{
 					tree.InsertElementForToken((TagToken)token);
 					tree.PopFromStack();
 					tree.AcknowledgeSelfClosingFlag((TagToken)token);
+					string typeValue = token.GetAttributeValue("type");
+					if(typeValue == null || typeValue.Equals("hidden", StringComparison.InvariantCultureIgnoreCase)){
+						tree.Parser.FramesetOK = false;
+					}
+					return;
+				}
 
+				if(token.IsStartTag("param", "source", "track")){
+					tree.InsertElementForToken((TagToken)token);
+					tree.AcknowledgeSelfClosingFlag((TagToken)token);
+					tree.PopFromStack();
+					return;
+				}
 
+				if(token.IsStartTag("hr")){
+					if(tree.StackOfOpenElements.HaveElementInButtonScope("p")){
+						EndTagPHadBeSeen(tree, token);
+					}
+					tree.InsertElementForToken((TagToken)token);
+					tree.AcknowledgeSelfClosingFlag((TagToken)token);
+					tree.PopFromStack();
+					return;
+				}
+
+				if(token.IsStartTag("image")){
+					tree.Parser.OnParseErrorRaised("image要素の開始タグを検出しました (img要素として扱います)。");
+					token.Name = "img";
+					tree.ReprocessFlag = true;
+					return;
+				}
+
+				if(token.IsStartTag("isindex")){
+					tree.Parser.OnParseErrorRaised("isindex要素の開始タグを検出しました。");
+					XmlElement node = tree.FormElementPointer;
+					if(node != null) return;
+					tree.AcknowledgeSelfClosingFlag((TagToken)token);
+
+					// IsIndexのフォーム作成
+					// ToDo: この実装は手抜きなのでちゃんと作る必要がある。たとえば form開始タグの前にpを閉じるなど。
+					XmlElement form = tree.InsertElementForToken("form");
+					string actionAttrValue = token.GetAttributeValue("action");
+					if(actionAttrValue != null) form.SetAttribute("action", actionAttrValue);
+					tree.InsertElementForToken("hr");
+					tree.PopFromStack();
+					tree.InsertElementForToken("label");
+					string promptAttrValue = token.GetAttributeValue("prompt");
+					if(promptAttrValue == null){
+						tree.InsertText("This is a searchable index. Enter search keywords:");
+					} else {
+						tree.InsertText(promptAttrValue);
+
+					}
+					XmlElement input = tree.InsertElementForToken("input");
+					input.SetAttribute("name", "isindex");
+					foreach(AttributeToken at in token.Attributes){
+						if(at.Name == "name" || at.Name == "action" || at.Name == "prompt") continue;
+						input.SetAttribute(at.Name, at.Value);
+					}
+					tree.PopFromStack();//input
+					tree.PopFromStack();//label
+					tree.InsertElementForToken("hr");
+					tree.PopFromStack();//hr
+					tree.PopFromStack();//form
+					return;
+				}
+
+				if(token.IsStartTag("textarea")){
+					tree.InsertElementForToken((TagToken)token);
+					tree.IgnoreNextLineFeed = true;
+					tree.Parser.ChangeTokenState<RCDATAState>();
+					tree.OriginalInsertionMode = tree.CurrentInsertionMode;
 					tree.Parser.FramesetOK = false;
+					tree.ChangeInsertionMode<TextInsertionMode>();
+					return;
+				}
+
+				if(token.IsStartTag("xmp")){
+					if(tree.StackOfOpenElements.HaveElementInButtonScope("p")){
+						EndTagPHadBeSeen(tree, token);
+					}
+					Reconstruct(tree, token);
+					tree.Parser.FramesetOK = false;
+					GenericRawtextElementParsingAlgorithm(tree, token);
+					return;
+				}
+
+				if(token.IsStartTag("iframe")){
+					tree.Parser.FramesetOK = false;
+					GenericRawtextElementParsingAlgorithm(tree, token);
+					return;
+				}
+
+				// start tag whose tag name is "noscript", if the scripting flag is enabled
+				if(token.IsStartTag("noembed")){
+					GenericRawtextElementParsingAlgorithm(tree, token);
+					return;
+				}
+
+				if(token.IsStartTag("select")){
+					Reconstruct(tree, token);
+					tree.InsertElementForToken((TagToken)token);
+					tree.Parser.FramesetOK = false;
+
+					//If the insertion mode is one of "in table", "in caption", "in table body", "in row", or "in cell", then switch the insertion mode to "in select in table". Otherwise, switch the insertion mode to "in select".
+
+					if(tree.CurrentInsertionMode is TableRelatedInsertionMode){
+						tree.ChangeInsertionMode<InSelectInTableInsertionMode>();
+					} else {
+						tree.ChangeInsertionMode<InSelectInsertionMode>();
+					}
+					return;
+				}
+
+				if(token.IsStartTag("optgroup", "option")){
+					if(tree.CurrentNode.Name == "option") EndTagHadBeSeen(tree, "option");
+					Reconstruct(tree, token);
+					tree.InsertElementForToken((TagToken)token);
 					return;
 				}
 
@@ -424,6 +538,12 @@ namespace Bakera.RedFace{
 
 // end tags
 
+			private void EndTagHadBeSeen(TreeConstruction tree, string name){
+				EndTagToken token = new EndTagToken();
+				token.Name = name;
+				AppendToken(tree, token);
+			}
+
 			private void AnyOtherEndTag(TreeConstruction tree, Token token){
 				foreach(XmlElement node in tree.StackOfOpenElements){
 					if(StackOfElements.IsNameMatch(node, token.Name)){
@@ -442,7 +562,6 @@ namespace Bakera.RedFace{
 				}
 				return;
 			}
-
 
 			private void FormatEndTagHadBeSeen(TreeConstruction tree, Token token, string tagName){
 				ListOfElements list = tree.ListOfActiveFormatElements;

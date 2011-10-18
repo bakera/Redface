@@ -21,7 +21,7 @@ namespace Bakera.RedFace{
 			set{myCurrentAttribute = value;}
 		}
 
-		public AttributeToken[] Attributes{
+		public override AttributeToken[] Attributes{
 			get{
 				AttributeToken[] result = new AttributeToken[myAttributes.Values.Count];
 				myAttributes.Values.CopyTo(result, 0);
@@ -29,7 +29,7 @@ namespace Bakera.RedFace{
 			}
 		}
 
-		public string GetAttributeValue(string name){
+		public override string GetAttributeValue(string name){
 			if(!myAttributes.ContainsKey(name)) return null;
 			return myAttributes[name].Value;
 		}

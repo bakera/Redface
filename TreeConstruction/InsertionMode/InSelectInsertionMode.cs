@@ -6,7 +6,7 @@ namespace Bakera.RedFace{
 
 	public partial class RedFaceParser{
 
-		public class InTableInsertionMode : TableRelatedInsertionMode{
+		public class InSelectInsertionMode : InsertionMode{
 
 			public override void AppendToken(TreeConstruction tree, Token token){
 				Console.WriteLine("========\nnot implemented: {0} - {1}", this.Name, token);
