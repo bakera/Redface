@@ -465,9 +465,6 @@ namespace Bakera.RedFace{
 					Reconstruct(tree, token);
 					tree.InsertElementForToken((TagToken)token);
 					tree.Parser.FramesetOK = false;
-
-					//If the insertion mode is one of "in table", "in caption", "in table body", "in row", or "in cell", then switch the insertion mode to "in select in table". Otherwise, switch the insertion mode to "in select".
-
 					if(tree.CurrentInsertionMode is TableRelatedInsertionMode){
 						tree.ChangeInsertionMode<InSelectInTableInsertionMode>();
 					} else {
@@ -483,7 +480,38 @@ namespace Bakera.RedFace{
 					return;
 				}
 
+				if(token.IsStartTag("rp", "rt")){
+					if(tree.StackOfOpenElements.HaveElementInScope("ruby")){
+						GenerateImpliedEndTags(tree, token);
+						if(!tree.StackOfOpenElements.IsCurrentNameMatch("ruby")){
+							tree.Parser.OnParseErrorRaised(string.Format("{0}要素が出現しましたが、親要素がruby要素ではありません。: {1}", token.Name, tree.CurrentNode.Name));
+							tree.StackOfOpenElements.PopUntilSameTagName("ruby");
+						}
+					}
+					tree.InsertElementForToken((TagToken)token);
+					return;
+				}
 
+				if(token.IsEndTag("br")){
+					tree.Parser.OnParseErrorRaised(string.Format("br要素の終了タグが出現しました。"));
+					StartTagHadBeSeen(tree, "br");
+					return;
+				}
+
+				if(token.IsStartTag("math")){
+					// ToDo: mathに対応
+					return;
+				}
+
+				if(token.IsStartTag("svg")){
+					// ToDo: svgに対応
+					return;
+				}
+
+				if(token.IsStartTag("caption", "col", "colgroup", "frame", "head", "tbody", "td", "tfoot", "th", "thead", "tr")){
+					tree.Parser.OnParseErrorRaised(string.Format("{0}要素の開始タグが出現しましたが、この文脈でこの要素が出現することはできません。", token.Name));
+					return;
+				}
 
 				if(token is StartTagToken){
 					Reconstruct(tree, token);
@@ -495,9 +523,6 @@ namespace Bakera.RedFace{
 					AnyOtherEndTag(tree, token);
 					return;
 				}
-
-				Console.WriteLine("========\nnot implemented: {0} - {1}", this.Name, token);
-				tree.Parser.Stop();
 				return;
 			}
 
@@ -540,6 +565,12 @@ namespace Bakera.RedFace{
 
 			private void EndTagHadBeSeen(TreeConstruction tree, string name){
 				EndTagToken token = new EndTagToken();
+				token.Name = name;
+				AppendToken(tree, token);
+			}
+
+			private void StartTagHadBeSeen(TreeConstruction tree, string name){
+				StartTagToken token = new StartTagToken();
 				token.Name = name;
 				AppendToken(tree, token);
 			}
