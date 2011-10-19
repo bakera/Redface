@@ -417,12 +417,12 @@ namespace Bakera.RedFace{
 					if(node != null) return;
 					tree.AcknowledgeSelfClosingFlag((TagToken)token);
 
-					XmlElement form = tree.InsertElementForToken("form");
+					StartTagHadBeSeen(tree, "form");
+					XmlElement form = (XmlElement)tree.CurrentNode;
 					string actionAttrValue = token.GetAttributeValue("action");
 					if(actionAttrValue != null) form.SetAttribute("action", actionAttrValue);
-					tree.InsertElementForToken("hr");
-					tree.PopFromStack();
-					tree.InsertElementForToken("label");
+					StartTagHadBeSeen(tree, "hr");
+					StartTagHadBeSeen(tree, "label");
 					string promptAttrValue = token.GetAttributeValue("prompt");
 					if(promptAttrValue == null){
 						tree.InsertText("This is a searchable index. Enter search keywords:");
@@ -430,17 +430,16 @@ namespace Bakera.RedFace{
 						tree.InsertText(promptAttrValue);
 
 					}
-					XmlElement input = tree.InsertElementForToken("input");
+					StartTagHadBeSeen(tree, "input");
+					XmlElement input = (XmlElement)tree.CurrentNode["input"];
 					input.SetAttribute("name", "isindex");
 					foreach(AttributeToken at in token.Attributes){
 						if(at.Name == "name" || at.Name == "action" || at.Name == "prompt") continue;
 						input.SetAttribute(at.Name, at.Value);
 					}
-					tree.PopFromStack();//input
-					tree.PopFromStack();//label
-					tree.InsertElementForToken("hr");
-					tree.PopFromStack();//hr
-					tree.PopFromStack();//form
+					EndTagHadBeSeen(tree, "label");
+					StartTagHadBeSeen(tree, "hr");
+					EndTagHadBeSeen(tree, "form");
 					return;
 				}
 

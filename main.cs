@@ -13,11 +13,13 @@ namespace Bakera.RedFace{
 
 				string f = "data/test.html";
 				FileInfo file = new FileInfo(f);
+
+				p.ParseErrorRaised += WriteError;
+
 /*
 				p.TokenStateChanged += WriteTokenState;
 				p.InsertionModeChanged += WriteInsertionMode;
 				p.DocumentModeChanged += WriteDocumentMode;
-				p.ParseErrorRaised += WriteError;
 				p.TokenCreated += WriteToken;
 				p.ImpliedEndTagInserted += WriteImpliedEndTagInserted;
 */
@@ -64,7 +66,7 @@ namespace Bakera.RedFace{
 			RedFaceParser p = sender as RedFaceParser;
 			ParseErrorEventArgs pe = e as ParseErrorEventArgs;
 			Console.WriteLine(pe.Message);
-			Console.WriteLine( p.StackOfOpenElements);
+			Console.WriteLine(p.StackOfOpenElements);
 		}
 
 		public static void WriteToken(Object sender, EventArgs e){

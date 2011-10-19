@@ -178,14 +178,12 @@ namespace Bakera.RedFace{
 
 
 		public override string ToString(){
-			if(this.Count == 0) return null;
 			XmlElement[] path = this.ToArray();
-			string result = "";
-			for(int i = 1; i < path.Length; i++){
-				XmlElement e = path[path.Length - i];
-				result += string.Format("{0} > ", e.Name);
+			string result = "(document)";
+			for(int i = 0; i < path.Length; i++){
+				XmlElement e = path[path.Length - i - 1];
+				result += string.Format(" > {0}", e.Name);
 			}
-			result += path[0].Name;
 			return result;
 		}
 
