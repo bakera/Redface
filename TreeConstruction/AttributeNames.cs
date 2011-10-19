@@ -15,7 +15,7 @@ namespace Bakera.RedFace{
 		}
 
 		public static void AdjustForeignAttributes(XmlElement e){
-			AdjustAttributes(e, mySVGAttributeNameReferences);
+			AdjustAttributes(e, myForeignAttributeNameReferences);
 		}
 
 		public static void AdjustAttributes(XmlElement e, Dictionary<string, AttributeInfo> dic){
