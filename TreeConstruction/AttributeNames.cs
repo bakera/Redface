@@ -99,18 +99,18 @@ namespace Bakera.RedFace{
 		};
 
 		private static readonly Dictionary<string, AttributeInfo> myForeignAttributeNameReferences = new Dictionary<string, AttributeInfo>(){
-			{"xlink:actuate", new AttributeInfo("xlink", "actuate", "XLink namespace")},
-			{"xlink:arcrole", new AttributeInfo("xlink", "arcrole", "XLink namespace")},
-			{"xlink:href", new AttributeInfo("xlink", "href", "XLink namespace")},
-			{"xlink:role", new AttributeInfo("xlink", "role", "XLink namespace")},
-			{"xlink:show", new AttributeInfo("xlink", "show", "XLink namespace")},
-			{"xlink:title", new AttributeInfo("xlink", "title", "XLink namespace")},
-			{"xlink:type", new AttributeInfo("xlink", "type", "XLink namespace")},
-			{"xml:base", new AttributeInfo("xml", "base", "XML namespace")},
-			{"xml:lang", new AttributeInfo("xml", "lang", "XML namespace")},
-			{"xml:space", new AttributeInfo("xml", "space", "XML namespace")},
-			{"xmlns", new AttributeInfo(null, "xmlns", "XMLNS namespace")},
-			{"xmlns:xlink", new AttributeInfo("xmlns", "xlink", "XMLNS namespace")},
+			{"xlink:actuate", new AttributeInfo("xlink", "actuate", Document.XLinkNamespace)},
+			{"xlink:arcrole", new AttributeInfo("xlink", "arcrole", Document.XLinkNamespace)},
+			{"xlink:href", new AttributeInfo("xlink", "href", Document.XLinkNamespace)},
+			{"xlink:role", new AttributeInfo("xlink", "role", Document.XLinkNamespace)},
+			{"xlink:show", new AttributeInfo("xlink", "show", Document.XLinkNamespace)},
+			{"xlink:title", new AttributeInfo("xlink", "title", Document.XLinkNamespace)},
+			{"xlink:type", new AttributeInfo("xlink", "type", Document.XLinkNamespace)},
+			{"xml:base", new AttributeInfo("xml", "base", Document.XmlNamespace)},
+			{"xml:lang", new AttributeInfo("xml", "lang", Document.XmlNamespace)},
+			{"xml:space", new AttributeInfo("xml", "space", Document.XmlNamespace)},
+			{"xmlns", new AttributeInfo(null, "xmlns", Document.XmlnsNamespace)},
+			{"xmlns:xlink", new AttributeInfo("xmlns", "xlink", Document.XmlnsNamespace)},
 		};
 	}
 }
