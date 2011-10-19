@@ -513,6 +513,7 @@ namespace Bakera.RedFace{
 				}
 
 				if(token.IsStartTag("math")){
+					Reconstruct(tree, token);
 					// ToDo: mathに対応
 					return;
 				}
