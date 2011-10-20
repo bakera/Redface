@@ -12,6 +12,7 @@ namespace Bakera.RedFace{
 		public override string Namespace{
 			get{return Document.MathMLNamespace;}
 		}
+
 	}
 
 }

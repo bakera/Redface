@@ -514,12 +514,29 @@ namespace Bakera.RedFace{
 
 				if(token.IsStartTag("math")){
 					Reconstruct(tree, token);
-					// ToDo: mathに対応
+					StartTagToken t = (StartTagToken)token;
+					t.AdjustMathMLAttributes();
+					t.AdjustForeignAttributes();
+					XmlElement result = tree.CreateElementForToken(t, Document.MathMLNamespace);
+					tree.InsertElement(result);
+					if(t.SelfClosing){
+						tree.AcknowledgeSelfClosingFlag(t);
+						tree.PopFromStack();
+					}
 					return;
 				}
 
 				if(token.IsStartTag("svg")){
-					// ToDo: svgに対応
+					Reconstruct(tree, token);
+					StartTagToken t = (StartTagToken)token;
+					t.AdjustSVGAttributes();
+					t.AdjustForeignAttributes();
+					XmlElement result = tree.CreateElementForToken(t, Document.SVGNamespace);
+					tree.InsertElement(result);
+					if(t.SelfClosing){
+						tree.AcknowledgeSelfClosingFlag(t);
+						tree.PopFromStack();
+					}
 					return;
 				}
 

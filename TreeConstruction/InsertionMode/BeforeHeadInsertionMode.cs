@@ -25,10 +25,7 @@ namespace Bakera.RedFace{
 				}
 
 				if(token.IsStartTag("html")){
-					// ToDo:
-					// Process the token using the rules for the "in body" insertion mode.
-					Console.WriteLine("not implemented:" + this.GetType().Name);
-					tree.Parser.Stop();
+					tree.AppendToken<InBodyInsertionMode>(token);
 					return;
 				}
 

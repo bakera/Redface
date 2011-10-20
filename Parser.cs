@@ -90,7 +90,6 @@ namespace Bakera.RedFace{
 				Token t = myTokenizer.GetToken();
 				if(t == null) continue;
 				OnTokenCreated(t);
-
 				// AppendTokenを実行。
 				// 実行後にReprocessフラグが立てられている場合は同じトークンを再処理する
 				do{

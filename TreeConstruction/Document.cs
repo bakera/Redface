@@ -40,7 +40,6 @@ namespace Bakera.RedFace{
 			return result;
 		}
 
-
 		// 渡されたXmlElementが同じ名前、名前空間、属性を持っていればtrueを返します。
 		// same tag name, namespace, and attributes as element
 		public static bool IsSamePairElement(XmlElement e1, XmlElement e2){
@@ -55,7 +54,6 @@ namespace Bakera.RedFace{
 			}
 			return true;
 		}
-
 
 	}
 

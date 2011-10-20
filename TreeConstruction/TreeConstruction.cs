@@ -72,12 +72,25 @@ namespace Bakera.RedFace{
 
 	// メソッド
 			public void AppendToken(Token t){
+				AppendToken(CurrentInsertionMode, t);
+			}
+
+			public void AppendToken<T>(Token t) where T : InsertionMode, new() {
+				InsertionMode mode = myInsertionModeManager.GetState<T>();
+				AppendToken(mode, t);
+			}
+
+			private void AppendToken(InsertionMode mode, Token t){
 				// 開始タグ直後の改行を無視するケース
 				if(IgnoreNextLineFeed){
 					if(t.IsLineFeed) return;
 					IgnoreNextLineFeed = false;
 				}
-				CurrentInsertionMode.AppendToken(this, t);
+				if(IsInHtmlContext(t)){
+					mode.AppendToken(this, t);
+				} else {
+					myInsertionModeManager.GetState<InForeignContent>().AppendToken(this, t);
+				}
 				if(t is StartTagToken && t.SelfClosing && t != myAcknowledgedSelfClosingTag){
 					Parser.OnParseErrorRaised(string.Format("空要素でない要素に空要素タグを使用することはできません。: {0}", t.Name));
 				}
@@ -91,9 +104,27 @@ namespace Bakera.RedFace{
 				myAcknowledgedSelfClosingTag = null;
 			}
 
-			public void AppendToken<T>(Token t) where T : InsertionMode, new() {
-				InsertionMode mode = myInsertionModeManager.GetState<T>();
-				mode.AppendToken(this, t);
+			// 渡されたトークンとカレントノードの状態を見て、current insertion mode in HTML content で扱うべきならtrueを返します。
+			public bool IsInHtmlContext(Token t){
+				XmlElement e = this.CurrentNode as XmlElement;
+				if(e == null) return true;
+				if(e.NamespaceURI.Equals(Document.HtmlNamespace, StringComparison.InvariantCulture)) return true;
+				if(ElementInfo.IsMathMLTextIntegrationPoint(e)){
+					if(t is StartTagToken){
+						if(!t.IsStartTag("mglyph", "malignmark")) return true;
+					}
+				}
+				if(ElementInfo.IsMathMLNameSpace(e)){
+					if(e.Name.Equals("annotation-xml", StringComparison.InvariantCulture)){
+						if(t.IsStartTag("svg")) return true;
+					}
+				}
+				if(ElementInfo.IsHtmlIntegrationPoint(e)){
+					if(t is StartTagToken) return true;
+					if(t is CharacterToken) return true;
+				}
+				if(t is EndTagToken) return true;
+				return false;
 			}
 
 			// InsertionModeを変更します。
@@ -142,7 +173,13 @@ namespace Bakera.RedFace{
 			// TagTokenに対応する要素を作って返します。
 			// XmlElement と TagToken の対応関係をDictionaryに記録します。
 			public XmlElement CreateElementForToken(TagToken t){
-				XmlElement result = Document.CreateHtmlElement(t.Name);
+				return CreateElementForToken(t, Document.HtmlNamespace);
+			}
+
+			// TagTokenに対応する要素を、指定された名前空間で作って返します。
+			// XmlElement と TagToken の対応関係をDictionaryに記録します。
+			public XmlElement CreateElementForToken(TagToken t, string ns){
+				XmlElement result = Document.CreateElement(t.Name, ns);
 				foreach(AttributeToken at in t.Attributes){
 					result.SetAttribute(at.Name, at.Value);
 				}
