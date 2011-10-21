@@ -1,5 +1,5 @@
 using System;
-using System.Reflection;
+using System.Xml;
 
 namespace Bakera.RedFace{
 
@@ -16,7 +16,7 @@ namespace Bakera.RedFace{
 
 				if(token is EndOfFileToken){
 					tree.Parser.OnParseErrorRaised(string.Format("テキストの途中で終端に達しました。終了タグがありません。"));
-					// ToDo: 
+					// Ignore?: 
 					// If the current node is a script element, mark the script element as "already started".
 					tree.PopFromStack();
 					tree.SwitchToOriginalInsertionMode();
@@ -24,9 +24,14 @@ namespace Bakera.RedFace{
 					return;
 				}
 
-				// ToDo:
-//				if(token.IsEndTag("script")){
-//				}
+				if(token.IsEndTag("script")){
+					// Ignore?: Provide a stable state.
+					// XmlElement script = tree.CurrentNode as XmlElement;
+					tree.PopFromStack();
+					tree.SwitchToOriginalInsertionMode();
+					// Ignore? script etc.
+					return;
+				}
 
 				if(token is EndTagToken){
 					tree.PopFromStack();

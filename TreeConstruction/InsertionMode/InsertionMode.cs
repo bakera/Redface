@@ -6,9 +6,6 @@ namespace Bakera.RedFace{
 
 		public abstract class InsertionMode : RedFaceParserState{
 			
-
-
-
 	// メソッド
 			public abstract void AppendToken(TreeConstruction tc, Token t);
 
