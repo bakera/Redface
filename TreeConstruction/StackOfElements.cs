@@ -166,6 +166,7 @@ namespace Bakera.RedFace{
 			new HtmlElementInfo("tr"),
 		};
 		private static readonly ElementInfo TableElement = new HtmlElementInfo("table");
+		private static readonly ElementInfo HtmlRootElement = new HtmlElementInfo("html");
 
 		// 上からn番目の要素を取得します。
 		public XmlElement this[int n]{
@@ -256,7 +257,7 @@ namespace Bakera.RedFace{
 
 // Get 
 
-		// 渡された要素よりも浅い階層にあるspecialに属する要素をすべて取得します。
+		// 渡された要素よりも浅い階層にあるspecialに属する要素を取得します。
 		public XmlElement GetFurthestBlock(XmlElement e){
 			XmlElement[] elements = this.ToArray();
 			List<XmlElement> result = new List<XmlElement>();
@@ -345,6 +346,15 @@ namespace Bakera.RedFace{
 				this.Push(tempStack.Pop());
 			}
 		}
+
+		public void ClearBackToTable(){
+			XmlElement x = this.Peek();
+			while(!HtmlRootElement.IsMatch(x) && !TableElement.IsMatch(x)){
+				x = this.Pop();
+			}
+		}
+
+
 
 // Scope
 		public bool HaveElementInScope(string elementName){

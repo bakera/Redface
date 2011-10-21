@@ -16,6 +16,8 @@ namespace Bakera.RedFace{
 			private ListOfElements myListOfActiveFormatElements = new ListOfElements();
 			private Dictionary<XmlElement, TagToken> myCreatedElementToken = new Dictionary<XmlElement, TagToken>();
 			private TagToken myAcknowledgedSelfClosingTag = null;
+			private List<CharacterToken> myPendingTableCharacterTokens = new List<CharacterToken>();
+
 
 			private RedFaceParser myParser = null;
 			public RedFaceParser Parser {
@@ -150,6 +152,15 @@ namespace Bakera.RedFace{
 				return myStackOfOpenElements.Pop();
 			}
 
+	// Pending table character tokens
+
+			public void ClearPendingTableCharacterTokens(){
+				myPendingTableCharacterTokens.Clear();
+			}
+
+			public void AddPendingTableCharacterToken(CharacterToken t){
+				myPendingTableCharacterTokens.Add(t);
+			}
 
 
 	// ノード作成
