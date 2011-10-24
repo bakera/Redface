@@ -1,26 +1,22 @@
 using System;
-using System.IO;
 
 namespace Bakera.RedFace{
 
-	public partial class RedFaceParser{
+	public class ScriptDataEscapeStartDashState : TokenizationState{
 
-		public class ScriptDataEscapeStartDashState : TokenizationState{
-
-			public override void Read(Tokenizer t){
-				char? c = t.ConsumeChar();
-				switch(c){
-					case Chars.HYPHEN_MINUS:
-						t.EmitToken(Chars.HYPHEN_MINUS);
-						t.ChangeTokenState<ScriptDataEscapedDashDashState>();
-						return;
-					default:
-						t.UnConsume(1);
-						t.ChangeTokenState<ScriptDataState>();
-						return;
-				}
-
+		public override void Read(Tokenizer t){
+			char? c = t.ConsumeChar();
+			switch(c){
+				case Chars.HYPHEN_MINUS:
+					t.EmitToken(Chars.HYPHEN_MINUS);
+					t.ChangeTokenState<ScriptDataEscapedDashDashState>();
+					return;
+				default:
+					t.UnConsume(1);
+					t.ChangeTokenState<ScriptDataState>();
+					return;
 			}
+
 		}
 	}
 }

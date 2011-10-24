@@ -11,18 +11,12 @@ namespace Bakera.RedFace{
 
 			try{
 
+				InitialInsertionMode temp = new InitialInsertionMode();
+
 				string f = "data/test.html";
 				FileInfo file = new FileInfo(f);
 
-				p.ParseErrorRaised += WriteError;
-
-/*
-				p.TokenStateChanged += WriteTokenState;
-				p.InsertionModeChanged += WriteInsertionMode;
-				p.DocumentModeChanged += WriteDocumentMode;
-				p.TokenCreated += WriteToken;
-				p.ImpliedEndTagInserted += WriteImpliedEndTagInserted;
-*/
+				p.ParserEventRaised += WriteEvent;
 
 				using(FileStream fs = file.Open(FileMode.Open, FileAccess.Read, FileShare.Read)){
 					p.Parse(fs);
@@ -38,7 +32,7 @@ namespace Bakera.RedFace{
 				Console.WriteLine("パース時間: {0}", p.EndTime - p.StartTime);
 				Console.WriteLine();
 				Console.WriteLine("========");
-				Console.WriteLine(p.Document.OuterXml);
+//				Console.WriteLine(p.Document.OuterXml);
 
 				return 0;
 			} catch(Exception e){
@@ -47,39 +41,9 @@ namespace Bakera.RedFace{
 			}
 		}
 
-		public static void WriteTokenState(Object sender, EventArgs e){
-			RedFaceParser p = sender as RedFaceParser;
-			Console.WriteLine(p.CurrentTokenState);
-		}
-
-		public static void WriteInsertionMode(Object sender, EventArgs e){
-			RedFaceParser p = sender as RedFaceParser;
-			Console.WriteLine("{0} ({1})", p.CurrentInsertionMode, p.StackOfOpenElements);
-		}
-
-		public static void WriteDocumentMode(Object sender, EventArgs e){
-			RedFaceParser p = sender as RedFaceParser;
-			Console.WriteLine("DocumentMode: {0}", p.Document.DocumentMode);
-		}
-
-		public static void WriteError(Object sender, EventArgs e){
-			RedFaceParser p = sender as RedFaceParser;
-			ParseErrorEventArgs pe = e as ParseErrorEventArgs;
-			Console.WriteLine(pe.Message);
-			Console.WriteLine(p.StackOfOpenElements);
-		}
-
-		public static void WriteToken(Object sender, EventArgs e){
-			RedFaceParser p = sender as RedFaceParser;
-			ParserTokenEventArgs pte = e as ParserTokenEventArgs;
-			Token t = pte.Token;
-			Console.WriteLine("Token: {0}", t);
-		}
-
-		public static void WriteImpliedEndTagInserted(Object sender, EventArgs e){
-			RedFaceParser p = sender as RedFaceParser;
-			ParserElementEventArgs pee = e as ParserElementEventArgs;
-			Console.WriteLine("ImpliedEndTagInserted: {0}", pee.Element.Name);
+		public static void WriteEvent(Object sender, ParserEventArgs e){
+			if(e.Message != null) Console.WriteLine(e.Message);
+			if(e.Token != null) Console.WriteLine(e.Token);
 		}
 
 	}

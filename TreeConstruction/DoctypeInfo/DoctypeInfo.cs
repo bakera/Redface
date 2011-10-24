@@ -27,6 +27,8 @@ namespace Bakera.RedFace{
 
 
 		public static bool IsHtml(DoctypeToken t){
+			if(t == null) return false;
+			if(t.Name == null) return false;
 			return t.Name.Equals("html", StringComparison.InvariantCulture);
 		}
 

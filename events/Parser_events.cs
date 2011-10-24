@@ -5,78 +5,61 @@ namespace Bakera.RedFace{
 
 	public partial class RedFaceParser{
 
-		public delegate void ParserEventHandler(Object sender, EventArgs e);
-		public event ParserEventHandler TokenStateChanged;
-		public event ParserEventHandler InsertionModeChanged;
-		public event ParserEventHandler ParseErrorRaised;
-		public event ParserEventHandler WillfulViolationRaised;
-		public event ParserEventHandler TokenCreated;
-		public event ParserEventHandler DocumentModeChanged;
-		public event ParserEventHandler ElementInserted;
-		public event ParserEventHandler ImpliedEndTagInserted;
-		public event ParserEventHandler DeepBreath;
+		public event EventHandler<ParserEventArgs> ParserEventRaised;
+
+		// イベントを発生します。
+		protected virtual void OnParserEventRaised(ParserEventArgs e){
+			OnParserEventRaised(this, e);
+		}
+		protected virtual void OnParserEventRaised(Object sender, ParserEventArgs e){
+			if(ParserEventRaised != null){
+				ParserEventRaised(this, e);
+			}
+		}
 
 		// TokenStateChangedイベントを発生します。
 		protected virtual void OnTokenStateChanged(){
-			if(TokenStateChanged != null){
-				TokenStateChanged(this, new ParserEventArgs(this));
-			}
+			OnParserEventRaised(new ParserEventArgs());
 		}
 
 		// InsertionModeChangedイベントを発生します。
 		protected virtual void OnInsertionModeChanged(){
-			if(InsertionModeChanged != null){
-				InsertionModeChanged(this, new ParserEventArgs(this));
-			}
+			OnParserEventRaised(new ParserEventArgs());
 		}
 
 		// TokenCreatedイベントを発生します。
 		protected virtual void OnTokenCreated(Token t){
-			if(TokenCreated != null){
-				TokenCreated(this, new ParserTokenEventArgs(this, t));
-			}
+			OnParserEventRaised(new ParserEventArgs(){Token=t});
 		}
 
 		// ParseErrorRaisedイベントを発生します。
 		protected virtual void OnParseErrorRaised(string s){
-			if(ParseErrorRaised != null){
-				ParseErrorRaised(this, new ParseErrorEventArgs(this){Message = s});
-			}
+			OnParserEventRaised(new ParserEventArgs(){Message = s});
 		}
 
 		// WillfulViolationRaisedイベントを発生します。
 		protected virtual void OnWillfulViolationRaised(string s){
-			if(WillfulViolationRaised != null){
-				WillfulViolationRaised(this, new ParseErrorEventArgs(this){Message = s});
-			}
+			OnParserEventRaised(new ParserEventArgs(){Message = s});
 		}
 
 		// DocumentModeChangedイベントを発生します。
 		protected virtual void OnDocumentModeChanged(){
-			if(DocumentModeChanged != null){
-				DocumentModeChanged(this, new ParseErrorEventArgs(this));
-			}
+			OnParserEventRaised(new ParserEventArgs());
 		}
 
 		// ElementInsertedイベントを発生します。
 		protected virtual void OnElementInserted(){
-			if(ElementInserted != null){
-				ElementInserted(this, new ParserEventArgs(this));
-			}
+			OnParserEventRaised(new ParserEventArgs());
 		}
 
 		// ImpliedEndTagInsertedイベントを発生します。
 		protected virtual void OnImpliedEndTagInserted(XmlElement e, Token t){
-			if(ImpliedEndTagInserted != null){
-				ImpliedEndTagInserted(this, new ParserElementEventArgs(this, t, e));
-			}
+			OnParserEventRaised(new ParserEventArgs(){Token=t,Element=e});
 		}
 
 		// DeepBreathイベントを発生します。
 		protected virtual void OnDeepBreath(){
-			if(DeepBreath != null){
-				DeepBreath(this, new ParserEventArgs(this));
-			}
+			OnParserEventRaised(new ParserEventArgs());
 		}
 
 	}

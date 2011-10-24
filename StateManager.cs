@@ -8,11 +8,6 @@ namespace Bakera.RedFace{
 
 		public T CurrentState{get; private set;}
 		public T PreviousState{get; private set;}
-		private RedFaceParser myParser = null;
-
-		public StateManager(RedFaceParser parser){
-			myParser = parser;
-		}
 
 		public void SetState<U>() where U : T, new(){
 			PreviousState = CurrentState;
@@ -30,7 +25,9 @@ namespace Bakera.RedFace{
 		public T GetState<U>() where U : T, new(){
 			Type t = typeof(U);
 			if(!this.Contains(t)){
-				this.Add(new U());
+				U state = new U();
+				state.ParserEventRaised += OnParserEventRaised;
+				this.Add(state);
 			}
 			return this[t];
 		}
@@ -41,6 +38,18 @@ namespace Bakera.RedFace{
 			CurrentState = PreviousState;
 			PreviousState = temp;
 		}
+
+
+// イベント
+		public event EventHandler<ParserEventArgs> ParserEventRaised;
+
+		// Stateが発生させたイベントを伝達します。
+		protected virtual void OnParserEventRaised(Object sender, ParserEventArgs e){
+			if(ParserEventRaised != null){
+				ParserEventRaised(sender, e);
+			}
+		}
+
 
 
 	}

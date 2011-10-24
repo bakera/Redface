@@ -84,7 +84,9 @@ namespace Bakera.RedFace{
 			TextReader tr = new StreamReader(s);
 			InputStream stream = new InputStream(this, tr);
 			myTokenizer = new Tokenizer(this, stream);
+			myTokenizer.ParserEventRaised += OnParserEventRaised;
 			myTreeConstruction = new TreeConstruction(this);
+			myTreeConstruction.ParserEventRaised += OnParserEventRaised;
 
 			while(!myStopFlag){
 				Token t = myTokenizer.GetToken();
