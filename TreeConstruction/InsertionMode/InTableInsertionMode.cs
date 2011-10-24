@@ -29,6 +29,9 @@ namespace Bakera.RedFace{
 
 				if(token.IsStartTag("caption")){
 					tree.StackOfOpenElements.ClearBackToTable();
+					tree.ListOfActiveFormatElements.InsertMarker();
+					tree.InsertElementForToken((TagToken)token);
+					tree.ChangeInsertionMode<InCaptionInsertionMode>();
 					return;
 
 				}
