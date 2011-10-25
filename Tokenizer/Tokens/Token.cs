@@ -10,6 +10,7 @@ The output of the tokenization step is a series of zero or more of the following
 		public bool SelfClosing{get; set;}
 		public virtual string Name{get; set;}
 
+
 		// 属性値を取得します。TagTokenの場合を除いて常にnullを返します。
 		public virtual string GetAttributeValue(string name){
 			return null;

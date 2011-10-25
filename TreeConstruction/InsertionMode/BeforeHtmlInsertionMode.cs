@@ -5,22 +5,20 @@ namespace Bakera.RedFace{
 
 	public class BeforeHtmlInsertionMode : InsertionMode{
 
-		public override void AppendToken(TreeConstruction tree, Token token){
+		protected override void AppendDoctypeToken(TreeConstruction tree, DoctypeToken token){
+			OnParseErrorRaised(string.Format("先頭以外の箇所に文書型宣言があります。"));
+		}
 
-			if(token is DoctypeToken){
-				OnParseErrorRaised(string.Format("先頭以外の箇所に文書型宣言があります。"));
-				return;
-			}
+		protected override void AppendCommentToken(TreeConstruction tree, CommentToken token){
+			tree.AppendCommentForToken(token);
+		}
 
-			if(token is CommentToken){
-				tree.AppendCommentForToken((CommentToken)token);
-				return;
-			}
+		protected override void AppendCharacterToken(TreeConstruction tree, CharacterToken token){
+			if(token.IsWhiteSpace) return;
+			AppendAnythingElse(tree, token);
+		}
 
-			if(token.IsWhiteSpace){
-				return;
-			}
-
+		protected override void AppendStartTagToken(TreeConstruction tree, StartTagToken token){
 			if(token.IsStartTag("html")){
 				XmlElement htmlElement = tree.CreateElementForToken((TagToken)token);
 				tree.AppendChild(htmlElement);
@@ -28,18 +26,24 @@ namespace Bakera.RedFace{
 				tree.ChangeInsertionMode<BeforeHeadInsertionMode>();
 				return;
 			}
+			AppendAnythingElse(tree, token);
+		}
 
-			if(token is EndTagToken && !token.IsEndTag("head", "body", "html", "br")){
-				OnParseErrorRaised(string.Format("不明な終了タグがあります。"));
+		protected override void AppendEndTagToken(TreeConstruction tree, EndTagToken token){
+			if(token.IsEndTag("head", "body", "html", "br")){
+				AppendAnythingElse(tree, token);
 				return;
 			}
+			OnParseErrorRaised(string.Format("不明な終了タグがあります。"));
+			return;
+		}
 
+		protected override void AppendAnythingElse(TreeConstruction tree, Token token){
 			XmlElement defaultHtmlElement = tree.Document.CreateHtmlElement("html");
 			tree.AppendChild(defaultHtmlElement);
 			tree.PutToStack(defaultHtmlElement);
 			tree.ChangeInsertionMode<BeforeHeadInsertionMode>();
 			tree.ReprocessFlag = true;
-			return;
 		}
 
 	}

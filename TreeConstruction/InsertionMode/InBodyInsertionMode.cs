@@ -11,40 +11,46 @@ namespace Bakera.RedFace{
 		private string[] myBodyEndTagPermitOpenTags = new string[]{"dd", "dt", "li", "optgroup", "option", "p", "rp", "rt", "tbody", "td", "tfoot", "th", "thead", "tr", "body", "html"};
 		private string[] myHeadingElements = new string[]{"h1", "h2", "h3", "h4", "h5", "h6"};
 
-		public override void AppendToken(TreeConstruction tree, Token token){
 
+		protected override void AppendDoctypeToken(TreeConstruction tree, DoctypeToken token){
+			OnParseErrorRaised(string.Format("先頭以外の箇所に文書型宣言があります。"));
+			return;
+		}
+
+		protected override void AppendCommentToken(TreeConstruction tree, CommentToken token){
+			tree.AppendCommentForToken(token);
+		}
+
+		protected override void AppendCharacterToken(TreeConstruction tree, CharacterToken token){
 			if(token.IsNULL){
 				OnParseErrorRaised(string.Format("NUL文字が出現しました。"));
 				return;
 			}
-
 			if(token.IsWhiteSpace){
 				Reconstruct(tree, token);
-				tree.InsertCharacter((CharacterToken)token);
+				tree.InsertCharacter(token);
 				return;
 			}
+			Reconstruct(tree, token);
+			tree.InsertCharacter(token);
+			tree.Parser.FramesetOK = false;
+		}
 
-			if(token is CharacterToken){
-				Reconstruct(tree, token);
-				tree.InsertCharacter((CharacterToken)token);
-				tree.Parser.FramesetOK = false;
-				return;
+		protected override void AppendEndOfFileToken(TreeConstruction tree, EndOfFileToken token){
+			string invalidOpenTag = tree.StackOfOpenElements.NotEither(myEndOfFilePermitOpenTags);
+			if(invalidOpenTag != null){
+				OnParseErrorRaised(string.Format("{0}の終了タグが不足しています。", invalidOpenTag));
 			}
+			tree.Parser.Stop();
+			return;
+		}
 
-			if(token is CommentToken){
-				tree.AppendCommentForToken((CommentToken)token);
-				return;
-			}
 
-			if(token is DoctypeToken){
-				OnParseErrorRaised(string.Format("先頭以外の箇所に文書型宣言があります。"));
-				return;
-			}
-
+		protected override void AppendStartTagToken(TreeConstruction tree, StartTagToken token){
 			if(token.IsStartTag("html")){
 				OnParseErrorRaised(string.Format("予期せぬ箇所にhtml要素開始タグがあります。"));
 				XmlElement topElement = tree.StackOfOpenElements[0];
-				tree.MergeAttribute(topElement, (TagToken)token);
+				tree.MergeAttribute(topElement, token);
 				return;
 			}
 
@@ -59,7 +65,7 @@ namespace Bakera.RedFace{
 				if(bodyElement == null || bodyElement.Name != "body") return;
 				tree.Parser.FramesetOK = false;
 
-				tree.MergeAttribute(bodyElement, (TagToken)token);
+				tree.MergeAttribute(bodyElement, token);
 				return;
 			}
 
@@ -71,37 +77,8 @@ namespace Bakera.RedFace{
 
 				bodyElement.ParentNode.RemoveChild(bodyElement);
 				while(tree.StackOfOpenElements.Count > 1) tree.StackOfOpenElements.Pop();
-				tree.InsertElementForToken((TagToken)token);
+				tree.InsertElementForToken(token);
 				tree.ChangeInsertionMode<InFramesetInsertionMode>();
-				return;
-			}
-
-			if(token is EndOfFileToken){
-				string invalidOpenTag = tree.StackOfOpenElements.NotEither(myEndOfFilePermitOpenTags);
-
-				if(invalidOpenTag != null){
-					OnParseErrorRaised(string.Format("{0}の終了タグが不足しています。", invalidOpenTag));
-				}
-				tree.Parser.Stop();
-				return;
-			}
-
-			if(token.IsEndTag("body")){
-				if(!tree.StackOfOpenElements.HaveElementInScope("body")){
-					OnParseErrorRaised(string.Format("予期せぬ箇所で終了タグが出現しました。: {0}", token.Name));
-					return;
-				}
-				string invalidOpenTag = tree.StackOfOpenElements.NotEither(myBodyEndTagPermitOpenTags);
-				if(invalidOpenTag != null){
-					OnParseErrorRaised(string.Format("{0}の終了タグが不足しています。", invalidOpenTag));
-				}
-				tree.ChangeInsertionMode<AfterBodyInsertionMode>();
-				return;
-			}
-
-			if(token.IsEndTag("html")){
-				EndTagHadBeSeen(tree, "body");
-				tree.ReprocessFlag = true;
 				return;
 			}
 
@@ -109,7 +86,7 @@ namespace Bakera.RedFace{
 				if(tree.StackOfOpenElements.HaveElementInButtonScope("p")){
 					EndTagPHadBeSeen(tree, token);
 				}
-				tree.InsertElementForToken((TagToken)token);
+				tree.InsertElementForToken(token);
 				return;
 			}
 
@@ -121,7 +98,7 @@ namespace Bakera.RedFace{
 					OnParseErrorRaised(string.Format("見出し要素の終了タグがありません。: {0}", tree.CurrentNode.Name));
 					tree.StackOfOpenElements.Pop();
 				}
-				tree.InsertElementForToken((TagToken)token);
+				tree.InsertElementForToken(token);
 				return;
 			}
 
@@ -129,7 +106,7 @@ namespace Bakera.RedFace{
 				if(tree.StackOfOpenElements.HaveElementInButtonScope("p")){
 					EndTagPHadBeSeen(tree, token);
 				}
-				tree.InsertElementForToken((TagToken)token);
+				tree.InsertElementForToken(token);
 				tree.Parser.FramesetOK = false;
 				tree.IgnoreNextLineFeed = true;
 				return;
@@ -143,7 +120,7 @@ namespace Bakera.RedFace{
 				if(tree.StackOfOpenElements.HaveElementInButtonScope("p")){
 					EndTagPHadBeSeen(tree, token);
 				}
-				XmlElement form = tree.InsertElementForToken((TagToken)token);
+				XmlElement form = tree.InsertElementForToken(token);
 				tree.FormElementPointer = form;
 				return;
 			}
@@ -164,7 +141,7 @@ namespace Bakera.RedFace{
 				if(tree.StackOfOpenElements.HaveElementInButtonScope("p")){
 					EndTagPHadBeSeen(tree, token);
 				}
-				tree.InsertElementForToken((TagToken)token);
+				tree.InsertElementForToken(token);
 				return;
 			}
 
@@ -184,7 +161,7 @@ namespace Bakera.RedFace{
 				if(tree.StackOfOpenElements.HaveElementInButtonScope("p")){
 					EndTagPHadBeSeen(tree, token);
 				}
-				tree.InsertElementForToken((TagToken)token);
+				tree.InsertElementForToken(token);
 				return;
 			}
 
@@ -192,7 +169,7 @@ namespace Bakera.RedFace{
 				if(tree.StackOfOpenElements.HaveElementInButtonScope("p")){
 					EndTagPHadBeSeen(tree, token);
 				}
-				tree.InsertElementForToken((TagToken)token);
+				tree.InsertElementForToken(token);
 				tree.Parser.ChangeTokenState<PLAINTEXTState>();
 				return;
 			}
@@ -205,8 +182,265 @@ namespace Bakera.RedFace{
 					return;
 				}
 				Reconstruct(tree, token);
-				tree.InsertElementForToken((TagToken)token);
+				tree.InsertElementForToken(token);
 				tree.Parser.FramesetOK = false;
+				return;
+			}
+
+			if(token.IsStartTag("a")){
+				var list = tree.ListOfActiveFormatElements;
+				var stack = tree.StackOfOpenElements;
+				int index = list.GetAfterMarkerIndexByName("a");
+				if(index >=0){
+					XmlElement aElement = list.GetAfterMarkerByAfterIndex(index);
+					OnParseErrorRaised(string.Format("a要素の中に他のa要素を入れ子にすることはできません。"));
+					EndTagHadBeSeen(tree, "a");
+					stack.Remove(aElement);
+					list.Remove(aElement);
+				}
+				Reconstruct(tree, token);
+				XmlElement e = tree.InsertElementForToken(token);
+				tree.ListOfActiveFormatElements.Push(e, token);
+				return;
+			}
+
+			if(token.IsStartTag("b", "big", "code", "em", "font", "i", "s", "small", "strike", "strong", "tt", "u")){
+				Reconstruct(tree, token);
+				XmlElement e = tree.InsertElementForToken(token);
+				tree.ListOfActiveFormatElements.Push(e, token);
+				return;
+			}
+
+			if(token.IsStartTag("nobr")){
+				Reconstruct(tree, token);
+				if(!tree.StackOfOpenElements.HaveElementInScope(token.Name)){
+					OnParseErrorRaised(string.Format("nobr開始タグが出現しましたが、以前のnobrが終了していません。"));
+					FormatEndTagHadBeSeen(tree, token, "nobr");
+					Reconstruct(tree, token);
+					return;
+				}
+				XmlElement e = tree.InsertElementForToken(token);
+				tree.ListOfActiveFormatElements.Push(e, token);
+				return;
+			}
+
+			if(token.IsStartTag("applet", "marquee", "object")){
+				Reconstruct(tree, token);
+				tree.InsertElementForToken(token);
+				tree.Parser.FramesetOK = false;
+				tree.ListOfActiveFormatElements.InsertMarker();
+				return;
+			}
+
+			if(token.IsStartTag("table")){
+				if(tree.Document.DocumentMode == DocumentMode.Quirks && tree.StackOfOpenElements.HaveElementInButtonScope("p")){
+					EndTagPHadBeSeen(tree, token);
+				}
+				tree.InsertElementForToken(token);
+				tree.Parser.FramesetOK = false;
+				tree.ChangeInsertionMode<InTableInsertionMode>();
+				return;
+			}
+
+			if(token.IsStartTag("area", "br", "embed", "img", "keygen", "wbr")){
+				Reconstruct(tree, token);
+				tree.InsertElementForToken(token);
+				tree.PopFromStack();
+				tree.AcknowledgeSelfClosingFlag(token);
+				tree.Parser.FramesetOK = false;
+				return;
+			}
+
+			if(token.IsStartTag("input")){
+				Reconstruct(tree, token);
+				tree.InsertElementForToken(token);
+				tree.PopFromStack();
+				tree.AcknowledgeSelfClosingFlag(token);
+				string typeValue = token.GetAttributeValue("type");
+				if(typeValue == null || typeValue.Equals("hidden", StringComparison.InvariantCultureIgnoreCase)){
+					tree.Parser.FramesetOK = false;
+				}
+				return;
+			}
+
+			if(token.IsStartTag("param", "source", "track")){
+				tree.InsertElementForToken(token);
+				tree.AcknowledgeSelfClosingFlag(token);
+				tree.PopFromStack();
+				return;
+			}
+
+			if(token.IsStartTag("hr")){
+				if(tree.StackOfOpenElements.HaveElementInButtonScope("p")){
+					EndTagPHadBeSeen(tree, token);
+				}
+				tree.InsertElementForToken(token);
+				tree.AcknowledgeSelfClosingFlag(token);
+				tree.PopFromStack();
+				return;
+			}
+
+			if(token.IsStartTag("image")){
+				OnParseErrorRaised("HTML5ではimage要素を使用することはできません。img要素に置き換えます。");
+				token.Name = "img";
+				tree.ReprocessFlag = true;
+				return;
+			}
+
+			if(token.IsStartTag("isindex")){
+				OnParseErrorRaised("HTML5ではisindex要素を使用することはできません。");
+				XmlElement node = tree.FormElementPointer;
+				if(node != null) return;
+				tree.AcknowledgeSelfClosingFlag(token);
+
+				StartTagHadBeSeen(tree, "form");
+				XmlElement form = (XmlElement)tree.CurrentNode;
+				string actionAttrValue = token.GetAttributeValue("action");
+				if(actionAttrValue != null) form.SetAttribute("action", actionAttrValue);
+				StartTagHadBeSeen(tree, "hr");
+				StartTagHadBeSeen(tree, "label");
+				string promptAttrValue = token.GetAttributeValue("prompt");
+				if(promptAttrValue == null){
+					tree.InsertText("This is a searchable index. Enter search keywords:");
+				} else {
+					tree.InsertText(promptAttrValue);
+
+				}
+				StartTagHadBeSeen(tree, "input");
+				XmlElement input = (XmlElement)tree.CurrentNode["input"];
+				input.SetAttribute("name", "isindex");
+				foreach(AttributeToken at in token.Attributes){
+					if(at.Name == "name" || at.Name == "action" || at.Name == "prompt") continue;
+					input.SetAttribute(at.Name, at.Value);
+				}
+				EndTagHadBeSeen(tree, "label");
+				StartTagHadBeSeen(tree, "hr");
+				EndTagHadBeSeen(tree, "form");
+				return;
+			}
+
+			if(token.IsStartTag("textarea")){
+				tree.InsertElementForToken(token);
+				tree.IgnoreNextLineFeed = true;
+				tree.Parser.ChangeTokenState<RCDATAState>();
+				tree.OriginalInsertionMode = tree.CurrentInsertionMode;
+				tree.Parser.FramesetOK = false;
+				tree.ChangeInsertionMode<TextInsertionMode>();
+				return;
+			}
+
+			if(token.IsStartTag("xmp")){
+				if(tree.StackOfOpenElements.HaveElementInButtonScope("p")){
+					EndTagPHadBeSeen(tree, token);
+				}
+				Reconstruct(tree, token);
+				tree.Parser.FramesetOK = false;
+				GenericRawtextElementParsingAlgorithm(tree, token);
+				return;
+			}
+
+			if(token.IsStartTag("iframe")){
+				tree.Parser.FramesetOK = false;
+				GenericRawtextElementParsingAlgorithm(tree, token);
+				return;
+			}
+
+			// start tag whose tag name is "noscript", if the scripting flag is enabled
+			if(token.IsStartTag("noembed")){
+				GenericRawtextElementParsingAlgorithm(tree, token);
+				return;
+			}
+
+			if(token.IsStartTag("select")){
+				Reconstruct(tree, token);
+				tree.InsertElementForToken(token);
+				tree.Parser.FramesetOK = false;
+				if(tree.CurrentInsertionMode is TableRelatedInsertionMode){
+					tree.ChangeInsertionMode<InSelectInTableInsertionMode>();
+				} else {
+					tree.ChangeInsertionMode<InSelectInsertionMode>();
+				}
+				return;
+			}
+
+			if(token.IsStartTag("optgroup", "option")){
+				if(tree.CurrentNode.Name == "option") EndTagHadBeSeen(tree, "option");
+				Reconstruct(tree, token);
+				tree.InsertElementForToken(token);
+				return;
+			}
+
+			if(token.IsStartTag("rp", "rt")){
+				if(tree.StackOfOpenElements.HaveElementInScope("ruby")){
+					GenerateImpliedEndTags(tree, token);
+					if(!tree.StackOfOpenElements.IsCurrentNameMatch("ruby")){
+						OnParseErrorRaised(string.Format("{0}要素が出現しましたが、親要素がruby要素ではありません。: {1}", token.Name, tree.CurrentNode.Name));
+						tree.StackOfOpenElements.PopUntilSameTagName("ruby");
+					}
+				}
+				tree.InsertElementForToken(token);
+				return;
+			}
+
+			if(token.IsStartTag("math")){
+				Reconstruct(tree, token);
+				StartTagToken t = (StartTagToken)token;
+				t.AdjustMathMLAttributes();
+				t.AdjustForeignAttributes();
+				XmlElement result = tree.CreateElementForToken(t, Document.MathMLNamespace);
+				tree.InsertElement(result);
+				if(t.SelfClosing){
+					tree.AcknowledgeSelfClosingFlag(t);
+					tree.PopFromStack();
+				}
+				return;
+			}
+
+			if(token.IsStartTag("svg")){
+				Reconstruct(tree, token);
+				StartTagToken t = (StartTagToken)token;
+				t.AdjustSVGAttributes();
+				t.AdjustForeignAttributes();
+				XmlElement result = tree.CreateElementForToken(t, Document.SVGNamespace);
+				tree.InsertElement(result);
+				if(t.SelfClosing){
+					tree.AcknowledgeSelfClosingFlag(t);
+					tree.PopFromStack();
+				}
+				return;
+			}
+
+			if(token.IsStartTag("caption", "col", "colgroup", "frame", "head", "tbody", "td", "tfoot", "th", "thead", "tr")){
+				OnParseErrorRaised(string.Format("{0}要素の開始タグが出現しましたが、この文脈でこの要素が出現することはできません。", token.Name));
+				return;
+			}
+
+			// Any Other Start Tags.
+			Reconstruct(tree, token);
+			tree.InsertElementForToken(token);
+			return;
+
+		}
+
+
+		protected override void AppendEndTagToken(TreeConstruction tree, EndTagToken token){
+
+			if(token.IsEndTag("body")){
+				if(!tree.StackOfOpenElements.HaveElementInScope("body")){
+					OnParseErrorRaised(string.Format("予期せぬ箇所で終了タグが出現しました。: {0}", token.Name));
+					return;
+				}
+				string invalidOpenTag = tree.StackOfOpenElements.NotEither(myBodyEndTagPermitOpenTags);
+				if(invalidOpenTag != null){
+					OnParseErrorRaised(string.Format("{0}の終了タグが不足しています。", invalidOpenTag));
+				}
+				tree.ChangeInsertionMode<AfterBodyInsertionMode>();
+				return;
+			}
+
+			if(token.IsEndTag("html")){
+				EndTagHadBeSeen(tree, "body");
+				tree.ReprocessFlag = true;
 				return;
 			}
 
@@ -222,7 +456,6 @@ namespace Bakera.RedFace{
 				tree.StackOfOpenElements.PopUntilSameTagName(token.Name);
 				return;
 			}
-
 
 			if(token.IsEndTag("form")){
 				XmlElement node = tree.FormElementPointer;
@@ -290,53 +523,8 @@ namespace Bakera.RedFace{
 				return;
 			}
 
-			if(token.IsStartTag("a")){
-				var list = tree.ListOfActiveFormatElements;
-				var stack = tree.StackOfOpenElements;
-				int index = list.GetAfterMarkerIndexByName("a");
-				if(index >=0){
-					XmlElement aElement = list.GetAfterMarkerByAfterIndex(index);
-					OnParseErrorRaised(string.Format("a要素の中に他のa要素を入れ子にすることはできません。"));
-					EndTagHadBeSeen(tree, "a");
-					stack.Remove(aElement);
-					list.Remove(aElement);
-				}
-				Reconstruct(tree, token);
-				XmlElement e = tree.InsertElementForToken((TagToken)token);
-				tree.ListOfActiveFormatElements.Push(e, (TagToken)token);
-				return;
-			}
-
-			if(token.IsStartTag("b", "big", "code", "em", "font", "i", "s", "small", "strike", "strong", "tt", "u")){
-				Reconstruct(tree, token);
-				XmlElement e = tree.InsertElementForToken((TagToken)token);
-				tree.ListOfActiveFormatElements.Push(e, (TagToken)token);
-				return;
-			}
-
-			if(token.IsStartTag("nobr")){
-				Reconstruct(tree, token);
-				if(!tree.StackOfOpenElements.HaveElementInScope(token.Name)){
-					OnParseErrorRaised(string.Format("nobr開始タグが出現しましたが、以前のnobrが終了していません。"));
-					FormatEndTagHadBeSeen(tree, token, "nobr");
-					Reconstruct(tree, token);
-					return;
-				}
-				XmlElement e = tree.InsertElementForToken((TagToken)token);
-				tree.ListOfActiveFormatElements.Push(e, (TagToken)token);
-				return;
-			}
-
 			if(token.IsEndTag("a", "b", "big", "code", "em", "font", "i", "nobr", "s", "small", "strike", "strong", "tt", "u")){
 				FormatEndTagHadBeSeen(tree, token, token.Name);
-				return;
-			}
-
-			if(token.IsStartTag("applet", "marquee", "object")){
-				Reconstruct(tree, token);
-				tree.InsertElementForToken((TagToken)token);
-				tree.Parser.FramesetOK = false;
-				tree.ListOfActiveFormatElements.InsertMarker();
 				return;
 			}
 
@@ -354,206 +542,13 @@ namespace Bakera.RedFace{
 				return;
 			}
 
-			if(token.IsStartTag("table")){
-				if(tree.Document.DocumentMode == DocumentMode.Quirks && tree.StackOfOpenElements.HaveElementInButtonScope("p")){
-					EndTagPHadBeSeen(tree, token);
-				}
-				tree.InsertElementForToken((TagToken)token);
-				tree.Parser.FramesetOK = false;
-				tree.ChangeInsertionMode<InTableInsertionMode>();
-				return;
-			}
-
-			if(token.IsStartTag("area", "br", "embed", "img", "keygen", "wbr")){
-				Reconstruct(tree, token);
-				tree.InsertElementForToken((TagToken)token);
-				tree.PopFromStack();
-				tree.AcknowledgeSelfClosingFlag((TagToken)token);
-				tree.Parser.FramesetOK = false;
-				return;
-			}
-
-			if(token.IsStartTag("input")){
-				Reconstruct(tree, token);
-				tree.InsertElementForToken((TagToken)token);
-				tree.PopFromStack();
-				tree.AcknowledgeSelfClosingFlag((TagToken)token);
-				string typeValue = token.GetAttributeValue("type");
-				if(typeValue == null || typeValue.Equals("hidden", StringComparison.InvariantCultureIgnoreCase)){
-					tree.Parser.FramesetOK = false;
-				}
-				return;
-			}
-
-			if(token.IsStartTag("param", "source", "track")){
-				tree.InsertElementForToken((TagToken)token);
-				tree.AcknowledgeSelfClosingFlag((TagToken)token);
-				tree.PopFromStack();
-				return;
-			}
-
-			if(token.IsStartTag("hr")){
-				if(tree.StackOfOpenElements.HaveElementInButtonScope("p")){
-					EndTagPHadBeSeen(tree, token);
-				}
-				tree.InsertElementForToken((TagToken)token);
-				tree.AcknowledgeSelfClosingFlag((TagToken)token);
-				tree.PopFromStack();
-				return;
-			}
-
-			if(token.IsStartTag("image")){
-				OnParseErrorRaised("HTML5ではimage要素を使用することはできません。img要素に置き換えます。");
-				token.Name = "img";
-				tree.ReprocessFlag = true;
-				return;
-			}
-
-			if(token.IsStartTag("isindex")){
-				OnParseErrorRaised("HTML5ではisindex要素を使用することはできません。");
-				XmlElement node = tree.FormElementPointer;
-				if(node != null) return;
-				tree.AcknowledgeSelfClosingFlag((TagToken)token);
-
-				StartTagHadBeSeen(tree, "form");
-				XmlElement form = (XmlElement)tree.CurrentNode;
-				string actionAttrValue = token.GetAttributeValue("action");
-				if(actionAttrValue != null) form.SetAttribute("action", actionAttrValue);
-				StartTagHadBeSeen(tree, "hr");
-				StartTagHadBeSeen(tree, "label");
-				string promptAttrValue = token.GetAttributeValue("prompt");
-				if(promptAttrValue == null){
-					tree.InsertText("This is a searchable index. Enter search keywords:");
-				} else {
-					tree.InsertText(promptAttrValue);
-
-				}
-				StartTagHadBeSeen(tree, "input");
-				XmlElement input = (XmlElement)tree.CurrentNode["input"];
-				input.SetAttribute("name", "isindex");
-				foreach(AttributeToken at in token.Attributes){
-					if(at.Name == "name" || at.Name == "action" || at.Name == "prompt") continue;
-					input.SetAttribute(at.Name, at.Value);
-				}
-				EndTagHadBeSeen(tree, "label");
-				StartTagHadBeSeen(tree, "hr");
-				EndTagHadBeSeen(tree, "form");
-				return;
-			}
-
-			if(token.IsStartTag("textarea")){
-				tree.InsertElementForToken((TagToken)token);
-				tree.IgnoreNextLineFeed = true;
-				tree.Parser.ChangeTokenState<RCDATAState>();
-				tree.OriginalInsertionMode = tree.CurrentInsertionMode;
-				tree.Parser.FramesetOK = false;
-				tree.ChangeInsertionMode<TextInsertionMode>();
-				return;
-			}
-
-			if(token.IsStartTag("xmp")){
-				if(tree.StackOfOpenElements.HaveElementInButtonScope("p")){
-					EndTagPHadBeSeen(tree, token);
-				}
-				Reconstruct(tree, token);
-				tree.Parser.FramesetOK = false;
-				GenericRawtextElementParsingAlgorithm(tree, token);
-				return;
-			}
-
-			if(token.IsStartTag("iframe")){
-				tree.Parser.FramesetOK = false;
-				GenericRawtextElementParsingAlgorithm(tree, token);
-				return;
-			}
-
-			// start tag whose tag name is "noscript", if the scripting flag is enabled
-			if(token.IsStartTag("noembed")){
-				GenericRawtextElementParsingAlgorithm(tree, token);
-				return;
-			}
-
-			if(token.IsStartTag("select")){
-				Reconstruct(tree, token);
-				tree.InsertElementForToken((TagToken)token);
-				tree.Parser.FramesetOK = false;
-				if(tree.CurrentInsertionMode is TableRelatedInsertionMode){
-					tree.ChangeInsertionMode<InSelectInTableInsertionMode>();
-				} else {
-					tree.ChangeInsertionMode<InSelectInsertionMode>();
-				}
-				return;
-			}
-
-			if(token.IsStartTag("optgroup", "option")){
-				if(tree.CurrentNode.Name == "option") EndTagHadBeSeen(tree, "option");
-				Reconstruct(tree, token);
-				tree.InsertElementForToken((TagToken)token);
-				return;
-			}
-
-			if(token.IsStartTag("rp", "rt")){
-				if(tree.StackOfOpenElements.HaveElementInScope("ruby")){
-					GenerateImpliedEndTags(tree, token);
-					if(!tree.StackOfOpenElements.IsCurrentNameMatch("ruby")){
-						OnParseErrorRaised(string.Format("{0}要素が出現しましたが、親要素がruby要素ではありません。: {1}", token.Name, tree.CurrentNode.Name));
-						tree.StackOfOpenElements.PopUntilSameTagName("ruby");
-					}
-				}
-				tree.InsertElementForToken((TagToken)token);
-				return;
-			}
-
 			if(token.IsEndTag("br")){
 				OnParseErrorRaised(string.Format("br要素の終了タグが出現しました。"));
 				StartTagHadBeSeen(tree, "br");
 				return;
 			}
 
-			if(token.IsStartTag("math")){
-				Reconstruct(tree, token);
-				StartTagToken t = (StartTagToken)token;
-				t.AdjustMathMLAttributes();
-				t.AdjustForeignAttributes();
-				XmlElement result = tree.CreateElementForToken(t, Document.MathMLNamespace);
-				tree.InsertElement(result);
-				if(t.SelfClosing){
-					tree.AcknowledgeSelfClosingFlag(t);
-					tree.PopFromStack();
-				}
-				return;
-			}
-
-			if(token.IsStartTag("svg")){
-				Reconstruct(tree, token);
-				StartTagToken t = (StartTagToken)token;
-				t.AdjustSVGAttributes();
-				t.AdjustForeignAttributes();
-				XmlElement result = tree.CreateElementForToken(t, Document.SVGNamespace);
-				tree.InsertElement(result);
-				if(t.SelfClosing){
-					tree.AcknowledgeSelfClosingFlag(t);
-					tree.PopFromStack();
-				}
-				return;
-			}
-
-			if(token.IsStartTag("caption", "col", "colgroup", "frame", "head", "tbody", "td", "tfoot", "th", "thead", "tr")){
-				OnParseErrorRaised(string.Format("{0}要素の開始タグが出現しましたが、この文脈でこの要素が出現することはできません。", token.Name));
-				return;
-			}
-
-			if(token is StartTagToken){
-				Reconstruct(tree, token);
-				tree.InsertElementForToken((TagToken)token);
-				return;
-			}
-
-			if(token is EndTagToken){
-				AnyOtherEndTag(tree, token);
-				return;
-			}
-			return;
+			AnyOtherEndTag(tree, token);
 		}
 
 

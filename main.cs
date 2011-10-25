@@ -32,7 +32,7 @@ namespace Bakera.RedFace{
 				Console.WriteLine("パース時間: {0}", p.EndTime - p.StartTime);
 				Console.WriteLine();
 				Console.WriteLine("========");
-//				Console.WriteLine(p.Document.OuterXml);
+				Console.WriteLine(p.Document.OuterXml);
 
 				return 0;
 			} catch(Exception e){
@@ -43,7 +43,7 @@ namespace Bakera.RedFace{
 
 		public static void WriteEvent(Object sender, ParserEventArgs e){
 			if(e.Message != null) Console.WriteLine(e.Message);
-			if(e.Token != null) Console.WriteLine(e.Token);
+			if(e.Token != null && !(e.Token is CharacterToken)) Console.WriteLine(e.Token);
 		}
 
 	}

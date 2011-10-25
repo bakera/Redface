@@ -13,6 +13,7 @@ namespace Bakera.RedFace{
 		}
 		protected virtual void OnParserEventRaised(Object sender, ParserEventArgs e){
 			if(ParserEventRaised != null){
+				e.Parser = this;
 				ParserEventRaised(this, e);
 			}
 		}

@@ -6,8 +6,53 @@ namespace Bakera.RedFace{
 	public abstract class InsertionMode : RedFaceParserState{
 		
 // メソッド
-		public abstract void AppendToken(TreeConstruction tc, Token t);
+		public virtual void AppendToken(TreeConstruction tree, Token token){
+			if(token is CharacterToken){
+				AppendCharacterToken(tree, (CharacterToken)token);
+				return;
+			} else if(token is CommentToken){
+				AppendCommentToken(tree, (CommentToken)token);
+				return;
+			} else if(token is DoctypeToken){
+				AppendDoctypeToken(tree, (DoctypeToken)token);
+				return;
+			} else if(token is StartTagToken) {
+				AppendStartTagToken(tree, (StartTagToken)token);
+				return;
+			} else if(token is EndTagToken) {
+				AppendEndTagToken(tree, (EndTagToken)token);
+				return;
+			} else if(token is EndOfFileToken) {
+				AppendEndOfFileToken(tree, (EndOfFileToken)token);
+				return;
+			}
+			AppendAnythingElse(tree, token);
+		}
 
+		protected virtual void AppendCharacterToken(TreeConstruction tree, CharacterToken token){
+			AppendAnythingElse(tree, token);
+		}
+		protected virtual void AppendCommentToken(TreeConstruction tree, CommentToken token){
+			AppendAnythingElse(tree, token);
+		}
+		protected virtual void AppendDoctypeToken(TreeConstruction tree, DoctypeToken token){
+			AppendAnythingElse(tree, token);
+		}
+		protected virtual void AppendStartTagToken(TreeConstruction tree, StartTagToken token){
+			AppendAnythingElse(tree, token);
+		}
+		protected virtual void AppendEndTagToken(TreeConstruction tree, EndTagToken token){
+			AppendAnythingElse(tree, token);
+		}
+		protected virtual void AppendEndOfFileToken(TreeConstruction tree, EndOfFileToken token){
+			AppendAnythingElse(tree, token);
+		}
+		protected virtual void AppendAnythingElse(TreeConstruction tree, Token token){
+		}
+
+
+
+// Text Parsing 
 		protected void GenericRCDATAElementParsingAlgorithm(TreeConstruction tree, Token token){
 			tree.InsertElementForToken((TagToken)token);
 			tree.Parser.ChangeTokenState<RCDATAState>();

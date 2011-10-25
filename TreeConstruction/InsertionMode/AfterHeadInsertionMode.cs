@@ -6,70 +6,70 @@ namespace Bakera.RedFace{
 
 	public class AfterHeadInsertionMode : InsertionMode{
 
-		public override void AppendToken(TreeConstruction tree, Token token){
 
+		protected override void AppendDoctypeToken(TreeConstruction tree, DoctypeToken token){
+			OnParseErrorRaised(string.Format("先頭以外の箇所に文書型宣言があります。"));
+		}
+
+		protected override void AppendCharacterToken(TreeConstruction tree, CharacterToken token){
 			if(token.IsWhiteSpace){
-				tree.InsertCharacter((CharacterToken)token);
+				tree.AppendToken<InHeadInsertionMode>(token);
 				return;
 			}
+			AppendAnythingElse(tree, token);
+		}
 
-			if(token is CommentToken){
-				tree.AppendCommentForToken((CommentToken)token);
-				return;
-			}
+		protected override void AppendCommentToken(TreeConstruction tree, CommentToken token){
+			tree.AppendCommentForToken(token);
+		}
 
-			if(token is DoctypeToken){
-				OnParseErrorRaised(string.Format("先頭以外の箇所に文書型宣言があります。"));
-				return;
-			}
-
+		protected override void AppendStartTagToken(TreeConstruction tree, StartTagToken token){
 			if(token.IsStartTag("html")){
 				tree.AppendToken<InBodyInsertionMode>(token);
 				return;
 			}
 
 			if(token.IsStartTag("body")){
-				tree.InsertElementForToken((TagToken)token);
+				tree.InsertElementForToken(token);
 				tree.Parser.FramesetOK = false;
 				tree.ChangeInsertionMode<InBodyInsertionMode>();
 				return;
 			}
 
 			if(token.IsStartTag("frameset")){
-				tree.InsertElementForToken((TagToken)token);
+				tree.InsertElementForToken(token);
 				tree.ChangeInsertionMode<InFramesetInsertionMode>();
 				return;
 			}
 
 			if(token.IsStartTag("base", "basefont", "bgsound", "link", "meta", "noframes", "script", "style", "title")){
-				OnParseErrorRaised(string.Format("head要素以外の箇所に要素があります。: {0}", token.Name));
-
+				OnParseErrorRaised(string.Format("head要素内にしか出現できない要素です。: {0}", token.Name));
 				tree.PutToStack(tree.HeadElementPointer);
 				tree.AppendToken<InHeadInsertionMode>(token);
 				tree.PopFromStack();
-
+				return;
+			}
+			if(token.IsStartTag("head")){
+				OnParseErrorRaised(string.Format("head要素が終了してからhaad要素の開始タグが出現しました。"));
 				return;
 			}
 
+			AppendAnythingElse(tree, token);
+		}
+
+
+		protected override void AppendEndTagToken(TreeConstruction tree, EndTagToken token){
 			if(token.IsEndTag("body", "html", "br")){
-				AnythingElse(tree, token);
+				AppendAnythingElse(tree, token);
 				return;
 			}
-
-			if(token.IsStartTag("head") || token is EndTagToken){
-				OnParseErrorRaised(string.Format("この場所には出現できないトークンです。: {0}", token.Name));
-				return;
-			}
-
-			AnythingElse(tree, token);
+			OnParseErrorRaised(string.Format("不明な終了タグがあります。"));
 			return;
 		}
 
-		private void AnythingElse(TreeConstruction tree, Token token){
-			XmlElement defaultBodyElement = tree.Document.CreateHtmlElement("body");
-			tree.InsertElement(defaultBodyElement);
+		protected override void AppendAnythingElse(TreeConstruction tree, Token token){
+			AppendStartTagToken(tree, new PseudoStartTagToken(){Name = "body"});
 			tree.Parser.FramesetOK = true;
-			tree.ChangeInsertionMode<InBodyInsertionMode>();
 			tree.ReprocessFlag = true;
 			return;
 		}
