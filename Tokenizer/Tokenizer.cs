@@ -69,6 +69,7 @@ namespace Bakera.RedFace{
 		public Tokenizer(RedFaceParser p, InputStream stream){
 			myParser = p;
 			myInputStream = stream;
+			myTokenStateManager.ParserEventRaised += OnParserEventRaised;
 			myTokenStateManager.SetState<DataState>();
 		}
 
