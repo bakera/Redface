@@ -82,7 +82,6 @@ namespace Bakera.RedFace{
 			AppendToken(mode, t);
 		}
 
-
 		private void AppendToken(InsertionMode mode, Token t){
 			// 開始タグ直後の改行を無視するケース
 			if(IgnoreNextLineFeed){
@@ -197,8 +196,12 @@ namespace Bakera.RedFace{
 			myPendingTableCharacterTokens.Clear();
 		}
 
-		public void AddPendingTableCharacterToken(CharacterToken t){
+		public void AppendPendingTableCharacterToken(CharacterToken t){
 			myPendingTableCharacterTokens.Add(t);
+		}
+
+		public CharacterToken[] GetPendingTableCharacterTokens(){
+			return myPendingTableCharacterTokens.ToArray();
 		}
 
 

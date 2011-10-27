@@ -12,16 +12,16 @@ namespace Bakera.RedFace{
 		private string[] myHeadingElements = new string[]{"h1", "h2", "h3", "h4", "h5", "h6"};
 
 
-		protected override void AppendDoctypeToken(TreeConstruction tree, DoctypeToken token){
+		public override void AppendDoctypeToken(TreeConstruction tree, DoctypeToken token){
 			OnParseErrorRaised(string.Format("先頭以外の箇所に文書型宣言があります。"));
 			return;
 		}
 
-		protected override void AppendCommentToken(TreeConstruction tree, CommentToken token){
+		public override void AppendCommentToken(TreeConstruction tree, CommentToken token){
 			tree.AppendCommentForToken(token);
 		}
 
-		protected override void AppendCharacterToken(TreeConstruction tree, CharacterToken token){
+		public override void AppendCharacterToken(TreeConstruction tree, CharacterToken token){
 			if(token.IsNULL){
 				OnParseErrorRaised(string.Format("NUL文字が出現しました。"));
 				return;
@@ -36,7 +36,7 @@ namespace Bakera.RedFace{
 			tree.Parser.FramesetOK = false;
 		}
 
-		protected override void AppendEndOfFileToken(TreeConstruction tree, EndOfFileToken token){
+		public override void AppendEndOfFileToken(TreeConstruction tree, EndOfFileToken token){
 			string invalidOpenTag = tree.StackOfOpenElements.NotEither(myEndOfFilePermitOpenTags);
 			if(invalidOpenTag != null){
 				OnParseErrorRaised(string.Format("{0}の終了タグが不足しています。", invalidOpenTag));
@@ -46,7 +46,7 @@ namespace Bakera.RedFace{
 		}
 
 
-		protected override void AppendStartTagToken(TreeConstruction tree, StartTagToken token){
+		public override void AppendStartTagToken(TreeConstruction tree, StartTagToken token){
 			if(token.IsStartTag("html")){
 				OnParseErrorRaised(string.Format("予期せぬ箇所にhtml要素開始タグがあります。"));
 				XmlElement topElement = tree.StackOfOpenElements[0];
@@ -422,7 +422,7 @@ namespace Bakera.RedFace{
 		}
 
 
-		protected override void AppendEndTagToken(TreeConstruction tree, EndTagToken token){
+		public override void AppendEndTagToken(TreeConstruction tree, EndTagToken token){
 
 			if(token.IsEndTag("body")){
 				if(!tree.StackOfOpenElements.HaveElementInScope("body")){

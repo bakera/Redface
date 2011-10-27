@@ -29,25 +29,25 @@ namespace Bakera.RedFace{
 			AppendAnythingElse(tree, token);
 		}
 
-		protected virtual void AppendCharacterToken(TreeConstruction tree, CharacterToken token){
+		public virtual void AppendCharacterToken(TreeConstruction tree, CharacterToken token){
 			AppendAnythingElse(tree, token);
 		}
-		protected virtual void AppendCommentToken(TreeConstruction tree, CommentToken token){
+		public virtual void AppendCommentToken(TreeConstruction tree, CommentToken token){
 			AppendAnythingElse(tree, token);
 		}
-		protected virtual void AppendDoctypeToken(TreeConstruction tree, DoctypeToken token){
+		public virtual void AppendDoctypeToken(TreeConstruction tree, DoctypeToken token){
 			AppendAnythingElse(tree, token);
 		}
-		protected virtual void AppendStartTagToken(TreeConstruction tree, StartTagToken token){
+		public virtual void AppendStartTagToken(TreeConstruction tree, StartTagToken token){
 			AppendAnythingElse(tree, token);
 		}
-		protected virtual void AppendEndTagToken(TreeConstruction tree, EndTagToken token){
+		public virtual void AppendEndTagToken(TreeConstruction tree, EndTagToken token){
 			AppendAnythingElse(tree, token);
 		}
-		protected virtual void AppendEndOfFileToken(TreeConstruction tree, EndOfFileToken token){
+		public virtual void AppendEndOfFileToken(TreeConstruction tree, EndOfFileToken token){
 			AppendAnythingElse(tree, token);
 		}
-		protected virtual void AppendAnythingElse(TreeConstruction tree, Token token){
+		public virtual void AppendAnythingElse(TreeConstruction tree, Token token){
 		}
 
 

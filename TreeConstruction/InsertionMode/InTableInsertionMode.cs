@@ -5,22 +5,22 @@ namespace Bakera.RedFace{
 
 	public class InTableInsertionMode : TableRelatedInsertionMode{
 
-		protected override void AppendDoctypeToken(TreeConstruction tree, DoctypeToken token){
+		public override void AppendDoctypeToken(TreeConstruction tree, DoctypeToken token){
 			OnParseErrorRaised(string.Format("先頭以外の箇所に文書型宣言があります。"));
 		}
 
-		protected override void AppendCommentToken(TreeConstruction tree, CommentToken token){
+		public override void AppendCommentToken(TreeConstruction tree, CommentToken token){
 			tree.AppendCommentForToken(token);
 		}
 
-		protected override void AppendCharacterToken(TreeConstruction tree, CharacterToken token){
+		public override void AppendCharacterToken(TreeConstruction tree, CharacterToken token){
 			tree.ClearPendingTableCharacterTokens();
 			tree.OriginalInsertionMode = tree.CurrentInsertionMode;
 			tree.ChangeInsertionMode<InTableTextInsertionMode>();
 			tree.ReprocessFlag = true;
 		}
 
-		protected override void AppendStartTagToken(TreeConstruction tree, StartTagToken token){
+		public override void AppendStartTagToken(TreeConstruction tree, StartTagToken token){
 			switch(token.Name){
 			case "caption":
 				tree.StackOfOpenElements.ClearBackToTable();
@@ -78,7 +78,7 @@ namespace Bakera.RedFace{
 			AppendAnythingElse(tree, token);
 		}
 
-		protected override void AppendEndTagToken(TreeConstruction tree, EndTagToken token){
+		public override void AppendEndTagToken(TreeConstruction tree, EndTagToken token){
 			switch(token.Name){
 			case "table":
 				if(!tree.StackOfOpenElements.HaveElementInTableScope(token.Name)){
@@ -105,7 +105,7 @@ namespace Bakera.RedFace{
 			AppendAnythingElse(tree, token);
 		}
 
-		protected override void AppendEndOfFileToken(TreeConstruction tree, EndOfFileToken token){
+		public override void AppendEndOfFileToken(TreeConstruction tree, EndOfFileToken token){
 			// If the current node is not the root html element, then this is a parse error.
 			// Note: It can only be the current node in the fragment case.
 			OnParseErrorRaised(string.Format("table要素の中で終端に達しました。"));
@@ -114,7 +114,7 @@ namespace Bakera.RedFace{
 		}
 
 
-		protected override void AppendAnythingElse(TreeConstruction tree, Token token){
+		public override void AppendAnythingElse(TreeConstruction tree, Token token){
 			OnParseErrorRaised(string.Format("table要素の中で不明なトークンが出現しました。{0}", token.Name));
 			tree.FosterParentMode = true;
 			tree.AppendToken<InBodyInsertionMode>(token);
