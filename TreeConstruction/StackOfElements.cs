@@ -279,16 +279,17 @@ namespace Bakera.RedFace{
 			return null;
 		}
 
-		// FosterParentElementを取得します。
-		// The foster parent element is the parent element of the last table element in the stack of open elements, if there is a table element and it has such a parent element.
-		public XmlElement GetFosterParentElement(){
+		// FosterParentを実行します。
+		// 渡された要素を、FosterParentElementのtable要素の直前に挿入します。
+		public void FosterParent(XmlNode node){
 			XmlElement[] elements = this.ToArray();
 			for(int i=0; i < elements.Length-1; i++){
 				if(TableElement.IsMatch(elements[i])){
-					return elements[i+1];
+					XmlElement table = elements[i];
+					XmlElement fosterParentElement = elements[i+1];
+					fosterParentElement.InsertBefore(node, table);
 				}
 			}
-			return elements[elements.Length-1];
 		}
 
 // Remove・Replace

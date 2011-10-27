@@ -60,6 +60,7 @@ namespace Bakera.RedFace{
 
 		public bool ReprocessFlag{get; set;}
 		public bool IgnoreNextLineFeed{get; set;}
+		public bool FosterParentMode = false;
 
 
 // コンストラクタ
@@ -80,6 +81,7 @@ namespace Bakera.RedFace{
 			InsertionMode mode = myInsertionModeManager.GetState<T>();
 			AppendToken(mode, t);
 		}
+
 
 		private void AppendToken(InsertionMode mode, Token t){
 			// 開始タグ直後の改行を無視するケース
@@ -142,14 +144,52 @@ namespace Bakera.RedFace{
 			OnInsertionModeChanged();
 		}
 
+		public void ResetInsertionModeAppropriately(){
+			// bool last = false;
+			// "last" は fragment case の場合のみtrueになりえる
+			// 通常は必ずいずれかの要素が存在するのでループが最後まで回ることはない
+			// このパーサは fragment case を実装しないので last は使用しない
+			XmlElement node = myStackOfOpenElements.Peek();
+			while(node != null){
+				if(StackOfElements.IsNameMatch(node, "td", "th")){ // && last == false
+					ChangeInsertionMode<InCellInsertionMode>();
+					return;
+				}
+				if(StackOfElements.IsNameMatch(node, "tr")){
+					ChangeInsertionMode<InRowInsertionMode>();
+					return;
+				}
+				if(StackOfElements.IsNameMatch(node, "tbody", "thead", "tfoot")){
+					ChangeInsertionMode<InTableBodyInsertionMode>();
+					return;
+				}
+				if(StackOfElements.IsNameMatch(node, "caption")){
+					ChangeInsertionMode<InCaptionInsertionMode>();
+					return;
+				}
+				if(StackOfElements.IsNameMatch(node, "table")){
+					ChangeInsertionMode<InTableInsertionMode>();
+					return;
+				}
+				if(StackOfElements.IsNameMatch(node, "body")){
+					ChangeInsertionMode<InBodyInsertionMode>();
+					return;
+				}
+				node = myStackOfOpenElements.GetAncestor(node);
+			}
+		}
+
+
 
 // Stack操作
 		public void PutToStack(XmlElement e){
 			myStackOfOpenElements.Push(e);
 		}
+
 		public XmlElement PopFromStack(){
 			return myStackOfOpenElements.Pop();
 		}
+
 
 // Pending table character tokens
 
@@ -164,8 +204,14 @@ namespace Bakera.RedFace{
 
 // ノード作成
 
+		// カレントノードにノードを挿入します。
+		// FosterParentモードがONかつカレントノードがtable関係の要素の場合はFosterParentを実行します。
 		public void AppendChild(XmlNode x){
-			CurrentNode.AppendChild(x);
+			if(FosterParentMode && myStackOfOpenElements.IsTableRealtedElement(CurrentNode as XmlElement)){
+				myStackOfOpenElements.FosterParent(x);
+			} else {
+				CurrentNode.AppendChild(x);
+			}
 		}
 
 		// CommentTokenに対応するコメントを作ります。

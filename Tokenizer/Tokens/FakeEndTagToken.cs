@@ -1,7 +1,7 @@
 using System;
 
 namespace Bakera.RedFace{
-	public class PseudoEndTagToken : EndTagToken{
+	public class FakeEndTagToken : EndTagToken{
 
 	}
 }

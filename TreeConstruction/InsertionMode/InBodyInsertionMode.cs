@@ -256,8 +256,7 @@ namespace Bakera.RedFace{
 				tree.InsertElementForToken(token);
 				tree.PopFromStack();
 				tree.AcknowledgeSelfClosingFlag(token);
-				string typeValue = token.GetAttributeValue("type");
-				if(typeValue == null || typeValue.Equals("hidden", StringComparison.InvariantCultureIgnoreCase)){
+				if(!token.IsHiddenType()){
 					tree.Parser.FramesetOK = false;
 				}
 				return;
@@ -576,16 +575,11 @@ namespace Bakera.RedFace{
 // tags had be seen
 
 		private void StartTagHadBeSeen(TreeConstruction tree, string name){
-			StartTagToken token = new StartTagToken();
-			token.Name = name;
-			AppendToken(tree, token);
+			AppendStartTagToken(tree, new FakeStartTagToken(){Name = name});
 		}
 
-
 		private void EndTagHadBeSeen(TreeConstruction tree, string name){
-			EndTagToken token = new EndTagToken();
-			token.Name = name;
-			AppendToken(tree, token);
+			AppendEndTagToken(tree, new FakeEndTagToken(){Name = name});
 		}
 
 		private void EndTagPHadBeSeen(TreeConstruction tree, Token token){
@@ -693,8 +687,7 @@ namespace Bakera.RedFace{
 					lastNode = node;
 				}
 				if(stack.IsTableRealtedElement(commonAncestor)){
-					XmlElement fosterParentElement = stack.GetFosterParentElement();
-					fosterParentElement.AppendChild(lastNode);
+					stack.FosterParent(lastNode);
 				} else {
 					commonAncestor.AppendChild(lastNode);
 				}

@@ -16,6 +16,14 @@ namespace Bakera.RedFace{
 			return false;
 		}
 
+		// type 属性が hidden の場合に true を返します。
+		public bool IsHiddenType(){
+			string typeValue = this.GetAttributeValue("type");
+			if(typeValue == null) return false;
+			if(typeValue.Equals("hidden", StringComparison.InvariantCultureIgnoreCase)) return true;
+			return false;
+		}
+
 	}
 
 }

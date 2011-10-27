@@ -95,7 +95,7 @@ namespace Bakera.RedFace{
 		}
 
 		protected override void AppendAnythingElse(TreeConstruction tree, Token token){
-			AppendEndTagToken(tree, new PseudoEndTagToken(){Name = "head"});
+			AppendEndTagToken(tree, new FakeEndTagToken(){Name = "head"});
 			tree.ReprocessFlag = true;
 			return;
 		}

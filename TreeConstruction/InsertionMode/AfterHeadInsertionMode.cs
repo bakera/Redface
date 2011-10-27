@@ -68,7 +68,7 @@ namespace Bakera.RedFace{
 		}
 
 		protected override void AppendAnythingElse(TreeConstruction tree, Token token){
-			AppendStartTagToken(tree, new PseudoStartTagToken(){Name = "body"});
+			AppendStartTagToken(tree, new FakeStartTagToken(){Name = "body"});
 			tree.Parser.FramesetOK = true;
 			tree.ReprocessFlag = true;
 			return;
