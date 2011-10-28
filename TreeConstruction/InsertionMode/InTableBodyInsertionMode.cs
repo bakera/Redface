@@ -5,52 +5,68 @@ namespace Bakera.RedFace{
 
 	public class InTableBodyInsertionMode : TableRelatedInsertionMode{
 
-		public override void AppendDoctypeToken(TreeConstruction tree, DoctypeToken token){
-			OnParseErrorRaised(string.Format("先頭以外の箇所に文書型宣言があります。"));
-		}
-
-		public override void AppendCommentToken(TreeConstruction tree, CommentToken token){
-			tree.AppendCommentForToken(token);
-		}
-
-		public override void AppendCharacterToken(TreeConstruction tree, CharacterToken token){
-			tree.ClearPendingTableCharacterTokens();
-			tree.OriginalInsertionMode = tree.CurrentInsertionMode;
-			tree.ChangeInsertionMode<InTableTextInsertionMode>();
-			tree.ReprocessFlag = true;
-		}
 
 		public override void AppendStartTagToken(TreeConstruction tree, StartTagToken token){
 			switch(token.Name){
-			case "caption":
-				tree.StackOfOpenElements.ClearBackToTable();
-				tree.ListOfActiveFormatElements.InsertMarker();
+			case "tr":
+				tree.StackOfOpenElements.ClearBackToTableBody();
 				tree.InsertElementForToken(token);
-				tree.ChangeInsertionMode<InCaptionInsertionMode>();
+				tree.ChangeInsertionMode<InRowInsertionMode>();
 				return;
-			case "colgroup":
-				tree.StackOfOpenElements.ClearBackToTable();
-				tree.InsertElementForToken(token);
-				tree.ChangeInsertionMode<InColumnGroupInsertionMode>();
-				return;
-			case "col":
-				AppendStartTagToken(tree, new FakeStartTagToken(){Name = "colgroup"});
+			case "th":
+			case "td":
+				OnParseErrorRaised(string.Format("tbody要素直下に{0}要素の開始タグが出現しました。", token.Name));
+				AppendStartTagToken(tree, new FakeStartTagToken(){Name = "tr"});
 				tree.ReprocessFlag = true;
 				return;
+			case "caption":
+			case "col":
+			case "colgroup":
 			case "tbody":
 			case "tfoot":
 			case "thead":
-				tree.StackOfOpenElements.ClearBackToTable();
-				tree.InsertElementForToken(token);
-				tree.ChangeInsertionMode<InTableBodyInsertionMode>();
+				tree.StackOfOpenElements.ClearBackToTableBody();
+				AppendEndTagToken(tree, new FakeEndTagToken(){Name = tree.CurrentNode.Name});
+				tree.ReprocessFlag = true;
 				return;
 			}
+			AppendAnythingElse(tree, token);
+		}
+
+		public override void AppendEndTagToken(TreeConstruction tree, EndTagToken token){
+			switch(token.Name){
+			case "tbody":
+			case "tfoot":
+			case "thead":
+				if(!tree.StackOfOpenElements.HaveElementInTableScope(token.Name)){
+					OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					return;
+				}
+				tree.StackOfOpenElements.ClearBackToTableBody();
+				tree.PopFromStack();
+				tree.ChangeInsertionMode<InTableInsertionMode>();
+				return;
+			case "table":
+				tree.StackOfOpenElements.ClearBackToTableBody();
+				AppendEndTagToken(tree, new FakeEndTagToken(){Name = tree.CurrentNode.Name});
+				tree.ReprocessFlag = true;
+				return;
+			case "body":
+			case "caption":
+			case "col":
+			case "colgroup":
+			case "html":
+			case "td":
+			case "th":
+			case "tr":
+				OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+				return;
+			}
+			AppendAnythingElse(tree, token);
 		}
 
 		public override void AppendAnythingElse(TreeConstruction tree, Token token){
-			Console.WriteLine("========\nnot implemented: {0} - {1}", this.Name, token);
-			tree.Parser.Stop();
-			return;
+			tree.AppendToken<InTableInsertionMode>(token);
 		}
 	}
 }
