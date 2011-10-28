@@ -560,17 +560,6 @@ namespace Bakera.RedFace{
 			return;
 		}
 
-		// 補える終了タグを補う処理
-		// 例外を指定
-		private void GenerateImpliedEndTags(TreeConstruction tree, Token token, params string[] except){
-			while(tree.StackOfOpenElements.IsImpliedEndTagElement()){
-				if(tree.StackOfOpenElements.IsCurrentNameMatch(except)) break;
-				XmlElement e = tree.StackOfOpenElements.Pop();
-				OnImpliedEndTagInserted(e, token);
-			}
-			return;
-		}
-
 
 // tags had be seen
 

@@ -52,6 +52,20 @@ namespace Bakera.RedFace{
 
 
 
+
+		// 補える終了タグを補う処理
+		// 例外を指定
+		protected void GenerateImpliedEndTags(TreeConstruction tree, Token token, params string[] except){
+			while(tree.StackOfOpenElements.IsImpliedEndTagElement()){
+				if(tree.StackOfOpenElements.IsCurrentNameMatch(except)) break;
+				XmlElement e = tree.StackOfOpenElements.Pop();
+				OnImpliedEndTagInserted(e, token);
+			}
+			return;
+		}
+
+
+
 // Text Parsing 
 		protected void GenericRCDATAElementParsingAlgorithm(TreeConstruction tree, Token token){
 			tree.InsertElementForToken((TagToken)token);
