@@ -6,13 +6,13 @@ namespace Bakera.RedFace{
 	public class AfterAfterBodyInsertionMode : InsertionMode{
 
 		public override void AppendCommentToken(TreeConstruction tree, CommentToken token){
-			XmlComment comment = tree.CreateCommentForToken((CommentToken)token);
+			XmlComment comment = tree.CreateCommentForToken(token);
 			tree.Document.AppendChild(comment);
 			return;
 		}
 
 		public override void AppendDoctypeToken(TreeConstruction tree, DoctypeToken token){
-				tree.AppendToken<InBodyInsertionMode>(token);
+			tree.AppendToken<InBodyInsertionMode>(token);
 		}
 
 		public override void AppendCharacterToken(TreeConstruction tree, CharacterToken token){
