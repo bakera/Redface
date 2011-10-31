@@ -64,7 +64,6 @@ namespace Bakera.RedFace{
 				XmlElement bodyElement = tree.StackOfOpenElements[1];
 				if(bodyElement == null || bodyElement.Name != "body") return;
 				tree.Parser.FramesetOK = false;
-
 				tree.MergeAttribute(bodyElement, token);
 				return;
 			}
