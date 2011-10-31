@@ -36,7 +36,6 @@ namespace Bakera.RedFace{
 
 		public override void AppendAnythingElse(TreeConstruction tree, Token token){
 			// 文書型宣言以外が出現
-			// ToDo:iframe srcdoc documentに対応する?
 			OnParseErrorRaised(string.Format("文書型宣言がありません。"));
 			tree.Document.DocumentMode = DocumentMode.Quirks;
 			OnDocumentModeChanged();

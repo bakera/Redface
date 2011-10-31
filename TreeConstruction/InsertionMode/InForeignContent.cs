@@ -5,12 +5,8 @@ namespace Bakera.RedFace{
 
 	public class InForeignContent : InsertionMode{
 
-		public override void AppendToken(TreeConstruction tree, Token token){
-
-			Console.WriteLine("========\nnot implemented: {0} - {1}", this.Name, token);
-			tree.Parser.Stop();
-			return;
-
+		public override void AppendAnythingElse(TreeConstruction tree, Token token){
+			throw new Exception(string.Format("このモードでの処理が定義されていないトークンです。モード: {0} トークン: {1}", this.Name, token));
 		}
 
 	}

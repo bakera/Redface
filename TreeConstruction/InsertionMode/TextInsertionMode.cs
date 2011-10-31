@@ -5,24 +5,35 @@ namespace Bakera.RedFace{
 
 	public class TextInsertionMode : InsertionMode{
 
-		public override void AppendToken(TreeConstruction tree, Token token){
+		public override void AppendCharacterToken(TreeConstruction tree, CharacterToken token){
+			tree.InsertCharacter(token);
+		}
 
-			if(token is CharacterToken){
-				tree.InsertCharacter((CharacterToken)token);
-				return;
-			}
+		public override void AppendEndOfFileToken(TreeConstruction tree, EndOfFileToken token){
+			OnParseErrorRaised(string.Format("テキスト解析の途中で終端に達しました。終了タグがありません。"));
+			// Ignore?: 
+			// If the current node is a script element, mark the script element as "already started".
+			tree.PopFromStack();
+			tree.SwitchToOriginalInsertionMode();
+			tree.ReprocessFlag = true;
+			return;
+		}
 
-			if(token is EndOfFileToken){
-				OnParseErrorRaised(string.Format("テキストの途中で終端に達しました。終了タグがありません。"));
-				// Ignore?: 
-				// If the current node is a script element, mark the script element as "already started".
-				tree.PopFromStack();
-				tree.SwitchToOriginalInsertionMode();
-				tree.ReprocessFlag = true;
-				return;
-			}
 
-			if(token.IsEndTag("script")){
+		public override void AppendCommentToken(TreeConstruction tree, CommentToken token){
+			XmlComment comment = tree.CreateCommentForToken(token);
+			tree.Document.AppendChild(comment);
+			return;
+		}
+
+		public override void AppendDoctypeToken(TreeConstruction tree, DoctypeToken token){
+			tree.AppendToken<InBodyInsertionMode>(token);
+		}
+
+
+		public override void AppendEndTagToken(TreeConstruction tree, EndTagToken token){
+			switch(token.Name){
+			case "script":
 				// Ignore?: Provide a stable state.
 				// XmlElement script = tree.CurrentNode as XmlElement;
 				tree.PopFromStack();
@@ -31,12 +42,15 @@ namespace Bakera.RedFace{
 				return;
 			}
 
-			if(token is EndTagToken){
-				tree.PopFromStack();
-				tree.SwitchToOriginalInsertionMode();
-				return;
-			}
+			// Any Other End Tag
+			tree.PopFromStack();
+			tree.SwitchToOriginalInsertionMode();
+			return;
+		}
 
+
+		public override void AppendAnythingElse(TreeConstruction tree, Token token){
+			// ここには来ないはず (来たらバグ)
 			throw new Exception(string.Format("このモードでの処理が定義されていないトークンです。モード: {0} トークン: {1}", this.Name, token));
 		}
 
