@@ -5,7 +5,6 @@ namespace Bakera.RedFace{
 
 	public class InRowInsertionMode : TableRelatedInsertionMode{
 
-
 		public override void AppendStartTagToken(TreeConstruction tree, StartTagToken token){
 			switch(token.Name){
 			case "th":
@@ -38,6 +37,11 @@ namespace Bakera.RedFace{
 				tree.ChangeInsertionMode<InTableBodyInsertionMode>();
 				return;
 
+			case "table":
+				AppendEndTagToken(tree, new FakeEndTagToken(){Name = "tr"});
+				tree.ReprocessFlag = true;
+				return;
+
 			case "tbody":
 			case "tfoot":
 			case "thead":
@@ -65,5 +69,6 @@ namespace Bakera.RedFace{
 		public override void AppendAnythingElse(TreeConstruction tree, Token token){
 			tree.AppendToken<InTableInsertionMode>(token);
 		}
+
 	}
 }

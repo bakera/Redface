@@ -171,6 +171,10 @@ namespace Bakera.RedFace{
 			new HtmlElementInfo("tfoot"),
 			new HtmlElementInfo("thead"),
 		};
+		private static readonly ElementInfo[] TableRowClearElements = new ElementInfo[]{
+			new HtmlElementInfo("tr"),
+			new HtmlElementInfo("html"),
+		};
 		private static readonly ElementInfo TableElement = new HtmlElementInfo("table");
 		private static readonly ElementInfo HtmlRootElement = new HtmlElementInfo("html");
 
@@ -364,6 +368,13 @@ namespace Bakera.RedFace{
 		public void ClearBackToTableBody(){
 			XmlElement x = this.Peek();
 			while(!IsElementInElementInfos(x, TbodyClearElements)){
+				x = this.Pop();
+			}
+		}
+
+		public void ClearBackToTableRow(){
+			XmlElement x = this.Peek();
+			while(!IsElementInElementInfos(x, TableRowClearElements)){
 				x = this.Pop();
 			}
 		}
