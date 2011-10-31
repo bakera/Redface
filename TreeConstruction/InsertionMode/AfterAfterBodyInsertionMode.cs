@@ -5,26 +5,42 @@ namespace Bakera.RedFace{
 
 	public class AfterAfterBodyInsertionMode : InsertionMode{
 
-		public override void AppendToken(TreeConstruction tree, Token token){
+		public override void AppendCommentToken(TreeConstruction tree, CommentToken token){
+			XmlComment comment = tree.CreateCommentForToken((CommentToken)token);
+			tree.Document.AppendChild(comment);
+			return;
+		}
 
-			if(token is CommentToken){
-				XmlComment comment = tree.CreateCommentForToken((CommentToken)token);
-				tree.StackOfOpenElements[0].AppendChild(comment);
-				return;
-			}
+		public override void AppendDoctypeToken(TreeConstruction tree, DoctypeToken token){
+				tree.AppendToken<InBodyInsertionMode>(token);
+		}
 
-			if(token is DoctypeToken || token.IsWhiteSpace || token.IsStartTag("html")){
+		public override void AppendCharacterToken(TreeConstruction tree, CharacterToken token){
+			if(token.IsWhiteSpace){
 				tree.AppendToken<InBodyInsertionMode>(token);
 				return;
 			}
+			AppendAnythingElse(tree, token);
+		}
 
-			if(token is EndOfFileToken){
-				tree.Parser.Stop();
+		public override void AppendStartTagToken(TreeConstruction tree, StartTagToken token){
+			switch(token.Name){
+			case "html":
+				tree.AppendToken<InBodyInsertionMode>(token);
 				return;
 			}
+			AppendAnythingElse(tree, token);
+		}
 
+		public override void AppendEndOfFileToken(TreeConstruction tree, EndOfFileToken token){
+			tree.Parser.Stop();
+			return;
+		}
+
+		public override void AppendAnythingElse(TreeConstruction tree, Token token){
 			OnParseErrorRaised(string.Format("html終了タグの後ろに不明なトークンがあります。: {0}", token.Name));
-			tree.AppendToken<InBodyInsertionMode>(token);
+			tree.ChangeInsertionMode<InBodyInsertionMode>();
+			tree.ReprocessFlag = true;
 			return;
 		}
 
