@@ -289,6 +289,13 @@ namespace Bakera.RedFace{
 			return null;
 		}
 
+		// CurrentNodeの直前の親を取得します。
+		public XmlElement GetImmediatelyBeforeCurrentNode(){
+			XmlElement[] elements = this.ToArray();
+			if(elements.Length < 2) return null;
+			return elements[1];
+		}
+
 		// FosterParentを実行します。
 		// 渡された要素を、FosterParentElementのtable要素の直前に挿入します。
 		public void FosterParent(XmlNode node){
