@@ -4,7 +4,7 @@ using System.Xml;
 namespace Bakera.RedFace{
 
 
-	public class AfterFramesetInsertionMode : InsertionMode{
+	public class AfterAfterFramesetInsertionMode : InsertionMode{
 
 
 		public override void AppendDoctypeToken(TreeConstruction tree, DoctypeToken token){
