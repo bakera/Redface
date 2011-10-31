@@ -42,7 +42,10 @@ namespace Bakera.RedFace{
 		}
 
 		public static void WriteEvent(Object sender, ParserEventArgs e){
-			if(e.Message != null) Console.WriteLine(e.Message);
+			if(e.Message != null){
+				Console.WriteLine(e.Message);
+				Console.WriteLine(e.Parser.CurrentInsertionMode);
+			}
 //			if(e.Token != null && !(e.Token is CharacterToken)) Console.WriteLine(e.Token);
 		}
 

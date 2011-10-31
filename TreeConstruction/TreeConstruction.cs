@@ -269,8 +269,16 @@ namespace Bakera.RedFace{
 			return e;
 		}
 
+		// CharacterTokenに対応する文字を挿入します。
 		public XmlNode InsertCharacter(CharacterToken t){
 			XmlText result = Document.CreateTextNode(t.Data);
+			AppendChild(result);
+			return result;
+		}
+
+		// 渡された文字を挿入します。
+		public XmlNode InsertCharacter(Char c){
+			XmlText result = Document.CreateTextNode(c.ToString());
 			AppendChild(result);
 			return result;
 		}
