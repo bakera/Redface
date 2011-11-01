@@ -124,8 +124,11 @@ namespace Bakera.RedFace{
 			return result;
 		}
 
+// Adjust Name
+		public void AdjustSVGElementName(){
+			if(mySVGElementNameReferences.ContainsKey(this.Name)) this.Name = mySVGElementNameReferences[this.Name];
+		}
 
-// Adjust Attribute
 		public void AdjustSVGAttributes(){
 			AdjustAttributes(mySVGAttributeNameReferences);
 		}
@@ -228,5 +231,46 @@ namespace Bakera.RedFace{
 			{"xmlns", new AttributeInfo(null, "xmlns", Document.XmlnsNamespace)},
 			{"xmlns:xlink", new AttributeInfo("xmlns", "xlink", Document.XmlnsNamespace)},
 		};
+
+		private static readonly Dictionary<string, string> mySVGElementNameReferences = new Dictionary<string, string>(){
+			{"altglyph", "altGlyph"},
+			{"altglyphdef", "altGlyphDef"},
+			{"altglyphitem", "altGlyphItem"},
+			{"animatecolor", "animateColor"},
+			{"animatemotion", "animateMotion"},
+			{"animatetransform", "animateTransform"},
+			{"clippath", "clipPath"},
+			{"feblend", "feBlend"},
+			{"fecolormatrix", "feColorMatrix"},
+			{"fecomponenttransfer", "feComponentTransfer"},
+			{"fecomposite", "feComposite"},
+			{"feconvolvematrix", "feConvolveMatrix"},
+			{"fediffuselighting", "feDiffuseLighting"},
+			{"fedisplacementmap", "feDisplacementMap"},
+			{"fedistantlight", "feDistantLight"},
+			{"feflood", "feFlood"},
+			{"fefunca", "feFuncA"},
+			{"fefuncb", "feFuncB"},
+			{"fefuncg", "feFuncG"},
+			{"fefuncr", "feFuncR"},
+			{"fegaussianblur", "feGaussianBlur"},
+			{"feimage", "feImage"},
+			{"femerge", "feMerge"},
+			{"femergenode", "feMergeNode"},
+			{"femorphology", "feMorphology"},
+			{"feoffset", "feOffset"},
+			{"fepointlight", "fePointLight"},
+			{"fespecularlighting", "feSpecularLighting"},
+			{"fespotlight", "feSpotLight"},
+			{"fetile", "feTile"},
+			{"feturbulence", "feTurbulence"},
+			{"foreignobject", "foreignObject"},
+			{"glyphref", "glyphRef"},
+			{"lineargradient", "linearGradient"},
+			{"radialgradient", "radialGradient"},
+			{"textpath", "textPath"},
+		};
+
+
 	}
 }

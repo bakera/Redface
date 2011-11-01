@@ -382,13 +382,12 @@ namespace Bakera.RedFace{
 
 			if(token.IsStartTag("math")){
 				Reconstruct(tree, token);
-				StartTagToken t = (StartTagToken)token;
-				t.AdjustMathMLAttributes();
-				t.AdjustForeignAttributes();
-				XmlElement result = tree.CreateElementForToken(t, Document.MathMLNamespace);
+				token.AdjustMathMLAttributes();
+				token.AdjustForeignAttributes();
+				XmlElement result = tree.CreateElementForToken(token, Document.MathMLNamespace);
 				tree.InsertElement(result);
-				if(t.SelfClosing){
-					tree.AcknowledgeSelfClosingFlag(t);
+				if(token.SelfClosing){
+					tree.AcknowledgeSelfClosingFlag(token);
 					tree.PopFromStack();
 				}
 				return;
@@ -396,13 +395,12 @@ namespace Bakera.RedFace{
 
 			if(token.IsStartTag("svg")){
 				Reconstruct(tree, token);
-				StartTagToken t = (StartTagToken)token;
-				t.AdjustSVGAttributes();
-				t.AdjustForeignAttributes();
-				XmlElement result = tree.CreateElementForToken(t, Document.SVGNamespace);
+				token.AdjustSVGAttributes();
+				token.AdjustForeignAttributes();
+				XmlElement result = tree.CreateElementForToken(token, Document.SVGNamespace);
 				tree.InsertElement(result);
-				if(t.SelfClosing){
-					tree.AcknowledgeSelfClosingFlag(t);
+				if(token.SelfClosing){
+					tree.AcknowledgeSelfClosingFlag(token);
 					tree.PopFromStack();
 				}
 				return;

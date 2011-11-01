@@ -13,11 +13,16 @@ namespace Bakera.RedFace{
 			return e.Name.Equals(this.Name, StringComparison.InvariantCulture) && e.NamespaceURI.Equals(this.Namespace, StringComparison.InvariantCulture);
 		}
 
-		public static  bool IsMathMLNameSpace(XmlElement e){
+		public static bool IsHtmlNameSpace(XmlElement e){
+			return e.NamespaceURI.Equals(Document.HtmlNamespace, StringComparison.InvariantCulture);
+		}
+
+
+		public static bool IsMathMLNameSpace(XmlElement e){
 			return e.NamespaceURI.Equals(Document.MathMLNamespace, StringComparison.InvariantCulture);
 		}
 
-		public static  bool IsSVGNameSpace(XmlElement e){
+		public static bool IsSVGNameSpace(XmlElement e){
 			return e.NamespaceURI.Equals(Document.SVGNamespace, StringComparison.InvariantCulture);
 		}
 

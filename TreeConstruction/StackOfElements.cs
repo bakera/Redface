@@ -198,12 +198,17 @@ namespace Bakera.RedFace{
 			return result;
 		}
 
+		// 指定された名前の要素が削除されるまで Stack から要素を削除します。
+		// 指定された名前の要素自体も削除されます。
 		public void PopUntilSameTagName(params string[] tagName){
 			while(!IsCurrentNameMatch(tagName)){
 				Pop();
 			}
 			Pop();
 		}
+
+		// 指定された要素が削除されるまで Stack から要素を削除します。
+		// 指定された要素自体も削除されます。
 		public void PopUntilSameElement(XmlElement e){
 			while(Peek() != e){
 				Pop();

@@ -252,13 +252,20 @@ namespace Bakera.RedFace{
 			return InsertElement(result);
 		}
 
-		// 渡された名前の要素を作って挿入します。
-		// tagTokenをねつ造し、XmlElement と TagToken の対応関係を記録します。
-		// isindex要素の処理に使われます。
-		public XmlElement InsertElementForToken(string s){
-			StartTagToken token = new StartTagToken();
-			token.Name = s;
-			return InsertElementForToken(token);
+		// TagTokenと名前空間を指定して、対応する要素を作って挿入します。
+		// TagTokenが指定された名前空間と異なるxmlnsを持つ場合はエラーとなります。
+		public XmlElement InsertForeignElementForToken(TagToken t, string ns){
+			XmlElement result = CreateElementForToken(t, ns);
+			string xmlns = result.GetAttribute("xmlns", Document.XmlnsNamespace);
+			if(xmlns != null && !xmlns.Equals(ns, StringComparison.InvariantCulture)){
+				OnParseErrorRaised(string.Format("8.2.5.1 Creating and inserting elements : 文脈と異なる名前空間が指定されています。: {0}", t.Name));
+			}
+
+			string xlink = result.GetAttribute("xmlns:xlink");
+			if(xlink != null && !xlink.Equals(Document.XLinkNamespace, StringComparison.InvariantCulture)){
+				OnParseErrorRaised(string.Format("8.2.5.1 Creating and inserting elements : xmlns:xlink属性の値は {0} でなければなりません。: {1}", Document.XLinkNamespace, t.Name));
+			}
+			return InsertElement(result);
 		}
 
 		// XmlElementをCurrentNodeに挿入します。
