@@ -14,7 +14,7 @@ namespace Bakera.RedFace{
 		}
 
 		public override void AppendCharacterToken(TreeConstruction tree, CharacterToken token){
-			if(token.IsWhiteSpace) return;
+			if(token.IsSpaceCharacter) return;
 			AppendAnythingElse(tree, token);
 		}
 

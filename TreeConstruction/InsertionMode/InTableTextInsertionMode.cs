@@ -17,7 +17,7 @@ namespace Bakera.RedFace{
 		public override void AppendAnythingElse(TreeConstruction tree, Token token){
 			CharacterToken[] tokenlist = tree.GetPendingTableCharacterTokens();
 			// 空白類以外があるかチェック
-			if(Array.Find(tokenlist, (c)=>!c.IsWhiteSpace) == null){
+			if(Array.Find(tokenlist, (c)=>!c.IsSpaceCharacter) == null){
 				// 空白類しかない
 				Array.ForEach(tokenlist, (c)=>tree.InsertCharacter(c));
 			} else {

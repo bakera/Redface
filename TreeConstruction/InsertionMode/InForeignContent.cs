@@ -11,7 +11,7 @@ namespace Bakera.RedFace{
 				tree.InsertCharacter(Chars.REPLACEMENT_CHARACTER);
 				return;
 			}
-			if(token.IsWhiteSpace){
+			if(token.IsSpaceCharacter){
 				tree.InsertCharacter(token);
 				return;
 			}

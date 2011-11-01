@@ -26,7 +26,7 @@ namespace Bakera.RedFace{
 				OnParseErrorRaised(string.Format("NUL文字が出現しました。"));
 				return;
 			}
-			if(token.IsWhiteSpace){
+			if(token.IsSpaceCharacter){
 				Reconstruct(tree, token);
 				tree.InsertCharacter(token);
 				return;

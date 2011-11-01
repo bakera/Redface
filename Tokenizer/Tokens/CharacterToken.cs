@@ -18,7 +18,7 @@ namespace Bakera.RedFace{
 
 		public override string ToString(){
 			string result = this.GetType().Name;
-			if(this.IsWhiteSpace){
+			if(this.IsSpaceCharacter){
 				result += " (white space)";
 			} else {
 				result += string.Format(" / Data: \"{0}\"", this.Data);
@@ -28,7 +28,8 @@ namespace Bakera.RedFace{
 
 		// CharacterTokenでかつ文字が空白類文字の場合true
 		// A character token that is one of U+0009 CHARACTER TABULATION, U+000A LINE FEED (LF), U+000C FORM FEED (FF), U+000D CARRIAGE RETURN (CR), or U+0020 SPACE
-		public override bool IsWhiteSpace{
+		// The space characters, for the purposes of this specification, are U+0020 SPACE, U+0009 CHARACTER TABULATION (tab), U+000A LINE FEED (LF), U+000C FORM FEED (FF), and U+000D CARRIAGE RETURN (CR).
+		public override bool IsSpaceCharacter{
 			get{
 				foreach(char c in this.Data){
 					switch(c){
