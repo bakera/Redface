@@ -89,9 +89,9 @@ namespace Bakera.RedFace{
 				IgnoreNextLineFeed = false;
 			}
 			if(IsInHtmlContext(t)){
-				mode.AppendToken(this, t);
+				t.AppendTo(this, mode);
 			} else {
-				myInsertionModeManager.GetState<InForeignContent>().AppendToken(this, t);
+				t.AppendTo(this, myInsertionModeManager.GetState<InForeignContent>());
 			}
 			if(t is StartTagToken && t.SelfClosing && t != myAcknowledgedSelfClosingTag){
 				OnParseErrorRaised(string.Format("空要素でない要素に空要素タグを使用することはできません。: {0}", t.Name));

@@ -36,6 +36,10 @@ namespace Bakera.RedFace{
 			return result;
 		}
 
+		public override void AppendTo(TreeConstruction tree, InsertionMode mode){
+			mode.AppendDoctypeToken(tree, this);
+		}
+
 
 
 	}

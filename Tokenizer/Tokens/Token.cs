@@ -54,6 +54,8 @@ The output of the tokenization step is a series of zero or more of the following
 		}
 
 
+		// このトークンを指定されたツリーに指定されたモードで挿入します。
+		public abstract void AppendTo(TreeConstruction tree, InsertionMode mode);
 
 	}
 

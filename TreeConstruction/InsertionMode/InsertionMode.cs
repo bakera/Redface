@@ -6,28 +6,6 @@ namespace Bakera.RedFace{
 	public abstract class InsertionMode : RedFaceParserState{
 		
 // メソッド
-		public void AppendToken(TreeConstruction tree, Token token){
-			if(token is CharacterToken){
-				AppendCharacterToken(tree, (CharacterToken)token);
-				return;
-			} else if(token is CommentToken){
-				AppendCommentToken(tree, (CommentToken)token);
-				return;
-			} else if(token is DoctypeToken){
-				AppendDoctypeToken(tree, (DoctypeToken)token);
-				return;
-			} else if(token is StartTagToken) {
-				AppendStartTagToken(tree, (StartTagToken)token);
-				return;
-			} else if(token is EndTagToken) {
-				AppendEndTagToken(tree, (EndTagToken)token);
-				return;
-			} else if(token is EndOfFileToken) {
-				AppendEndOfFileToken(tree, (EndOfFileToken)token);
-				return;
-			}
-			AppendAnythingElse(tree, token);
-		}
 
 		public virtual void AppendCharacterToken(TreeConstruction tree, CharacterToken token){
 			AppendAnythingElse(tree, token);

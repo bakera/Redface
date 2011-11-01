@@ -23,5 +23,10 @@ namespace Bakera.RedFace{
 			return false;
 		}
 
+		public override void AppendTo(TreeConstruction tree, InsertionMode mode){
+			mode.AppendEndTagToken(tree, this);
+		}
+
+
 	}
 }
