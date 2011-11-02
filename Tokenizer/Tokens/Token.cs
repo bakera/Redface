@@ -16,6 +16,11 @@ The output of the tokenization step is a series of zero or more of the following
 			return null;
 		}
 
+		// 指定された名前の属性値があれば true を返します。TagToken以外は常にfalseを返します。
+		public virtual bool HasAttribute(string name){
+			return false;
+		}
+
 		public virtual AttributeToken[] Attributes{
 			get{return new AttributeToken[0];}
 		}

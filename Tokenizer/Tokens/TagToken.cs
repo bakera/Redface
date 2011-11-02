@@ -40,7 +40,7 @@ namespace Bakera.RedFace{
 		}
 
 		// 指定された名前の属性があればtrueを返します。
-		public bool HasAttribute(string key){
+		public override bool HasAttribute(string key){
 			return myAttributes.ContainsKey(key);
 		}
 

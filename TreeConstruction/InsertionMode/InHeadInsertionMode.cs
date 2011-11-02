@@ -40,6 +40,12 @@ namespace Bakera.RedFace{
 				tree.InsertElementForToken(token);
 				tree.PopFromStack();
 				tree.AcknowledgeSelfClosingFlag(token);
+
+				string charsetValue = token.GetAttributeValue("charset");
+				if(charsetValue != null){
+
+				}
+
 				// ToDo: process charset
 				return;
 			}

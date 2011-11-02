@@ -7,20 +7,15 @@ namespace Bakera.RedFace{
 
 	public class InputStream : IDisposable{
 
-		private StringBuilder myConsumedChars = null; // Consumeされた文字の履歴
+		private StringBuilder myConsumedChars = new StringBuilder(); // Consumeされた文字の履歴
 		private int myOffset = 0;
 		private TextReader myTextReader = null;
-		private RedFaceParser myParser = null;
+
+		public EncodingConfidence EncodingConfidence{get; set;}
 
 // コンストラクタ
 		public InputStream(RedFaceParser parser, TextReader reader){
-			myParser = parser;
 			myTextReader = reader;
-			if(reader is StreamReader){
-				myConsumedChars = new StringBuilder((int)((StreamReader)reader).BaseStream.Length);
-			} else {
-				myConsumedChars = new StringBuilder();
-			}
 		}
 
 
@@ -43,10 +38,6 @@ namespace Bakera.RedFace{
 				}
 				return null;
 			}
-		}
-
-		public RedFaceParser Parser{
-			get {return myParser;}
 		}
 
 		// UnConsumeされた文字があるとき、オフセットを示す。EOFに達すると-1

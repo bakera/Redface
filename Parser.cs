@@ -59,11 +59,14 @@ namespace Bakera.RedFace{
 			}
 		}
 
+		public Encoding Encoding{get; private set;}
+
 // コンストラクタ
 
 		public RedFaceParser(){}
 
-		private void Init(){}
+		private void Init(){
+		}
 
 
 
@@ -74,20 +77,46 @@ namespace Bakera.RedFace{
 		}
 
 
+		// charsetを指定します。
+		public void SetCharset(string s){
+			try{
+				Encoding enc = Encoding.GetEncoding(s);
+				this.Encoding = enc;
+			} catch(ArgumentOutOfRangeException e){
+
+			}
+		}
+
+
 
 // パース系
 
+
 		public void Parse(Stream s){
 			StartTime = DateTime.Now;
-			this.Init();
-
-			TextReader tr = new StreamReader(s);
+			StreamReader tr = new StreamReader(s, Encoding);
 			InputStream stream = new InputStream(this, tr);
 			myTokenizer = new Tokenizer(this, stream);
 			myTokenizer.ParserEventRaised += OnParserEventRaised;
 			myTreeConstruction = new TreeConstruction(this);
 			myTreeConstruction.ParserEventRaised += OnParserEventRaised;
+			TreeConstruct();
+			EndTime = DateTime.Now;
+			Console.WriteLine(tr.CurrentEncoding);
+		}
 
+		// パース停止フラグをONにします。
+		// 次のトークンの読み取りを止めて停止します。
+		public void Stop(){
+			// ToDo: Stop処理実装
+			myStopFlag = true;
+		}
+
+		public void ChangeTokenState<T>() where T : TokenizationState, new(){
+			myTokenizer.ChangeTokenState<T>();
+		}
+
+		private void TreeConstruct(){
 			while(!myStopFlag){
 				Token t = myTokenizer.GetToken();
 				if(t == null) continue;
@@ -101,19 +130,8 @@ namespace Bakera.RedFace{
 
 				if(t is EndOfFileToken) break;
 			}
-			EndTime = DateTime.Now;
 		}
 
-		// パース停止フラグをONにします。
-		// 次のトークンの読み取りを止めて停止します。
-		public void Stop(){
-			// ToDo: Stop処理実装
-			myStopFlag = true;
-		}
-
-		public void ChangeTokenState<T>() where T : TokenizationState, new(){
-			myTokenizer.ChangeTokenState<T>();
-		}
 
 // エラー記録
 

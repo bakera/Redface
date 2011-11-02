@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using System.Xml;
 
 namespace Bakera.RedFace{
@@ -7,9 +8,9 @@ namespace Bakera.RedFace{
 	public class App{
 		public static int Main(){
 
-			RedFaceParser p = new RedFaceParser();
-
 			try{
+				RedFaceParser p = new RedFaceParser();
+				p.SetCharset("");
 
 				InitialInsertionMode temp = new InitialInsertionMode();
 
@@ -32,7 +33,7 @@ namespace Bakera.RedFace{
 				Console.WriteLine("パース時間: {0}", p.EndTime - p.StartTime);
 				Console.WriteLine();
 				Console.WriteLine("========");
-//				Console.WriteLine(p.Document.OuterXml);
+				Console.WriteLine(p.Document.OuterXml);
 
 				return 0;
 			} catch(Exception e){
