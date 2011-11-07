@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -9,17 +10,23 @@ namespace Bakera.RedFace{
 
 		private StringBuilder myConsumedChars = new StringBuilder(); // Consumeされた文字の履歴
 		private int myOffset = 0;
+		private Stream myStream = null;
 		private TextReader myTextReader = null;
 
-		public EncodingConfidence EncodingConfidence{get; set;}
+		private const int SniffEncodingBufferSize = 1024;
 
 // コンストラクタ
-		public InputStream(RedFaceParser parser, TextReader reader){
-			myTextReader = reader;
+		public InputStream(RedFaceParser parser, Encoding defaultEncoding, Stream s){
+			myStream = s;
+			this.Encoding = defaultEncoding;
+			this.EncodingConfidence = EncodingConfidence.Tentative;
 		}
 
 
 // プロパティ
+		public EncodingConfidence EncodingConfidence{get; set;}
+		public Encoding Encoding{get; set;}
+
 		public char? CurrentInputChar{
 			get {
 				char? result = GetCharByPosition(CurrentPosition);
@@ -97,7 +104,7 @@ namespace Bakera.RedFace{
 				}
 
 				// noncharactersはパースエラー
-				// HTML5 spec では処理が未定義だがとりあえず無視する (バッファに取り込まない)
+				// HTML5 spec ではエラー後の処理が未定義だがとりあえず無視する (バッファに取り込まない)
 				if(Chars.IsErrorChar(charNum)){
 					OnParseErrorRaised(string.Format("非Unicode文字 (noncharacters) が含まれています。: {0}", charNum));
 					continue;
@@ -105,10 +112,11 @@ namespace Bakera.RedFace{
 
 				if(charNum == Chars.CARRIAGE_RETURN){
 					// CR+LFの場合、LFのみバッファに入れる
+					// CR+終端の場合、LFのみバッファに入れる
 					// CR+何かの場合、LF+何かをバッファに入れてOffsetを+1する
 					myConsumedChars.Append(Chars.LINE_FEED);
 					int nextCharNum = myTextReader.Read();
-					if(nextCharNum == Chars.LINE_FEED) return true;
+					if(nextCharNum < 0 || nextCharNum == Chars.LINE_FEED) return true;
 					myConsumedChars.Append((char)nextCharNum);
 					myOffset++;
 					return true;
@@ -141,6 +149,82 @@ namespace Bakera.RedFace{
 				WillfulViolationRaised(this, new ParserEventArgs(){Message = s});
 			}
 		}
+
+
+
+// エンコード
+
+		private static readonly Dictionary<string, string> CharacterEncodingOverrides = new Dictionary<string, string>(){
+			{"EUC-KR", "windows-949"},
+			{"EUC-JP", "CP51932"},
+			{"GB2312", "GBK"},
+			{"GB_2312-80", "GBK"},
+			{"ISO-8859-1", "windows-1252"},
+			{"ISO-8859-9", "windows-1254"},
+			{"ISO-8859-11", "windows-874"},
+			{"KS_C_5601-1987", "windows-949"},
+//			{"Shift_JIS", "Windows-31J"},
+			{"TIS-620", "windows-874"},
+			{"US-ASCII", "windows-1252"},
+		};
+
+
+		// Encoding と EncodingConfidence をセットし、textReaderを初期化します。
+		public void SetEncoding(Encoding enc, EncodingConfidence conf){
+			if(myTextReader != null){
+				//ToDo:
+				throw new Exception("Encodingをあとから変更することはできません。");
+			}
+			this.Encoding = enc;
+			this.EncodingConfidence = conf;
+			myTextReader = new StreamReader(myStream, this.Encoding);
+		}
+
+		public static Encoding GetEncodingByName(string s){
+			try{
+				if(CharacterEncodingOverrides.ContainsKey(s)){
+					string newName = CharacterEncodingOverrides[s];
+					Console.WriteLine("文字符号化方式の名称 {0} が指定されましたが、{1} を使用します。", s, newName);
+					s = newName;
+				}
+				Encoding enc = Encoding.GetEncoding(s);
+				return enc;
+			} catch(ArgumentException){
+				Console.WriteLine("指定された名称の文字符号化方式は扱えません。: {0}", s);
+				return null;
+			}
+		}
+
+
+		// バイナリStreamの先頭最大1024バイトを読み取ってEncodingを判別します。
+		public void SniffEncoding(){
+			int length = myStream.Length > SniffEncodingBufferSize ? SniffEncodingBufferSize : (int)myStream.Length;
+
+			byte[] buffer = new byte[length];
+			myStream.Read(buffer, 0, length);
+			myStream.Position = 0;
+
+			if(length < 2) return;
+			if(buffer[0] == 0xfe && buffer[1] == 0xff){
+				SetEncoding(new UnicodeEncoding(true, true), EncodingConfidence.Tentative);
+				return;
+			} else if(buffer[0] == 0xff && buffer[1] == 0xfe){
+				SetEncoding(Encoding.Unicode, EncodingConfidence.Tentative);
+				return;
+			}
+
+			if(length < 3) return;
+			if(buffer[0] == 0xEF && buffer[1] == 0xBB && buffer[2] == 0xBF){
+				SetEncoding(Encoding.UTF8, EncodingConfidence.Tentative);
+				return;
+			}
+
+			int position = 0;
+			// ToDo:
+
+
+		}
+
 
 
 	} //  class InputStream

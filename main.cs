@@ -9,8 +9,17 @@ namespace Bakera.RedFace{
 		public static int Main(){
 
 			try{
+
+/*
+				foreach( EncodingInfo ei in Encoding.GetEncodings() )  {
+					Console.WriteLine( "{0} / {1}  / {2}", ei.CodePage, ei.Name, ei.DisplayName );
+				}
+				return 0;
+*/
+
+
 				RedFaceParser p = new RedFaceParser();
-				p.SetCharset("");
+//				p.SetForceEncoding("csWindows31J");
 
 				InitialInsertionMode temp = new InitialInsertionMode();
 
@@ -51,33 +60,6 @@ namespace Bakera.RedFace{
 		}
 
 	}
-
-	public enum InsetionMode{
-		Initial,
-		BeforeHtml,
-		BeforeHead,
-		InHead,
-		InHeadNoscript,
-		AfterHead,
-		InBody,
-		Text,
-		InTable,
-		InTableText,
-		InCaption,
-		InColumnGroup,
-		InTableBody,
-		InRow,
-		InCell,
-		InSelect,
-		InSelectInTable,
-		AfterBody,
-		InFrameset,
-		AfterFrameset,
-		AfterAfterBody,
-		AfterAfterFrameset,
-	}
-
-
 
 }
 

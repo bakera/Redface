@@ -15,6 +15,8 @@ namespace Bakera.RedFace{
 		private Tokenizer myTokenizer = null;
 		private TreeConstruction myTreeConstruction = null;
 		private bool myFramesetOK = true;
+		private Encoding myDefaultEncoding = Encoding.UTF8;
+		private Encoding myForceEncoding = null;
 
 
 
@@ -59,14 +61,8 @@ namespace Bakera.RedFace{
 			}
 		}
 
-		public Encoding Encoding{get; private set;}
 
 // コンストラクタ
-
-		public RedFaceParser(){}
-
-		private void Init(){
-		}
 
 
 
@@ -77,16 +73,6 @@ namespace Bakera.RedFace{
 		}
 
 
-		// charsetを指定します。
-		public void SetCharset(string s){
-			try{
-				Encoding enc = Encoding.GetEncoding(s);
-				this.Encoding = enc;
-			} catch(ArgumentOutOfRangeException e){
-
-			}
-		}
-
 
 
 // パース系
@@ -94,15 +80,20 @@ namespace Bakera.RedFace{
 
 		public void Parse(Stream s){
 			StartTime = DateTime.Now;
-			StreamReader tr = new StreamReader(s, Encoding);
-			InputStream stream = new InputStream(this, tr);
+			InputStream stream = new InputStream(this, myDefaultEncoding, s);
 			myTokenizer = new Tokenizer(this, stream);
 			myTokenizer.ParserEventRaised += OnParserEventRaised;
 			myTreeConstruction = new TreeConstruction(this);
 			myTreeConstruction.ParserEventRaised += OnParserEventRaised;
+
+			if(myForceEncoding != null){
+				stream.SetEncoding(myForceEncoding, EncodingConfidence.Certain);
+			} else {
+				stream.SniffEncoding();
+			}
 			TreeConstruct();
+
 			EndTime = DateTime.Now;
-			Console.WriteLine(tr.CurrentEncoding);
 		}
 
 		// パース停止フラグをONにします。
@@ -133,14 +124,33 @@ namespace Bakera.RedFace{
 		}
 
 
-// エラー記録
+// エンコード
 
-		public void AddError(string message){
-			ParserError pe = new ParserError(){Message = message};
-			AddError(pe);
+		private static readonly Dictionary<string, string> CharacterEncodingOverrides = new Dictionary<string, string>(){
+			{"EUC-KR", "windows-949"},
+			{"EUC-JP", "CP51932"},
+			{"GB2312", "GBK"},
+			{"GB_2312-80", "GBK"},
+			{"ISO-8859-1", "windows-1252"},
+			{"ISO-8859-9", "windows-1254"},
+			{"ISO-8859-11", "windows-874"},
+			{"KS_C_5601-1987", "windows-949"},
+//			{"Shift_JIS", "Windows-31J"},
+			{"TIS-620", "windows-874"},
+			{"US-ASCII", "windows-1252"},
+		};
+
+		// charsetを明示的に指定します。
+		// encoding判定は行われず、ここで指定したEncodingが強制的に使用されるようになります。
+		public void SetForceEncoding(string s){
+			myForceEncoding = InputStream.GetEncodingByName(s);
 		}
-		public void AddError(ParserError pe){
-			myLogs.Add(pe);
+
+		// デフォルトのcharsetを指定します。
+		// encoding判定に失敗した際に、ここで指定したEncodingが使用されるようになります。
+		// このメソッドを呼ばない場合のデフォルトは UTF-8 です。
+		public void SetDefaultEncoding(string s){
+			myDefaultEncoding = InputStream.GetEncodingByName(s);
 		}
 
 
