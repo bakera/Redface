@@ -67,8 +67,6 @@ If the character reference is being consumed as part of an attribute, and the la
 			if('\u0061' <= c && c <= '\u007a') return true;
 			return false;
 		}
-
-
 	}
 }
 

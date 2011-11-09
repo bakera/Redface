@@ -151,7 +151,6 @@ namespace Bakera.RedFace{
 		}
 
 
-
 // エンコード
 
 		private static readonly Dictionary<string, string> CharacterEncodingOverrides = new Dictionary<string, string>(){
@@ -173,12 +172,13 @@ namespace Bakera.RedFace{
 		public void SetEncoding(Encoding enc, EncodingConfidence conf){
 			if(myTextReader != null){
 				//ToDo:
-				throw new Exception("Encodingをあとから変更することはできません。");
+				throw new Exception("Encodingをあとから変更することはできません。InputStreamを初期化してください。");
 			}
 			this.Encoding = enc;
 			this.EncodingConfidence = conf;
 			myTextReader = new StreamReader(myStream, this.Encoding);
 		}
+
 
 		public static Encoding GetEncodingByName(string s){
 			try{
@@ -219,9 +219,13 @@ namespace Bakera.RedFace{
 				return;
 			}
 
-			int position = 0;
+			EncodingSniffer es = new EncodingSniffer();
+			Encoding result = es.SniffEncoding(buffer);
+			if(result != null){
+				SetEncoding(result, EncodingConfidence.Tentative);
+				return;
+			}
 			// ToDo:
-
 
 		}
 
