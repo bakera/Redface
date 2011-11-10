@@ -126,31 +126,17 @@ namespace Bakera.RedFace{
 
 // エンコード
 
-		private static readonly Dictionary<string, string> CharacterEncodingOverrides = new Dictionary<string, string>(){
-			{"EUC-KR", "windows-949"},
-			{"EUC-JP", "CP51932"},
-			{"GB2312", "GBK"},
-			{"GB_2312-80", "GBK"},
-			{"ISO-8859-1", "windows-1252"},
-			{"ISO-8859-9", "windows-1254"},
-			{"ISO-8859-11", "windows-874"},
-			{"KS_C_5601-1987", "windows-949"},
-//			{"Shift_JIS", "Windows-31J"},
-			{"TIS-620", "windows-874"},
-			{"US-ASCII", "windows-1252"},
-		};
-
 		// charsetを明示的に指定します。
 		// encoding判定は行われず、ここで指定したEncodingが強制的に使用されるようになります。
 		public void SetForceEncoding(string s){
-			myForceEncoding = InputStream.GetEncodingByName(s);
+			myForceEncoding = EncodingSniffer.GetEncodingByName(s);
 		}
 
 		// デフォルトのcharsetを指定します。
 		// encoding判定に失敗した際に、ここで指定したEncodingが使用されるようになります。
 		// このメソッドを呼ばない場合のデフォルトは UTF-8 です。
 		public void SetDefaultEncoding(string s){
-			myDefaultEncoding = InputStream.GetEncodingByName(s);
+			myDefaultEncoding = EncodingSniffer.GetEncodingByName(s);
 		}
 
 

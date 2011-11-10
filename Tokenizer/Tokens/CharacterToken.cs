@@ -32,16 +32,7 @@ namespace Bakera.RedFace{
 		public override bool IsSpaceCharacter{
 			get{
 				foreach(char c in this.Data){
-					switch(c){
-						case Chars.CHARACTER_TABULATION:
-						case Chars.LINE_FEED:
-						case Chars.FORM_FEED:
-						case Chars.CARRIAGE_RETURN:
-						case Chars.SPACE:
-							break;
-						default:
-							return false;
-					}
+					if(!c.IsSpaceCharacter()) return false;
 				}
 				return true;
 			}

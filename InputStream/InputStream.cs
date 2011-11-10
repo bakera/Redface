@@ -153,19 +153,6 @@ namespace Bakera.RedFace{
 
 // エンコード
 
-		private static readonly Dictionary<string, string> CharacterEncodingOverrides = new Dictionary<string, string>(){
-			{"EUC-KR", "windows-949"},
-			{"EUC-JP", "CP51932"},
-			{"GB2312", "GBK"},
-			{"GB_2312-80", "GBK"},
-			{"ISO-8859-1", "windows-1252"},
-			{"ISO-8859-9", "windows-1254"},
-			{"ISO-8859-11", "windows-874"},
-			{"KS_C_5601-1987", "windows-949"},
-//			{"Shift_JIS", "Windows-31J"},
-			{"TIS-620", "windows-874"},
-			{"US-ASCII", "windows-1252"},
-		};
 
 
 		// Encoding と EncodingConfidence をセットし、textReaderを初期化します。
@@ -177,22 +164,6 @@ namespace Bakera.RedFace{
 			this.Encoding = enc;
 			this.EncodingConfidence = conf;
 			myTextReader = new StreamReader(myStream, this.Encoding);
-		}
-
-
-		public static Encoding GetEncodingByName(string s){
-			try{
-				if(CharacterEncodingOverrides.ContainsKey(s)){
-					string newName = CharacterEncodingOverrides[s];
-					Console.WriteLine("文字符号化方式の名称 {0} が指定されましたが、{1} を使用します。", s, newName);
-					s = newName;
-				}
-				Encoding enc = Encoding.GetEncoding(s);
-				return enc;
-			} catch(ArgumentException){
-				Console.WriteLine("指定された名称の文字符号化方式は扱えません。: {0}", s);
-				return null;
-			}
 		}
 
 
