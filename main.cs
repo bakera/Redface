@@ -10,14 +10,6 @@ namespace Bakera.RedFace{
 
 			try{
 
-/*
-				foreach( EncodingInfo ei in Encoding.GetEncodings() )  {
-					Console.WriteLine( "{0} / {1}  / {2}", ei.CodePage, ei.Name, ei.DisplayName );
-				}
-				return 0;
-*/
-
-
 				RedFaceParser p = new RedFaceParser();
 //				p.SetForceEncoding("csWindows31J");
 
@@ -52,9 +44,9 @@ namespace Bakera.RedFace{
 		}
 
 		public static void WriteEvent(Object sender, ParserEventArgs e){
-			if(e.Message != null){
-				Console.WriteLine(e.Message);
-				Console.WriteLine(e.Parser.CurrentInsertionMode);
+			if(e.Level > EventLevel.Verbose){
+				if(!string.IsNullOrEmpty(e.Message)) Console.WriteLine(e.Message);
+//				Console.WriteLine(e.Parser.CurrentInsertionMode);
 			}
 //			if(e.Token != null && !(e.Token is CharacterToken)) Console.WriteLine(e.Token);
 		}

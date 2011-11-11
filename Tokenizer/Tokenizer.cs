@@ -63,6 +63,10 @@ namespace Bakera.RedFace{
 			}
 		}
 
+		public InputStream InputStream {
+			get{return myInputStream;}
+		}
+
 
 // コンストラクタ
 
@@ -182,11 +186,11 @@ namespace Bakera.RedFace{
 
 		// ParseErrorRaisedイベントを発生します。
 		protected virtual void OnParseErrorRaised(string s){
-			OnParserEventRaised(this, new ParserEventArgs(){Message = s});
+			OnParserEventRaised(this, new ParserEventArgs(EventLevel.ParseError){Message = s});
 		}
 		// TokenStateChangedイベントを発生します。
 		protected virtual void OnTokenStateChanged(){
-			OnParserEventRaised(this, new ParserEventArgs());
+			OnParserEventRaised(this, new ParserEventArgs(EventLevel.Verbose));
 		}
 
 

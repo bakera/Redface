@@ -61,6 +61,9 @@ namespace Bakera.RedFace{
 			}
 		}
 
+		public EncodingConfidence EncodingConfidence{
+			get{return myTokenizer.InputStream.EncodingConfidence;}
+		}
 
 // コンストラクタ
 
@@ -81,6 +84,7 @@ namespace Bakera.RedFace{
 		public void Parse(Stream s){
 			StartTime = DateTime.Now;
 			InputStream stream = new InputStream(this, myDefaultEncoding, s);
+			stream.ParseEventRaised += OnParserEventRaised;
 			myTokenizer = new Tokenizer(this, stream);
 			myTokenizer.ParserEventRaised += OnParserEventRaised;
 			myTreeConstruction = new TreeConstruction(this);

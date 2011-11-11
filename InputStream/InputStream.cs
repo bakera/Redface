@@ -134,19 +134,23 @@ namespace Bakera.RedFace{
 		}
 
 // イベント
-		public event EventHandler<ParserEventArgs> ParseErrorRaised;
-		public event EventHandler<ParserEventArgs> WillfulViolationRaised;
+		public event EventHandler<ParserEventArgs> ParseEventRaised;
 
 		// ParseErrorRaisedイベントを発生します。
 		protected virtual void OnParseErrorRaised(string s){
-			if(ParseErrorRaised != null){
-				ParseErrorRaised(this, new ParserEventArgs(){Message = s});
+			if(ParseEventRaised != null){
+				ParseEventRaised(this, new ParserEventArgs(EventLevel.ParseError){Message = s});
 			}
 		}
 		// WillfulViolationRaisedイベントを発生します。
 		protected virtual void OnWillfulViolationRaised(string s){
-			if(WillfulViolationRaised != null){
-				WillfulViolationRaised(this, new ParserEventArgs(){Message = s});
+			if(ParseEventRaised != null){
+				ParseEventRaised(this, new ParserEventArgs(EventLevel.Information){Message = s});
+			}
+		}
+		protected virtual void OnInformationRaised(string s){
+			if(ParseEventRaised != null){
+				ParseEventRaised(this, new ParserEventArgs(EventLevel.Information){Message = s});
 			}
 		}
 
@@ -163,12 +167,14 @@ namespace Bakera.RedFace{
 			}
 			this.Encoding = enc;
 			this.EncodingConfidence = conf;
+			OnInformationRaised(string.Format("文字符号化方式を判別しました。: {0} / {1}", enc.EncodingName, conf));
 			myTextReader = new StreamReader(myStream, this.Encoding);
 		}
 
 
 		// バイナリStreamの先頭最大1024バイトを読み取ってEncodingを判別します。
 		public void SniffEncoding(){
+			OnInformationRaised(string.Format("文字符号化方式の読み取りを開始します。"));
 			int length = myStream.Length > SniffEncodingBufferSize ? SniffEncodingBufferSize : (int)myStream.Length;
 
 			byte[] buffer = new byte[length];
@@ -177,16 +183,15 @@ namespace Bakera.RedFace{
 
 			if(length < 2) return;
 			if(buffer[0] == 0xfe && buffer[1] == 0xff){
-				SetEncoding(new UnicodeEncoding(true, true), EncodingConfidence.Tentative);
+				SetEncoding(new UnicodeEncoding(true, true), EncodingConfidence.Certain);
 				return;
 			} else if(buffer[0] == 0xff && buffer[1] == 0xfe){
-				SetEncoding(Encoding.Unicode, EncodingConfidence.Tentative);
+				SetEncoding(Encoding.Unicode, EncodingConfidence.Certain);
 				return;
 			}
-
 			if(length < 3) return;
 			if(buffer[0] == 0xEF && buffer[1] == 0xBB && buffer[2] == 0xBF){
-				SetEncoding(Encoding.UTF8, EncodingConfidence.Tentative);
+				SetEncoding(Encoding.UTF8, EncodingConfidence.Certain);
 				return;
 			}
 
@@ -196,8 +201,7 @@ namespace Bakera.RedFace{
 				SetEncoding(result, EncodingConfidence.Tentative);
 				return;
 			}
-			// ToDo:
-
+			OnInformationRaised(string.Format("文字符号化方式の読み取りに失敗しました。"));
 		}
 
 

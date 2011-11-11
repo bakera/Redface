@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Xml;
 
 namespace Bakera.RedFace{
@@ -41,9 +42,14 @@ namespace Bakera.RedFace{
 				tree.PopFromStack();
 				tree.AcknowledgeSelfClosingFlag(token);
 
-				string charsetValue = token.GetAttributeValue("charset");
-				if(charsetValue != null){
+				// charset判定
+				// tentative 
 
+				string charsetValue = token.GetAttributeValue("charset");
+				if(!string.IsNullOrEmpty(charsetValue)){
+					Encoding enc = EncodingSniffer.GetEncodingByName(charsetValue);
+					OnInformationRaised(string.Format("meta charset で文字符号化方式が指定されています。: {0} / {1}", charsetValue, enc.EncodingName));
+				// ToDo: process charset
 				}
 
 				// ToDo: process charset

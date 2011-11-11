@@ -11,7 +11,7 @@ namespace Bakera.RedFace{
 		// ParseErrorRaisedイベントを発生します。
 		protected virtual void OnParseErrorRaised(string message){
 			if(ParserEventRaised != null){
-				ParserEventRaised(this, new ParserEventArgs(){Message = message});
+				ParserEventRaised(this, new ParserEventArgs(EventLevel.ParseError){Message = message});
 			}
 		}
 
@@ -24,21 +24,25 @@ namespace Bakera.RedFace{
 
 		// ImpliedEndTagInsertedイベントを発生します。
 		protected virtual void OnImpliedEndTagInserted(XmlElement e, Token t){
-			ParserEventArgs args = new ParserEventArgs();
+			ParserEventArgs args = new ParserEventArgs(EventLevel.Information);
 			args.Element = e;
 			args.Token = t;
 			OnParserEventRaised(args);
-			
 		}
 
 		// DeepBreathイベントを発生します。
 		protected virtual void OnDeepBreath(){
-			OnParserEventRaised(new ParserEventArgs());
+			OnParserEventRaised(new ParserEventArgs(EventLevel.Warning));
 		}
 
 		// DocumentModeChangedイベントを発生します。
 		protected virtual void OnDocumentModeChanged(){
-			OnParserEventRaised(new ParserEventArgs());
+			OnParserEventRaised(new ParserEventArgs(EventLevel.Verbose));
+		}
+
+		// InformationRaisedイベントを発生します。
+		protected virtual void OnInformationRaised(string s){
+			OnParserEventRaised(new ParserEventArgs(EventLevel.Information){Message = s});
 		}
 
 	}

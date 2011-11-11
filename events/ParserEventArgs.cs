@@ -5,14 +5,14 @@ namespace Bakera.RedFace{
 
 	public class ParserEventArgs : EventArgs{
 
-		public ParserEventArgs(){}
-		public ParserEventArgs(RedFaceParser p){
-			this.Parser = p;
+		public ParserEventArgs(EventLevel level){
+			this.Level = level;
 		}
 		public RedFaceParser Parser{get; set;}
 		public XmlElement Element{get; set;}
 		public Token Token{get; set;}
 		public string Message{get; set;}
+		public EventLevel Level{get;set;}
 	}
 
 }

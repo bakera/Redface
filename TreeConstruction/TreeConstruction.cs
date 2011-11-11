@@ -322,13 +322,13 @@ namespace Bakera.RedFace{
 
 		protected virtual void OnParserEventRaised(Object sender, ParserEventArgs e){
 			if(ParserEventRaised != null){
-				ParserEventRaised(this, e);
+				ParserEventRaised(sender, e);
 			}
 		}
 
 		// ParseErrorRaisedイベントを発生します。
 		protected virtual void OnParseErrorRaised(string message){
-			OnParserEventRaised(this, new ParserEventArgs(){Message = message});
+			OnParserEventRaised(this, new ParserEventArgs(EventLevel.ParseError){Message = message});
 		}
 		protected virtual void OnParseErrorRaised(Object sender, ParserEventArgs args){
 			OnParserEventRaised(sender, args);
@@ -336,12 +336,12 @@ namespace Bakera.RedFace{
 
 		// InsertionModeChangedイベントを発生します。
 		protected virtual void OnInsertionModeChanged(){
-			OnParserEventRaised(this, new ParserEventArgs());
+			OnParserEventRaised(this, new ParserEventArgs(EventLevel.Verbose));
 		}
 
 		// ElementInsertedイベントを発生します。
 		protected virtual void OnElementInserted(){
-			OnParserEventRaised(this, new ParserEventArgs(null));
+			OnParserEventRaised(this, new ParserEventArgs(EventLevel.Verbose));
 		}
 
 
