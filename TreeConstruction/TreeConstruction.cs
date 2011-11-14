@@ -14,7 +14,6 @@ namespace Bakera.RedFace{
 		private StackOfElements myStackOfOpenElements = new StackOfElements();
 		private ListOfElements myListOfActiveFormatElements = new ListOfElements();
 		private Dictionary<XmlElement, TagToken> myCreatedElementToken = new Dictionary<XmlElement, TagToken>();
-		private TagToken myAcknowledgedSelfClosingTag = null;
 		private List<CharacterToken> myPendingTableCharacterTokens = new List<CharacterToken>();
 
 
@@ -78,7 +77,7 @@ namespace Bakera.RedFace{
 				ReprocessFlag = false;
 				AppendToken(CurrentInsertionMode, t);
 			}while(ReprocessFlag);
-			if(t is StartTagToken && t.SelfClosing && t != myAcknowledgedSelfClosingTag){
+			if(t is StartTagToken && t.SelfClosing && !t.AcknowledgedSelfClosing){
 				OnParseErrorRaised(string.Format("空要素でない要素に空要素タグを使用することはできません。: {0}", t.Name));
 			}
 			if(t is EndTagToken && t.Attributes.Length > 0){
@@ -88,7 +87,6 @@ namespace Bakera.RedFace{
 			if(t is EndTagToken && t.SelfClosing){
 				OnParseErrorRaised(string.Format("終了タグに空要素タグを使用することはできません。: {0}", t.Name));
 			}
-			myAcknowledgedSelfClosingTag = null;
 		}
 
 		public void AppendToken<T>(Token t) where T : InsertionMode, new() {
@@ -310,7 +308,7 @@ namespace Bakera.RedFace{
 		}
 
 		public void AcknowledgeSelfClosingFlag(TagToken t){
-			myAcknowledgedSelfClosingTag = t;
+			t.AcknowledgedSelfClosing = true;
 			OnMessageRaised(EventLevel.Verbose, string.Format("終了タグの省略が可能なトークンです。: {0}", t.Name));
 		}
 

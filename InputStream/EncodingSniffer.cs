@@ -26,6 +26,15 @@ namespace Bakera.RedFace{
 		};
 
 
+
+		// コンストラクタ
+		// Sniff対象となるバイト列を指定して EncodingSniffer のインスタンスを開始します。
+		public EncodingSniffer(byte[] buffer){
+			myBuffer = buffer;
+		}
+
+
+
 		// 現在位置からのオフセットを指定してバイト列を取得します。
 		private byte Get(int offset){
 			return myBuffer[myPosition + offset];
@@ -37,7 +46,6 @@ namespace Bakera.RedFace{
 			try{
 				if(CharacterEncodingOverrides.ContainsKey(s)){
 					string newName = CharacterEncodingOverrides[s];
-					Console.WriteLine("文字符号化方式の名称 {0} が指定されましたが、{1} を使用します。", s, newName);
 					s = newName;
 				}
 				Encoding enc = Encoding.GetEncoding(s);
@@ -49,13 +57,29 @@ namespace Bakera.RedFace{
 		}
 
 
-
-		// 渡されたバイナリデータを読み取ってEncodingを判別します。
+		// バイナリデータからBOMを読み取ってEncodingを判別します。
 		// 判別に成功した場合は Encoding を返します。
 		// 判別に失敗した場合は null を返します。
-		public Encoding SniffEncoding(byte[] buffer){
-			myBuffer = buffer;
-			while(myPosition < buffer.Length - MinimumSniffableLength){
+		public Encoding SniffEncodingFromBOM(){
+			if(myBuffer.Length < 2) return null;
+			if(myBuffer[0] == 0xfe && myBuffer[1] == 0xff){
+				return new UnicodeEncoding(true, true);
+			} else if(myBuffer[0] == 0xff && myBuffer[1] == 0xfe){
+				return Encoding.Unicode;
+			}
+			if(myBuffer.Length < 3) return null;
+			if(myBuffer[0] == 0xEF && myBuffer[1] == 0xBB && myBuffer[2] == 0xBF){
+				return Encoding.UTF8;
+			}
+			return null;
+		}
+
+
+		// バイナリデータから meta charset を読み取ってEncodingを判別します。
+		// 判別に成功した場合は Encoding を返します。
+		// 判別に失敗した場合は null を返します。
+		public Encoding SniffEncodingFromMeta(){
+			while(myPosition < myBuffer.Length - MinimumSniffableLength){
 				if(Get(0) != 0x3c){
 					myPosition++;
 					continue;
@@ -74,6 +98,7 @@ namespace Bakera.RedFace{
 					SkipTag();
 					continue;
 				}
+				myPosition++;
 			}
 			return null;
 		}
@@ -153,8 +178,7 @@ namespace Bakera.RedFace{
 		}
 
 
-	// meta 要素の属性を読み取って Encoding を決定します。
-
+		// meta 要素の属性を読み取って Encoding を決定します。
 		private Encoding SniffMetaElement(){
 			while(myPosition < myBuffer.Length - MinimumSniffableLength){
 				if(IsSpace(Get(0)) || Get(0) == 0x2F) break;
@@ -208,16 +232,21 @@ namespace Bakera.RedFace{
 
 			string attributeName = "";
 			string attributeValue = "";
+			byte current;
 
-			while(myPosition < myBuffer.Length - MinimumSniffableLength){
-				byte current = Get(0);
-				if(current == 0x3D && attributeName == ""){
-					myPosition++;
-					goto Value;
+			while(myPosition < myBuffer.Length){
+				current = Get(0);
+				if(current == 0x3D && attributeName != ""){
+					break;
 				} else if(IsSpace(current)){
-					goto Spaces;
+					break;
 				} else if(current == 0x2F || current == 0x3E){
-					return new AttributeToken(){Name = attributeName, Value = ""};
+					myPosition++;
+					if(attributeName != ""){
+						return new AttributeToken(){Name = attributeName, Value = ""};
+					} else {
+						return null;
+					}
 				} else if(0x41 <= current && current <= 0x5A){
 					attributeName += (char)(current + 0x20);
 				} else {
@@ -226,57 +255,60 @@ namespace Bakera.RedFace{
 				myPosition++;
 			}
 
-			Spaces:{
-				SkipSpace();
-				if(Get(0) != 0x3D){
-					return new AttributeToken(){Name = attributeName, Value = ""};
-				}
+			SkipSpace();
+			if(Get(0) != 0x3D){
 				myPosition++;
+				return new AttributeToken(){Name = attributeName, Value = ""};
 			}
+			myPosition++;
 
-			Value:{
-				SkipSpace();
-				byte current = Get(0);
-				if(current == 0x22 || current == 0x27){
-					byte b = current;
-					while(myPosition < myBuffer.Length - MinimumSniffableLength){
-						myPosition++;
-						byte inAttr = Get(0);
-						if(inAttr == b){
-							myPosition++;
-							return new AttributeToken(){Name = attributeName, Value = attributeValue};
-						} else if(0x41 <= current && current <= 0x5A){
-							attributeValue += (char)(current + 0x20);
-						} else {
-							attributeValue += (char)(current);
-						}
-					}
-				} else if(current == 0x3E){
-					return new AttributeToken(){Name = attributeName, Value = ""};
-				} else if(0x41 <= current && current <= 0x5A){
-					attributeValue += (char)(current + 0x20);
+			SkipSpace();
+			current = Get(0);
+			if(current == 0x22 || current == 0x27){
+				byte b = current;
+				while(myPosition < myBuffer.Length){
 					myPosition++;
-				} else {
-					attributeValue += (char)(current);
-					myPosition++;
-				}
-
-				while(myPosition < myBuffer.Length - MinimumSniffableLength){
 					current = Get(0);
-					if(IsSpace(current) || current == 0x3E){
+					if(current == b){
+						myPosition++;
 						return new AttributeToken(){Name = attributeName, Value = attributeValue};
 					} else if(0x41 <= current && current <= 0x5A){
 						attributeValue += (char)(current + 0x20);
 					} else {
 						attributeValue += (char)(current);
 					}
-					myPosition++;
 				}
+			} else if(current == 0x3E){
+				myPosition++;
+				return new AttributeToken(){Name = attributeName, Value = ""};
+			} else if(0x41 <= current && current <= 0x5A){
+				attributeValue += (char)(current + 0x20);
+				myPosition++;
+			} else {
+				attributeValue += (char)(current);
+				myPosition++;
 			}
+
+
+
+			while(myPosition < myBuffer.Length){
+				current = Get(0);
+				if(IsSpace(current) || current == 0x3E){
+					myPosition++;
+					return new AttributeToken(){Name = attributeName, Value = attributeValue};
+				} else if(0x41 <= current && current <= 0x5A){
+					attributeValue += (char)(current + 0x20);
+				} else {
+					attributeValue += (char)(current);
+				}
+				myPosition++;
+			}
+			myPosition++;
 			return null;
 		}
 
-		
+
+
 		private string ExtractEncodingNameFromMetaElement(string s){
 			int position = 0;
 			for(;;){

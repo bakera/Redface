@@ -6,7 +6,7 @@ using System.Text;
 namespace Bakera.RedFace{
 
 
-	public class InputStream : IDisposable{
+	public class InputStream : ParserEventSender, IDisposable{
 
 		private StringBuilder myConsumedChars = new StringBuilder(); // Consumeされた文字の履歴
 		private int myOffset = 0;
@@ -16,10 +16,8 @@ namespace Bakera.RedFace{
 		private const int SniffEncodingBufferSize = 1024;
 
 // コンストラクタ
-		public InputStream(Stream s, Encoding defaultEncoding){
+		public InputStream(Stream s){
 			myStream = s;
-			this.Encoding = defaultEncoding;
-			this.EncodingConfidence = EncodingConfidence.Tentative;
 		}
 
 
@@ -99,7 +97,7 @@ namespace Bakera.RedFace{
 				// ZWNBSは無視する (willful violation)
 				// BOMはTextReaderによって既に無視されているはず
 				if(charNum == Chars.BOM){
-					OnWillfulViolationRaised(string.Format("文中に U+FEFF (BYTE ORDER MARK / ZERO WIDTH NO BREAK SPACE) を検出しましたが、無視します。"));
+					OnMessageRaised(EventLevel.Information, string.Format("文中に U+FEFF (BYTE ORDER MARK / ZERO WIDTH NO BREAK SPACE) を検出しましたが、無視します。"));
 					continue;
 				}
 
@@ -133,26 +131,6 @@ namespace Bakera.RedFace{
 			return myConsumedChars[index];
 		}
 
-// イベント
-		public event EventHandler<ParserEventArgs> ParseEventRaised;
-
-		// ParseErrorRaisedイベントを発生します。
-		protected virtual void OnParseErrorRaised(string s){
-			if(ParseEventRaised != null){
-				ParseEventRaised(this, new ParserEventArgs(EventLevel.ParseError){Message = s});
-			}
-		}
-		// WillfulViolationRaisedイベントを発生します。
-		protected virtual void OnWillfulViolationRaised(string s){
-			if(ParseEventRaised != null){
-				ParseEventRaised(this, new ParserEventArgs(EventLevel.Information){Message = s});
-			}
-		}
-		protected virtual void OnInformationRaised(string s){
-			if(ParseEventRaised != null){
-				ParseEventRaised(this, new ParserEventArgs(EventLevel.Information){Message = s});
-			}
-		}
 
 
 // エンコード
@@ -167,41 +145,35 @@ namespace Bakera.RedFace{
 			}
 			this.Encoding = enc;
 			this.EncodingConfidence = conf;
-			OnInformationRaised(string.Format("文字符号化方式を判別しました。: {0} / {1}", enc.EncodingName, conf));
 			myTextReader = new StreamReader(myStream, this.Encoding);
 		}
 
 
 		// バイナリStreamの先頭最大1024バイトを読み取ってEncodingを判別します。
-		public void SniffEncoding(){
-			OnInformationRaised(string.Format("文字符号化方式の読み取りを開始します。"));
+		public Encoding SniffEncoding(){
+			OnMessageRaised(EventLevel.Information, string.Format("文字符号化方式の読み取りを開始します。"));
 			int length = myStream.Length > SniffEncodingBufferSize ? SniffEncodingBufferSize : (int)myStream.Length;
 
 			byte[] buffer = new byte[length];
 			myStream.Read(buffer, 0, length);
 			myStream.Position = 0;
 
-			if(length < 2) return;
-			if(buffer[0] == 0xfe && buffer[1] == 0xff){
-				SetEncoding(new UnicodeEncoding(true, true), EncodingConfidence.Certain);
-				return;
-			} else if(buffer[0] == 0xff && buffer[1] == 0xfe){
-				SetEncoding(Encoding.Unicode, EncodingConfidence.Certain);
-				return;
-			}
-			if(length < 3) return;
-			if(buffer[0] == 0xEF && buffer[1] == 0xBB && buffer[2] == 0xBF){
-				SetEncoding(Encoding.UTF8, EncodingConfidence.Certain);
-				return;
+			EncodingSniffer es = new EncodingSniffer(buffer);
+
+			OnMessageRaised(EventLevel.Verbose, string.Format("BOMの読み取りを試みます。"));
+			Encoding result = es.SniffEncodingFromBOM();
+			if(result != null){
+				OnMessageRaised(EventLevel.Information, string.Format("BOMから文字符号化方式を判別しました。: {0} (確定)", result.EncodingName));
+				return result;
 			}
 
-			EncodingSniffer es = new EncodingSniffer();
-			Encoding result = es.SniffEncoding(buffer);
+			OnMessageRaised(EventLevel.Verbose, string.Format("meta要素の読み取りを試みます。"));
+			result = es.SniffEncodingFromMeta();
 			if(result != null){
-				SetEncoding(result, EncodingConfidence.Tentative);
-				return;
+				OnMessageRaised(EventLevel.Information, string.Format("meta要素から文字符号化方式を判別しました。: {0} (未確定)", result.EncodingName));
+				return result;
 			}
-			OnInformationRaised(string.Format("文字符号化方式の読み取りに失敗しました。"));
+			return null;
 		}
 
 

@@ -83,8 +83,8 @@ namespace Bakera.RedFace{
 
 		public void Parse(Stream s){
 			StartTime = DateTime.Now;
-			InputStream stream = new InputStream(s, myDefaultEncoding);
-			stream.ParseEventRaised += OnParserEventRaised;
+			InputStream stream = new InputStream(s);
+			stream.ParserEventRaised += OnParserEventRaised;
 			myTokenizer = new Tokenizer(this, stream);
 			myTokenizer.ParserEventRaised += OnParserEventRaised;
 			myTreeConstruction = new TreeConstruction(this);
@@ -93,7 +93,13 @@ namespace Bakera.RedFace{
 			if(myForceEncoding != null){
 				stream.SetEncoding(myForceEncoding, EncodingConfidence.Certain);
 			} else {
-				stream.SniffEncoding();
+				Encoding enc = stream.SniffEncoding();
+				if(enc == null){
+					OnMessageRaised(EventLevel.Information, string.Format("文字符号化方式の読み取りに失敗しました。既定の文字符号化方式を使用します。: {0}", myDefaultEncoding.EncodingName));
+					stream.SetEncoding(myDefaultEncoding, EncodingConfidence.Tentative);
+				} else {
+					stream.SetEncoding(enc, EncodingConfidence.Tentative);
+				}
 			}
 			TreeConstruct();
 

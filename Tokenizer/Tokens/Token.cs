@@ -7,8 +7,18 @@ The output of the tokenization step is a series of zero or more of the following
 */
 
 	public abstract class Token{
-		public bool SelfClosing{get; set;}
+
+		// トークンの名前を返します。
 		public virtual string Name{get; set;}
+
+
+		// SelfClosing であれば true を返します。
+		// その要素が SelfClosing 可能であるかどうかは問わず、SelfClosingの記法であればtrueになります。
+		public bool SelfClosing{get; set;}
+
+		// SelfClosing 可能な要素であれば true を返します。
+		// TreeConstructinのプロセスでセットされます。
+		public bool AcknowledgedSelfClosing{get; set;}
 
 
 		// 属性値を取得します。TagTokenの場合を除いて常にnullを返します。
