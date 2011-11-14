@@ -7,7 +7,7 @@ using System.Xml;
 namespace Bakera.RedFace{
 
 
-	public partial class TreeConstruction{
+	public partial class TreeConstruction : ParserEventSender{
 
 		private StateManager<InsertionMode> myInsertionModeManager = new StateManager<InsertionMode>();
 		private Document myDocument = new Document();
@@ -74,7 +74,21 @@ namespace Bakera.RedFace{
 
 // メソッド
 		public void AppendToken(Token t){
-			AppendToken(CurrentInsertionMode, t);
+			do{
+				ReprocessFlag = false;
+				AppendToken(CurrentInsertionMode, t);
+			}while(ReprocessFlag);
+			if(t is StartTagToken && t.SelfClosing && t != myAcknowledgedSelfClosingTag){
+				OnParseErrorRaised(string.Format("空要素でない要素に空要素タグを使用することはできません。: {0}", t.Name));
+			}
+			if(t is EndTagToken && t.Attributes.Length > 0){
+				OnParseErrorRaised(string.Format("終了タグに属性を指定することはできません。: {0}", t.Name));
+
+			}
+			if(t is EndTagToken && t.SelfClosing){
+				OnParseErrorRaised(string.Format("終了タグに空要素タグを使用することはできません。: {0}", t.Name));
+			}
+			myAcknowledgedSelfClosingTag = null;
 		}
 
 		public void AppendToken<T>(Token t) where T : InsertionMode, new() {
@@ -89,21 +103,12 @@ namespace Bakera.RedFace{
 				IgnoreNextLineFeed = false;
 			}
 			if(IsInHtmlContext(t)){
+				OnMessageRaised(EventLevel.Verbose, string.Format("HTMLコンテキストでトークンを挿入します。: {0}", t));
 				t.AppendTo(this, mode);
 			} else {
+				OnMessageRaised(EventLevel.Verbose, string.Format("InForeignContentコンテキストでトークンを挿入します。: {0}", t));
 				t.AppendTo(this, myInsertionModeManager.GetState<InForeignContent>());
 			}
-			if(t is StartTagToken && t.SelfClosing && t != myAcknowledgedSelfClosingTag){
-				OnParseErrorRaised(string.Format("空要素でない要素に空要素タグを使用することはできません。: {0}", t.Name));
-			}
-			if(t is EndTagToken && t.Attributes.Length > 0){
-				OnParseErrorRaised(string.Format("終了タグに属性を指定することはできません。: {0}", t.Name));
-
-			}
-			if(t is EndTagToken && t.SelfClosing){
-				OnParseErrorRaised(string.Format("終了タグに空要素タグを使用することはできません。: {0}", t.Name));
-			}
-			myAcknowledgedSelfClosingTag = null;
 		}
 
 		// 渡されたトークンとカレントノードの状態を見て、current insertion mode in HTML content で扱うべきならtrueを返します。
@@ -133,14 +138,14 @@ namespace Bakera.RedFace{
 		public void ChangeInsertionMode<T>() where T : InsertionMode, new(){
 			if(CurrentInsertionMode != null && CurrentInsertionMode.GetType() == typeof(T)) return;
 			myInsertionModeManager.SetState<T>();
-			OnInsertionModeChanged();
+			OnMessageRaised(EventLevel.Verbose, string.Format("InsertionMode を変更しました: {0}", CurrentInsertionMode));
 		}
 
 		// InsertionModeを元に戻します。
 		public void SwitchToOriginalInsertionMode(){
 			myInsertionModeManager.SetState(OriginalInsertionMode);
 			OriginalInsertionMode = null;
-			OnInsertionModeChanged();
+			OnMessageRaised(EventLevel.Verbose, string.Format("InsertionMode を元に戻しました: {0}", CurrentInsertionMode));
 		}
 
 		public void ResetInsertionModeAppropriately(){
@@ -270,7 +275,7 @@ namespace Bakera.RedFace{
 
 		// XmlElementをCurrentNodeに挿入します。
 		public XmlElement InsertElement(XmlElement e){
-			OnElementInserted();
+			OnMessageRaised(EventLevel.Verbose, string.Format("要素を挿入しました。: {0}", e.Name));
 			AppendChild(e);
 			PutToStack(e);
 			return e;
@@ -306,6 +311,7 @@ namespace Bakera.RedFace{
 
 		public void AcknowledgeSelfClosingFlag(TagToken t){
 			myAcknowledgedSelfClosingTag = t;
+			OnMessageRaised(EventLevel.Verbose, string.Format("終了タグの省略が可能なトークンです。: {0}", t.Name));
 		}
 
 // Tokenの参照
@@ -314,37 +320,6 @@ namespace Bakera.RedFace{
 		public TagToken GetToken(XmlElement e){
 			return myCreatedElementToken[e];
 		}
-
-
-// イベント
-
-		public event EventHandler<ParserEventArgs> ParserEventRaised;
-
-		protected virtual void OnParserEventRaised(Object sender, ParserEventArgs e){
-			if(ParserEventRaised != null){
-				ParserEventRaised(sender, e);
-			}
-		}
-
-		// ParseErrorRaisedイベントを発生します。
-		protected virtual void OnParseErrorRaised(string message){
-			OnParserEventRaised(this, new ParserEventArgs(EventLevel.ParseError){Message = message});
-		}
-		protected virtual void OnParseErrorRaised(Object sender, ParserEventArgs args){
-			OnParserEventRaised(sender, args);
-		}
-
-		// InsertionModeChangedイベントを発生します。
-		protected virtual void OnInsertionModeChanged(){
-			OnParserEventRaised(this, new ParserEventArgs(EventLevel.Verbose));
-		}
-
-		// ElementInsertedイベントを発生します。
-		protected virtual void OnElementInserted(){
-			OnParserEventRaised(this, new ParserEventArgs(EventLevel.Verbose));
-		}
-
-
 
 	}
 }

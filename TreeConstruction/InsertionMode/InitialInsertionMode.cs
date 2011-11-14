@@ -21,7 +21,7 @@ namespace Bakera.RedFace{
 				}
 			}
 			tree.ChangeInsertionMode<BeforeHtmlInsertionMode>();
-			OnDocumentModeChanged();
+			OnMessageRaised(EventLevel.Information, string.Format("ドキュメントモードが変更されました。: {0}", tree.Document.DocumentMode));
 			return;
 		}
 
@@ -38,7 +38,7 @@ namespace Bakera.RedFace{
 			// 文書型宣言以外が出現
 			OnParseErrorRaised(string.Format("文書型宣言がありません。"));
 			tree.Document.DocumentMode = DocumentMode.Quirks;
-			OnDocumentModeChanged();
+			OnMessageRaised(EventLevel.Information, string.Format("ドキュメントモードが変更されました。: {0}", tree.Document.DocumentMode));
 			tree.ChangeInsertionMode<BeforeHtmlInsertionMode>();
 			tree.ReprocessFlag = true;
 		}

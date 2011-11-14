@@ -3,24 +3,17 @@ using System.Xml;
 
 namespace Bakera.RedFace{
 
-	public abstract class RedFaceParserState{
+
+	// InsertionMode と tokenizationStateの共通機能をまとめた抽象クラスです。
+	public abstract class RedFaceParserState : ParserEventSender{
+
+		public override string ToString(){
+			return this.GetType().Name;
+		}
+
+
 
 // イベント
-		public event EventHandler<ParserEventArgs> ParserEventRaised;
-
-		// ParseErrorRaisedイベントを発生します。
-		protected virtual void OnParseErrorRaised(string message){
-			if(ParserEventRaised != null){
-				ParserEventRaised(this, new ParserEventArgs(EventLevel.ParseError){Message = message});
-			}
-		}
-
-		// イベントを発生します。
-		protected virtual void OnParserEventRaised(ParserEventArgs e){
-			if(ParserEventRaised != null){
-				ParserEventRaised(this, e);
-			}
-		}
 
 		// ImpliedEndTagInsertedイベントを発生します。
 		protected virtual void OnImpliedEndTagInserted(XmlElement e, Token t){
@@ -33,11 +26,6 @@ namespace Bakera.RedFace{
 		// DeepBreathイベントを発生します。
 		protected virtual void OnDeepBreath(){
 			OnParserEventRaised(new ParserEventArgs(EventLevel.Warning));
-		}
-
-		// DocumentModeChangedイベントを発生します。
-		protected virtual void OnDocumentModeChanged(){
-			OnParserEventRaised(new ParserEventArgs(EventLevel.Verbose));
 		}
 
 		// InformationRaisedイベントを発生します。

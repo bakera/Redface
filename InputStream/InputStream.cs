@@ -16,7 +16,7 @@ namespace Bakera.RedFace{
 		private const int SniffEncodingBufferSize = 1024;
 
 // コンストラクタ
-		public InputStream(RedFaceParser parser, Encoding defaultEncoding, Stream s){
+		public InputStream(Stream s, Encoding defaultEncoding){
 			myStream = s;
 			this.Encoding = defaultEncoding;
 			this.EncodingConfidence = EncodingConfidence.Tentative;

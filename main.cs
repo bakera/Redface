@@ -6,10 +6,26 @@ using System.Xml;
 namespace Bakera.RedFace{
 
 	public class App{
-		public static int Main(){
 
+		private EventLevel myEventLevel = EventLevel.Information;
+		private EventLevel EventLevel{
+			get{return myEventLevel;}
+			set{myEventLevel = value;}
+		}
+
+		public static int Main(string[] args){
+			App app = new App();
+
+			if(Array.IndexOf(args, "-v") >= 0){
+				app.EventLevel = EventLevel.Verbose;
+			}
+
+			return app.Execute();
+		}
+
+
+		private int Execute(){
 			try{
-
 				RedFaceParser p = new RedFaceParser();
 //				p.SetForceEncoding("csWindows31J");
 
@@ -43,12 +59,13 @@ namespace Bakera.RedFace{
 			}
 		}
 
-		public static void WriteEvent(Object sender, ParserEventArgs e){
-			if(e.Level > EventLevel.Verbose){
-				if(!string.IsNullOrEmpty(e.Message)) Console.WriteLine(e.Message);
-//				Console.WriteLine(e.Parser.CurrentInsertionMode);
+		public void WriteEvent(Object sender, ParserEventArgs e){
+			if(e.Level >= myEventLevel){
+				Console.Write("{0}: ", e.Level);
+//				Console.Write("({0}) ", sender.GetType());
+				if(!string.IsNullOrEmpty(e.Message)) Console.Write(e.Message);
+				Console.WriteLine();
 			}
-//			if(e.Token != null && !(e.Token is CharacterToken)) Console.WriteLine(e.Token);
 		}
 
 	}

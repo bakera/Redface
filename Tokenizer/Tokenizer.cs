@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Bakera.RedFace{
 
-	public partial class Tokenizer{
+	public partial class Tokenizer : ParserEventSender{
 
 		private StateManager<TokenizationState> myTokenStateManager = new StateManager<TokenizationState>();
 		private RedFaceParser myParser = null;
@@ -127,7 +127,7 @@ namespace Bakera.RedFace{
 		public void ChangeTokenState<T>() where T : TokenizationState, new(){
 			if(CurrentTokenState != null && typeof(T) == CurrentTokenState.GetType()) return;
 			myTokenStateManager.SetState<T>();
-			OnTokenStateChanged();
+			OnMessageRaised(EventLevel.Verbose, string.Format("TokenizationState を変更しました: {0}", CurrentTokenState));
 		}
 		// トークン走査状態をひとつ前のものに戻します。
 		public void BackTokenState(){
@@ -173,26 +173,6 @@ namespace Bakera.RedFace{
 		public void UnConsume(){
 			myInputStream.UnConsume(1);
 		}
-
-
-// イベント
-		public event EventHandler<ParserEventArgs> ParserEventRaised;
-
-		protected virtual void OnParserEventRaised(Object sender, ParserEventArgs e){
-			if(ParserEventRaised != null){
-				ParserEventRaised(this, e);
-			}
-		}
-
-		// ParseErrorRaisedイベントを発生します。
-		protected virtual void OnParseErrorRaised(string s){
-			OnParserEventRaised(this, new ParserEventArgs(EventLevel.ParseError){Message = s});
-		}
-		// TokenStateChangedイベントを発生します。
-		protected virtual void OnTokenStateChanged(){
-			OnParserEventRaised(this, new ParserEventArgs(EventLevel.Verbose));
-		}
-
 
 
 

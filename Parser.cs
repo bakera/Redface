@@ -7,7 +7,7 @@ using System.Xml;
 namespace Bakera.RedFace{
 
 
-	public partial class RedFaceParser{
+	public class RedFaceParser : ParserEventSender{
 
 		private List<ParserLog> myLogs = new List<ParserLog>();
 
@@ -83,7 +83,7 @@ namespace Bakera.RedFace{
 
 		public void Parse(Stream s){
 			StartTime = DateTime.Now;
-			InputStream stream = new InputStream(this, myDefaultEncoding, s);
+			InputStream stream = new InputStream(s, myDefaultEncoding);
 			stream.ParseEventRaised += OnParserEventRaised;
 			myTokenizer = new Tokenizer(this, stream);
 			myTokenizer.ParserEventRaised += OnParserEventRaised;
@@ -115,7 +115,7 @@ namespace Bakera.RedFace{
 			while(!myStopFlag){
 				Token t = myTokenizer.GetToken();
 				if(t == null) continue;
-				OnTokenCreated(t);
+				OnMessageRaised(EventLevel.Verbose, string.Format("Tokenを作成しました。: {0}", t));
 				// AppendTokenを実行。
 				// 実行後にReprocessフラグが立てられている場合は同じトークンを再処理する
 				do{
