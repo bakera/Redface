@@ -63,7 +63,7 @@ namespace Bakera.RedFace{
 		public Encoding SniffEncodingFromBOM(){
 			if(myBuffer.Length < 2) return null;
 			if(myBuffer[0] == 0xfe && myBuffer[1] == 0xff){
-				return new UnicodeEncoding(true, true);
+				return Encoding.BigEndianUnicode;
 			} else if(myBuffer[0] == 0xff && myBuffer[1] == 0xfe){
 				return Encoding.Unicode;
 			}
@@ -309,7 +309,7 @@ namespace Bakera.RedFace{
 
 
 
-		private string ExtractEncodingNameFromMetaElement(string s){
+		public static string ExtractEncodingNameFromMetaElement(string s){
 			int position = 0;
 			for(;;){
 				int idx = s.IndexOf("charset", position, StringComparison.InvariantCultureIgnoreCase);
@@ -326,6 +326,8 @@ namespace Bakera.RedFace{
 				if(!s[position].IsSpaceCharacter()) break;
 			}
 			if(position >= s.Length) return null;
+
+
 			if(s[position] == Chars.QUOTATION_MARK){
 				int idx = s.IndexOf(Chars.QUOTATION_MARK, position);
 				if(idx < 0) return null;
@@ -336,11 +338,12 @@ namespace Bakera.RedFace{
 				return s.Substring(position, idx - position);
 			}
 
+			StringBuilder result = new StringBuilder();
 			for(int idx = 0; position + idx < s.Length; idx++){
-				if(!s[position+idx].IsSpaceCharacter()) continue;
-				return s.Substring(position, idx - position);
+				if(s[position+idx].IsSpaceCharacter()) break;
+				result.Append(s[position+idx]);
 			}
-			return null;
+			return result.ToString();
 		}
 
 

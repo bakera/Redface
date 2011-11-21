@@ -43,16 +43,55 @@ namespace Bakera.RedFace{
 				tree.AcknowledgeSelfClosingFlag(token);
 
 				// charset判定
-				// tentative 
-
 				string charsetValue = token.GetAttributeValue("charset");
-				if(!string.IsNullOrEmpty(charsetValue)){
-					Encoding enc = EncodingSniffer.GetEncodingByName(charsetValue);
-					OnInformationRaised(string.Format("meta charset で文字符号化方式が指定されています。: {0} / {1}", charsetValue, enc.EncodingName));
-				// ToDo: process charset
+				string httpEquivValue = token.GetAttributeValue("http-equiv");
+				string contentValue = token.GetAttributeValue("content");
+				string charsetName = null;
+
+
+				if(charsetValue != null){
+					OnMessageRaised(EventLevel.Verbose, string.Format("meta要素のcharset属性が指定されています。: {0}", charsetValue));
+					charsetName = charsetValue;
+					if(charsetName == ""){
+						OnInformationRaised(string.Format("meta要素のcharset属性に空の値が指定されています。: {0}", charsetValue));
+						return;
+					}
+					OnInformationRaised(string.Format("meta charset で文字符号化方式が指定されています。: {0}", charsetValue));
+				} else if(httpEquivValue != null && httpEquivValue.Equals("Content-Type", StringComparison.InvariantCultureIgnoreCase) && contentValue != null){
+					charsetName = EncodingSniffer.ExtractEncodingNameFromMetaElement(contentValue);
+
+					if(string.IsNullOrEmpty(charsetName)){
+						OnInformationRaised(string.Format("meta要素でhttp-equiv=\"Content-Type\"が指定されていますが、content属性に有効なcharsetの指定がありません。: {0}", contentValue));
+						return;
+					}
+					OnInformationRaised(string.Format("meta http-equivで文字符号化方式が指定されています。: {0}({1})", contentValue, charsetName));
 				}
 
-				// ToDo: process charset
+				if(charsetName == null) return;
+
+				InputStream stream = tree.Parser.InputStream;
+				if(stream.EncodingConfidence == EncodingConfidence.Irrelevant){
+					OnMessageRaised(EventLevel.Verbose, string.Format("metaで文字符号化方式が指定されていますが、文字符号化方式は無視します。"));
+					return;
+				}
+				OnMessageRaised(EventLevel.Verbose, string.Format("metaの属性値から文字符号化方式を決定します。"));
+				Encoding enc = EncodingSniffer.GetEncodingByName(charsetName);
+				if(enc == null){
+					OnMessageRaised(EventLevel.Information, string.Format("指定された名前から文字符号化方式を取得できませんでした。: {0}", charsetName));
+					return;
+				}
+
+				if(stream.EncodingConfidence == EncodingConfidence.Certain){
+					if(enc == stream.Encoding){
+						OnInformationRaised(string.Format("metaで文字符号化方式が指定されていますが、文字符号化方式は既に確定しています。: {0}", enc.EncodingName));
+					} else {
+						OnInformationRaised(string.Format("文字符号化方式は既に確定していますが、metaでは異なる文字符号化方式が指定されています。指定を無視します。: {0}", enc.EncodingName));
+					}
+					return;
+				}
+
+				// ToDo: Encodingを変更する
+				stream.ChangeEncoding(enc);
 				return;
 			}
 

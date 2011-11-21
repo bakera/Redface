@@ -134,9 +134,6 @@ namespace Bakera.RedFace{
 
 
 // エンコード
-
-
-
 		// Encoding と EncodingConfidence をセットし、textReaderを初期化します。
 		public void SetEncoding(Encoding enc, EncodingConfidence conf){
 			if(myTextReader != null){
@@ -176,6 +173,30 @@ namespace Bakera.RedFace{
 			return null;
 		}
 
+
+		// Encodingを後から変更します。
+		public void ChangeEncoding(Encoding enc){
+			if(this.Encoding == Encoding.Unicode || this.Encoding == Encoding.BigEndianUnicode){
+				OnMessageRaised(EventLevel.Information, string.Format("文字符号化方式が指定されましたが、ストリームは既にUTF-16として読み込まれています。指定された文字符号化方式を無視してUTF-16に確定します。: {0}", enc.EncodingName));
+				this.EncodingConfidence = EncodingConfidence.Certain;
+				return;
+			}
+
+			if(enc == Encoding.Unicode || enc == Encoding.BigEndianUnicode){
+				OnMessageRaised(EventLevel.Information, string.Format("文字符号化方式UTF-16が指定されましたが、UTF-8が指定されたものとして扱います。: {0}", enc.EncodingName));
+				enc = Encoding.UTF8;
+			}
+
+			if(enc == this.Encoding){
+				OnMessageRaised(EventLevel.Information, string.Format("指定された文字符号化方式は、既知の文字符号化方式と一致しています。文字符号化方式を確定します。: {0}", enc.EncodingName));
+				this.EncodingConfidence = EncodingConfidence.Certain;
+				return;
+			}
+
+			// ToDo: on the fly?
+			// ToDO: reload
+			return;
+		}
 
 
 	} //  class InputStream

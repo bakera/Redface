@@ -14,6 +14,7 @@ namespace Bakera.RedFace{
 		private bool myStopFlag = false;
 		private Tokenizer myTokenizer = null;
 		private TreeConstruction myTreeConstruction = null;
+		private InputStream myStream = null;
 		private bool myFramesetOK = true;
 		private Encoding myDefaultEncoding = Encoding.UTF8;
 		private Encoding myForceEncoding = null;
@@ -64,6 +65,9 @@ namespace Bakera.RedFace{
 		public EncodingConfidence EncodingConfidence{
 			get{return myTokenizer.InputStream.EncodingConfidence;}
 		}
+		public InputStream InputStream{
+			get{return myStream;}
+		}
 
 // コンストラクタ
 
@@ -83,22 +87,22 @@ namespace Bakera.RedFace{
 
 		public void Parse(Stream s){
 			StartTime = DateTime.Now;
-			InputStream stream = new InputStream(s);
-			stream.ParserEventRaised += OnParserEventRaised;
-			myTokenizer = new Tokenizer(this, stream);
+			myStream = new InputStream(s);
+			myStream.ParserEventRaised += OnParserEventRaised;
+			myTokenizer = new Tokenizer(this);
 			myTokenizer.ParserEventRaised += OnParserEventRaised;
 			myTreeConstruction = new TreeConstruction(this);
 			myTreeConstruction.ParserEventRaised += OnParserEventRaised;
 
 			if(myForceEncoding != null){
-				stream.SetEncoding(myForceEncoding, EncodingConfidence.Certain);
+				myStream.SetEncoding(myForceEncoding, EncodingConfidence.Certain);
 			} else {
-				Encoding enc = stream.SniffEncoding();
+				Encoding enc = myStream.SniffEncoding();
 				if(enc == null){
 					OnMessageRaised(EventLevel.Information, string.Format("文字符号化方式の読み取りに失敗しました。既定の文字符号化方式を使用します。: {0}", myDefaultEncoding.EncodingName));
-					stream.SetEncoding(myDefaultEncoding, EncodingConfidence.Tentative);
+					myStream.SetEncoding(myDefaultEncoding, EncodingConfidence.Tentative);
 				} else {
-					stream.SetEncoding(enc, EncodingConfidence.Tentative);
+					myStream.SetEncoding(enc, EncodingConfidence.Tentative);
 				}
 			}
 			TreeConstruct();
