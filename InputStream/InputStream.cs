@@ -195,7 +195,15 @@ namespace Bakera.RedFace{
 
 			// ToDo: on the fly?
 			// ToDO: reload
+			OnEncodingChanged(enc);
 			return;
+		}
+
+		public event EventHandler<ParserEventArgs> EncodingChanged;
+		protected void OnEncodingChanged(Encoding enc){
+			if(EncodingChanged != null){
+				EncodingChanged(this, new ParserEventArgs(EventLevel.Information){Message=string.Format("文字符号化方式を変更する必要があります。: {0}", enc.EncodingName)});
+			}
 		}
 
 

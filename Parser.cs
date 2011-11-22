@@ -105,6 +105,7 @@ namespace Bakera.RedFace{
 					myStream.SetEncoding(enc, EncodingConfidence.Tentative);
 				}
 			}
+			OnMessageRaised(EventLevel.Information, string.Format("構文解析を開始します。"));
 			TreeConstruct();
 
 			EndTime = DateTime.Now;
