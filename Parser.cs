@@ -12,9 +12,11 @@ namespace Bakera.RedFace{
 		private List<ParserLog> myLogs = new List<ParserLog>();
 
 		private bool myStopFlag = false;
+		private bool myEncodingChangingFlag = true;
 		private Tokenizer myTokenizer = null;
 		private TreeConstruction myTreeConstruction = null;
-		private InputStream myStream = null;
+		private Stream myStream = null;
+		private InputStream myInputStream = null;
 		private bool myFramesetOK = true;
 		private Encoding myDefaultEncoding = Encoding.UTF8;
 		private Encoding myForceEncoding = null;
@@ -66,7 +68,7 @@ namespace Bakera.RedFace{
 			get{return myTokenizer.InputStream.EncodingConfidence;}
 		}
 		public InputStream InputStream{
-			get{return myStream;}
+			get{return myInputStream;}
 		}
 
 // コンストラクタ
@@ -86,27 +88,34 @@ namespace Bakera.RedFace{
 
 
 		public void Parse(Stream s){
+			myStream = s;
+			Initialize();
 			StartTime = DateTime.Now;
-			myStream = new InputStream(s);
-			myStream.ParserEventRaised += OnParserEventRaised;
-			myTokenizer = new Tokenizer(this);
-			myTokenizer.ParserEventRaised += OnParserEventRaised;
-			myTreeConstruction = new TreeConstruction(this);
-			myTreeConstruction.ParserEventRaised += OnParserEventRaised;
 
 			if(myForceEncoding != null){
-				myStream.SetEncoding(myForceEncoding, EncodingConfidence.Certain);
+				myInputStream.SetEncoding(myForceEncoding, EncodingConfidence.Certain);
 			} else {
-				Encoding enc = myStream.SniffEncoding();
+				Encoding enc = myInputStream.SniffEncoding();
 				if(enc == null){
 					OnMessageRaised(EventLevel.Information, string.Format("文字符号化方式の読み取りに失敗しました。既定の文字符号化方式を使用します。: {0}", myDefaultEncoding.EncodingName));
-					myStream.SetEncoding(myDefaultEncoding, EncodingConfidence.Tentative);
+					myInputStream.SetEncoding(myDefaultEncoding, EncodingConfidence.Tentative);
 				} else {
-					myStream.SetEncoding(enc, EncodingConfidence.Tentative);
+					myInputStream.SetEncoding(enc, EncodingConfidence.Tentative);
 				}
 			}
 			OnMessageRaised(EventLevel.Information, string.Format("構文解析を開始します。"));
+
+			// パースする
 			TreeConstruct();
+			// EncodingChangedイベントで停止した場合、一度だけ再実行
+			if(myEncodingChangingFlag){
+				OnMessageRaised(EventLevel.Warning, string.Format("構文解析の途中で文字符号化方式が判明したため、構文解析をやり直します。判明した文字符号化方式: {0}", myForceEncoding.EncodingName));
+				myStopFlag = false;
+				myEncodingChangingFlag = false;
+				Initialize();
+				myInputStream.SetEncoding(myForceEncoding, EncodingConfidence.Certain);
+				TreeConstruct();
+			}
 
 			EndTime = DateTime.Now;
 		}
@@ -136,6 +145,23 @@ namespace Bakera.RedFace{
 
 				if(t is EndOfFileToken) break;
 			}
+		}
+
+		private void EncodeChanged(Object sender, EncodingChangedEventArgs e){
+			myStopFlag = true;
+			myEncodingChangingFlag = true;
+			myForceEncoding = e.Encoding;
+		}
+
+		private void Initialize(){
+			myStream.Position = 0;
+			myInputStream = new InputStream(myStream);
+			myInputStream.ParserEventRaised += OnParserEventRaised;
+			myInputStream.EncodingChanged += EncodeChanged;
+			myTokenizer = new Tokenizer(this);
+			myTokenizer.ParserEventRaised += OnParserEventRaised;
+			myTreeConstruction = new TreeConstruction(this);
+			myTreeConstruction.ParserEventRaised += OnParserEventRaised;
 		}
 
 

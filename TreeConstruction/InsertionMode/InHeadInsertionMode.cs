@@ -71,7 +71,7 @@ namespace Bakera.RedFace{
 
 				InputStream stream = tree.Parser.InputStream;
 				if(stream.EncodingConfidence == EncodingConfidence.Irrelevant){
-					OnMessageRaised(EventLevel.Verbose, string.Format("metaで文字符号化方式が指定されていますが、文字符号化方式は無視します。"));
+					OnMessageRaised(EventLevel.Verbose, string.Format("metaで文字符号化方式が指定されていますが、文字符号化方式の判別が必要ないモードであるため、指定を無視します。"));
 					return;
 				}
 				OnMessageRaised(EventLevel.Verbose, string.Format("metaの属性値から文字符号化方式を決定します。"));
@@ -83,7 +83,7 @@ namespace Bakera.RedFace{
 
 				if(stream.EncodingConfidence == EncodingConfidence.Certain){
 					if(enc == stream.Encoding){
-						OnInformationRaised(string.Format("metaで文字符号化方式が指定されていますが、文字符号化方式は既に確定しています。: {0}", enc.EncodingName));
+						OnInformationRaised(string.Format("metaで文字符号化方式が指定されていますが、既に確定している文字符号化方式と一致しています。指定を無視します。: {0}", enc.EncodingName));
 					} else {
 						OnInformationRaised(string.Format("文字符号化方式は既に確定していますが、metaでは異なる文字符号化方式が指定されています。指定を無視します。: {0}", enc.EncodingName));
 					}

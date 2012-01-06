@@ -148,7 +148,7 @@ namespace Bakera.RedFace{
 
 		// バイナリStreamの先頭最大1024バイトを読み取ってEncodingを判別します。
 		public Encoding SniffEncoding(){
-			OnMessageRaised(EventLevel.Information, string.Format("文字符号化方式の読み取りを開始します。"));
+			OnMessageRaised(EventLevel.Information, string.Format("文字符号化方式の事前読み取りを開始します。"));
 			int length = myStream.Length > SniffEncodingBufferSize ? SniffEncodingBufferSize : (int)myStream.Length;
 
 			byte[] buffer = new byte[length];
@@ -164,7 +164,7 @@ namespace Bakera.RedFace{
 				return result;
 			}
 
-			OnMessageRaised(EventLevel.Verbose, string.Format("meta要素の読み取りを試みます。"));
+			OnMessageRaised(EventLevel.Verbose, string.Format("meta要素の事前読み取りを試みます。"));
 			result = es.SniffEncodingFromMeta();
 			if(result != null){
 				OnMessageRaised(EventLevel.Information, string.Format("meta要素から文字符号化方式を判別しました。: {0} (未確定)", result.EncodingName));
@@ -199,10 +199,10 @@ namespace Bakera.RedFace{
 			return;
 		}
 
-		public event EventHandler<ParserEventArgs> EncodingChanged;
+		public event EventHandler<EncodingChangedEventArgs> EncodingChanged;
 		protected void OnEncodingChanged(Encoding enc){
 			if(EncodingChanged != null){
-				EncodingChanged(this, new ParserEventArgs(EventLevel.Information){Message=string.Format("文字符号化方式を変更する必要があります。: {0}", enc.EncodingName)});
+				EncodingChanged(this, new EncodingChangedEventArgs(enc));
 			}
 		}
 
