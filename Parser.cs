@@ -12,7 +12,7 @@ namespace Bakera.RedFace{
 		private List<ParserLog> myLogs = new List<ParserLog>();
 
 		private bool myStopFlag = false;
-		private bool myEncodingChangingFlag = true;
+		private bool myEncodingChangingFlag = false;
 		private Tokenizer myTokenizer = null;
 		private TreeConstruction myTreeConstruction = null;
 		private Stream myStream = null;
@@ -88,7 +88,13 @@ namespace Bakera.RedFace{
 
 
 		public void Parse(Stream s){
-			myStream = s;
+			if(s.CanSeek){
+				myStream = s;
+			} else {
+				myStream = new MemoryStream();
+				s.CopyTo(myStream);
+			}
+
 			Initialize();
 			StartTime = DateTime.Now;
 
@@ -106,17 +112,21 @@ namespace Bakera.RedFace{
 			OnMessageRaised(EventLevel.Information, string.Format("構文解析を開始します。"));
 
 			// パースする
+			OnMessageRaised(EventLevel.Verbose, "Tree Constructを開始します。");
 			TreeConstruct();
 			// EncodingChangedイベントで停止した場合、一度だけ再実行
 			if(myEncodingChangingFlag){
+				OnMessageRaised(EventLevel.Verbose, "Tree Constructが中断されました。");
 				OnMessageRaised(EventLevel.Warning, string.Format("構文解析の途中で文字符号化方式が判明したため、構文解析をやり直します。判明した文字符号化方式: {0}", myForceEncoding.EncodingName));
 				myStopFlag = false;
 				myEncodingChangingFlag = false;
 				Initialize();
 				myInputStream.SetEncoding(myForceEncoding, EncodingConfidence.Certain);
 				TreeConstruct();
+			} else {
+				OnMessageRaised(EventLevel.Verbose, "Tree Constructが終了しました。");
 			}
-
+			OnMessageRaised(EventLevel.Verbose, "パース終了しました。");
 			EndTime = DateTime.Now;
 		}
 
@@ -143,7 +153,10 @@ namespace Bakera.RedFace{
 					myTreeConstruction.AppendToken(t);
 				} while(myTreeConstruction.ReprocessFlag);
 
-				if(t is EndOfFileToken) break;
+				if(t is EndOfFileToken){
+					OnMessageRaised(EventLevel.Verbose, "ファイルの終端に達したため、終了します。");
+					break;
+				}
 			}
 		}
 
