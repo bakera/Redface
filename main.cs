@@ -21,6 +21,7 @@ namespace Bakera.RedFace{
 		public static int Main(string[] args){
 			try{
 				App app = new App();
+				app.ParseArgs(args);
 				return app.Execute(args);
 			} catch(Exception e){
 				Console.WriteLine(e);
@@ -29,52 +30,48 @@ namespace Bakera.RedFace{
 		}
 
 
-		private void ParseFromUri(string uri){
+		private int ParseFromUri(string uri){
 			RedFaceParser p = new RedFaceParser();
 			p.ParserEventRaised += WriteEvent;
 
 			WebClient client = new WebClient();
-			client.Headers.Add ("User-Agent", "RedFace/1.0");
+			client.Headers.Add("User-Agent", "RedFace/0.1");
 			using(Stream data = client.OpenRead(uri)){
 				p.Parse(data);
 			}
 			PrintResult(p);
+			return 0;
 		}
 
-		private void ParseFromFile(string path){
+		private int ParseFromFile(string path){
+
+			FileInfo file = new FileInfo(path);
+			if(!file.Exists){
+				Console.WriteLine("指定されたファイルがみつかりませんでした: {0}", file.FullName);
+				return 1;
+			}
+
 			RedFaceParser p = new RedFaceParser();
 			p.ParserEventRaised += WriteEvent;
 
-			FileInfo file = new FileInfo(path);
 			using(FileStream fs = file.Open(FileMode.Open, FileAccess.Read, FileShare.Read)){
 				p.Parse(fs);
 			}
 			PrintResult(p);
+			return 0;
 		}
 
 		private int Execute(string[] args){
-			for(int i=0; i < args.Length; i++){
-				string argName = args[i];
-				if(argName.StartsWith("-")){
-					if(argName == "-v"){
-						this.EventLevel = EventLevel.Verbose;
-					}
-				} else {
-					myTargetPath = argName;
-				}
-			}
-
 			if(myTargetPath == null){
 				Console.WriteLine("対象のファイル名もしくはURLを指定してください。");
 				return 1;
 			}
 
-			if(myTargetPath.StartsWith("http://")){
-				ParseFromUri(myTargetPath);
+			if(myTargetPath.StartsWith("http://") || myTargetPath.StartsWith("https://")){
+				return ParseFromUri(myTargetPath);
 			} else {
-				ParseFromFile(myTargetPath);
+				return ParseFromFile(myTargetPath);
 			}
-			return 0;
 		}
 
 		private void PrintResult(RedFaceParser p){
@@ -88,17 +85,40 @@ namespace Bakera.RedFace{
 			Console.WriteLine("パース時間: {0}", p.EndTime - p.StartTime);
 			Console.WriteLine();
 			Console.WriteLine("========");
-			Console.WriteLine(p.Document.OuterXml);
+//			Console.WriteLine(p.Document.OuterXml);
 		}
 
 
 		public void WriteEvent(Object sender, ParserEventArgs e){
 			if(e.Level >= myEventLevel){
 				Console.Write("{0}: ", e.Level);
-//				Console.Write("({0}) ", sender.GetType());
+				if(e.OriginalSender != null){
+					Console.Write("{0}:", e.OriginalSender.GetType());
+				}
+				if(sender is RedFaceParser){
+					RedFaceParser parser = (RedFaceParser)sender;
+					Console.Write("({0}文字目)", parser.InputStream.CurrentPosition);
+					Console.WriteLine(" {0}", parser.InputStream.GetRecentString(20));
+				}
 				if(!string.IsNullOrEmpty(e.Message)) Console.Write(e.Message);
 				Console.WriteLine();
 			}
+		}
+
+
+		// コマンドライン引数を解析してNameValueCollectionに格納します。
+		private void ParseArgs(string[] args){
+			for(int i=0; i < args.Length; i++){
+				string argName = args[i];
+				if(argName.StartsWith("-")){
+					if(argName == "-v"){
+						this.EventLevel = EventLevel.Verbose;
+					}
+				} else {
+					myTargetPath = argName;
+				}
+			}
+
 		}
 
 	}

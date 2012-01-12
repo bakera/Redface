@@ -96,7 +96,6 @@ namespace Bakera.RedFace{
 			if(IsDuplicateAttribute){
 				DropAttribute();
 				myDroppedAttributes.Add(myCurrentAttribute);
-				myCurrentAttribute = null;
 				return false;
 			}
 			myAttributes.Add(myCurrentAttribute.Name, myCurrentAttribute);

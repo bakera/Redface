@@ -15,6 +15,7 @@ namespace Bakera.RedFace{
 		public TokenizationState TokenizationState{get; set;}
 		public string Message{get; set;}
 		public EventLevel Level{get;set;}
+		public ParserEventSender OriginalSender{get;set;}
 	}
 
 }

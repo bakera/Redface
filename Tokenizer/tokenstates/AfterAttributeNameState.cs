@@ -34,7 +34,7 @@ namespace Bakera.RedFace{
 				case Chars.QUOTATION_MARK:
 				case Chars.APOSTROPHE:
 				case Chars.LESS_THAN_SIGN:
-					OnParseErrorRaised(string.Format("属性名の後に不正な文字を検出しました。: {0}", c));
+					OnParseErrorRaised(string.Format("属性名の後に不正な文字を検出しました。: {0} ({1}属性)", c,  t.CurrentTagToken.CurrentAttribute.Name));
 					goto default;
 				case null:
 					OnParseErrorRaised(string.Format("属性名の解析中に終端に達しました。"));
@@ -51,6 +51,7 @@ namespace Bakera.RedFace{
 					} else {
 						t.CurrentTagToken.CreateAttribute(c, "");
 					}
+					t.ChangeTokenState<AttributeNameState>();
 					return;
 			}
 		}

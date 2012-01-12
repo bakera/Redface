@@ -109,7 +109,7 @@ namespace Bakera.RedFace{
 					myInputStream.SetEncoding(enc, EncodingConfidence.Tentative);
 				}
 			}
-			OnMessageRaised(EventLevel.Information, string.Format("構文解析を開始します。"));
+			OnMessageRaised(EventLevel.Verbose, string.Format("構文解析を開始します。"));
 
 			// パースする
 			OnMessageRaised(EventLevel.Verbose, "Tree Constructを開始します。");

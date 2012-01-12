@@ -37,7 +37,27 @@ namespace Bakera.RedFace{
 
 		// 現在位置からのオフセットを指定してバイト列を取得します。
 		private byte Get(int offset){
+			if(myPosition >= myBuffer.Length){
+				Console.WriteLine("Length = {0}", myBuffer.Length);
+				Console.WriteLine("Position = {0}", myPosition);
+				Console.WriteLine("Offset = {0}", offset);
+				Console.WriteLine("Last Byte = {0}", myBuffer[myBuffer.Length-1]);
+			}
 			return myBuffer[myPosition + offset];
+		}
+
+		// 現在位置をひとつシフトします。
+		// すでに終端に達している場合はfalseを返します。
+		private bool MoveNext(){
+			return MoveNext(1);
+		}
+
+		// 現在位置をシフトします。
+		// 終端を超える場合はfalseを返します。
+		private bool MoveNext(int offset){
+			if(myPosition + offset >= myBuffer.Length) return false;
+			myPosition += offset;
+			return true;
 		}
 
 
@@ -81,13 +101,14 @@ namespace Bakera.RedFace{
 		public Encoding SniffEncodingFromMeta(){
 			while(myPosition < myBuffer.Length - MinimumSniffableLength){
 				if(Get(0) != 0x3c){
-					myPosition++;
+					if(MoveNext() == false) return null;
 					continue;
 				}
 				byte nextByte = Get(1);
 				byte nextNextByte = Get(2);
 				if(nextByte == 0x21 && nextNextByte == 0x2D && Get(3) == 0x2D){ // <!--
-					myPosition += 5; // !-- をスキップ、さらに --> の -- ぶんスキップ
+					// !-- をスキップ、さらに --> の -- ぶんスキップ
+					if(MoveNext(5) == false) return null;
 					SkipComment();
 					continue;
 				} else if(IsMeta()){ // <meta
@@ -98,7 +119,7 @@ namespace Bakera.RedFace{
 					SkipTag();
 					continue;
 				}
-				myPosition++;
+				if(MoveNext() == false) return null;
 			}
 			return null;
 		}
@@ -108,7 +129,7 @@ namespace Bakera.RedFace{
 		private void SkipSpace(){
 			while(myPosition < myBuffer.Length - MinimumSniffableLength){
 				if(!IsSpace(Get(0))) break;
-				myPosition++;
+				if(MoveNext() == false) return;
 			}
 		}
 
@@ -117,10 +138,10 @@ namespace Bakera.RedFace{
 		private void SkipComment(){
 			while(myPosition < myBuffer.Length - MinimumSniffableLength){
 				if(Get(0) == 0x3E && Get(-1) == 0x21 && Get(-2) == 0x21){
-					myPosition++;
+					if(MoveNext() == false) return;
 					break;
 				}
-				myPosition++;
+				if(MoveNext() == false) return;
 			}
 		}
 
@@ -129,7 +150,7 @@ namespace Bakera.RedFace{
 			// 次のスペースか > まで飛ばす
 			while(myPosition < myBuffer.Length - MinimumSniffableLength){
 				if(IsSpace(Get(0)) || Get(0) == 0x3E) break;
-				myPosition++;
+				if(MoveNext() == false) return;
 			}
 			while(GetAttribute() != null){}
 		}
@@ -138,10 +159,10 @@ namespace Bakera.RedFace{
 		private void SkipToGt(){
 			while(myPosition < myBuffer.Length - MinimumSniffableLength){
 				if(Get(0) == 0x3c){
-					myPosition++;
+					if(MoveNext() == false) return;
 					break;
 				}
-				myPosition++;
+				if(MoveNext() == false) return;
 			}
 		}
 
@@ -182,7 +203,7 @@ namespace Bakera.RedFace{
 		private Encoding SniffMetaElement(){
 			while(myPosition < myBuffer.Length - MinimumSniffableLength){
 				if(IsSpace(Get(0)) || Get(0) == 0x2F) break;
-				myPosition++;
+				if(MoveNext() == false) return null;
 			}
 			HashSet<string> attributeList = new HashSet<string>();
 			bool gotPragma = false;
@@ -227,13 +248,13 @@ namespace Bakera.RedFace{
 		// 現在位置以降から属性を取得します。
 		private AttributeToken GetAttribute(){
 			SkipSpace();
-
 			if(Get(0) == 0x3E) return null;
 
 			string attributeName = "";
 			string attributeValue = "";
 			byte current;
 
+			// 属性名を取得
 			while(myPosition < myBuffer.Length){
 				current = Get(0);
 				if(current == 0x3D && attributeName != ""){
@@ -241,7 +262,7 @@ namespace Bakera.RedFace{
 				} else if(IsSpace(current)){
 					break;
 				} else if(current == 0x2F || current == 0x3E){
-					myPosition++;
+					if(MoveNext() == false) return null;
 					if(attributeName != ""){
 						return new AttributeToken(){Name = attributeName, Value = ""};
 					} else {
@@ -252,22 +273,22 @@ namespace Bakera.RedFace{
 				} else {
 					attributeName += (char)(current);
 				}
-				myPosition++;
+				if(MoveNext() == false) return null;
 			}
 
 			SkipSpace();
 			if(Get(0) != 0x3D){
-				myPosition++;
+				if(MoveNext() == false) return null;
 				return new AttributeToken(){Name = attributeName, Value = ""};
 			}
-			myPosition++;
-
+			if(MoveNext() == false) return null;
 			SkipSpace();
 			current = Get(0);
+
 			if(current == 0x22 || current == 0x27){
 				byte b = current;
 				while(myPosition < myBuffer.Length){
-					myPosition++;
+					if(MoveNext() == false) return null;
 					current = Get(0);
 					if(current == b){
 						myPosition++;
@@ -279,34 +300,31 @@ namespace Bakera.RedFace{
 					}
 				}
 			} else if(current == 0x3E){
-				myPosition++;
+				if(MoveNext() == false) return null;
 				return new AttributeToken(){Name = attributeName, Value = ""};
 			} else if(0x41 <= current && current <= 0x5A){
 				attributeValue += (char)(current + 0x20);
-				myPosition++;
+				if(MoveNext() == false) return null;
 			} else {
 				attributeValue += (char)(current);
-				myPosition++;
+				if(MoveNext() == false) return null;
 			}
-
-
 
 			while(myPosition < myBuffer.Length){
 				current = Get(0);
 				if(IsSpace(current) || current == 0x3E){
-					myPosition++;
+					if(MoveNext() == false) return null;
 					return new AttributeToken(){Name = attributeName, Value = attributeValue};
 				} else if(0x41 <= current && current <= 0x5A){
 					attributeValue += (char)(current + 0x20);
 				} else {
 					attributeValue += (char)(current);
 				}
-				myPosition++;
+				if(MoveNext() == false) return null;
 			}
-			myPosition++;
+			if(MoveNext() == false) return null;
 			return null;
 		}
-
 
 
 		public static string ExtractEncodingNameFromMetaElement(string s){

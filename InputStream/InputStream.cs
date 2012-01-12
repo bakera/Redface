@@ -56,6 +56,12 @@ namespace Bakera.RedFace{
 			}
 		}
 
+		// 現在オフセット位置から少し前の文字列を指定した文字数分だけ取得します。
+		public string GetRecentString(int length){
+			if(length > CurrentPosition) length = CurrentPosition;
+			return myConsumedChars.ToString(CurrentPosition-length, length);
+		}
+
 
 
 // メソッド
@@ -148,7 +154,7 @@ namespace Bakera.RedFace{
 
 		// バイナリStreamの先頭最大1024バイトを読み取ってEncodingを判別します。
 		public Encoding SniffEncoding(){
-			OnMessageRaised(EventLevel.Information, string.Format("文字符号化方式の事前読み取りを開始します。"));
+			OnMessageRaised(EventLevel.Verbose, string.Format("文字符号化方式の事前読み取りを開始します。"));
 			int length = myStream.Length > SniffEncodingBufferSize ? SniffEncodingBufferSize : (int)myStream.Length;
 
 			byte[] buffer = new byte[length];
