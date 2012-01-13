@@ -34,8 +34,8 @@ namespace Bakera.RedFace{
 
 		public char? NextInputChar{
 			get {
-				if(Offset > 0) return GetCharByPosition(CurrentPosition + 1);
-				if(Offset == 0) {
+				if(myOffset > 0) return GetCharByPosition(CurrentPosition + 1);
+				if(myOffset == 0) {
 					if(ConsumeNextInputChar()){
 						myOffset--;
 						return GetCharByPosition(CurrentPosition + 1);
@@ -58,8 +58,15 @@ namespace Bakera.RedFace{
 
 		// 現在オフセット位置から少し前の文字列を指定した文字数分だけ取得します。
 		public string GetRecentString(int length){
-			if(length > CurrentPosition) length = CurrentPosition;
-			return myConsumedChars.ToString(CurrentPosition-length, length);
+			try{
+				int startPos = CurrentPosition - length;
+				if(startPos < 0) startPos = 0;
+				if(startPos + length > myConsumedChars.Length) length = myConsumedChars.Length - startPos;
+				return myConsumedChars.ToString(startPos, length);
+			} catch (ArgumentOutOfRangeException) {
+				Console.WriteLine("{0}, {1}, {2}, {3}", CurrentPosition, myConsumedChars.Length, myOffset, length);
+				throw;
+			}
 		}
 
 

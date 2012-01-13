@@ -238,22 +238,24 @@ namespace Bakera.RedFace{
 			return CreateElementForToken(t, Document.HtmlNamespace);
 		}
 
-		// TagTokenに対応する要素を、指定された名前空間で作って返します。
-		// XmlElement と TagToken の対応関係をDictionaryに記録します。
-		public XmlElement CreateElementForToken(TagToken t, string ns){
-			XmlElement result = Document.CreateElement(t.Name, ns);
-			foreach(AttributeToken at in t.Attributes){
-				result.SetAttribute(at.Name, at.Value);
-			}
-			myCreatedElementToken.Add(result, t);
-			return result;
-		}
-
 		// TagTokenに対応する要素を作って挿入します。
 		public XmlElement InsertElementForToken(TagToken t){
 			XmlElement result = CreateElementForToken(t);
 			return InsertElement(result);
 		}
+
+		// TagTokenに対応する要素を、指定された名前空間で作って返します。
+		// XmlElement と TagToken の対応関係をDictionaryに記録します。
+		public XmlElement CreateElementForToken(TagToken t, string ns){
+			string name = ReplaceInvalidXmlName(t.Name);
+			XmlElement result = Document.CreateElement(name, ns);
+			foreach(AttributeToken at in t.Attributes){
+				result.SetAttribute(ReplaceInvalidXmlName(at.Name), at.Value);
+			}
+			myCreatedElementToken.Add(result, t);
+			return result;
+		}
+
 
 		// TagTokenと名前空間を指定して、対応する要素を作って挿入します。
 		// TagTokenが指定された名前空間と異なるxmlnsを持つ場合はエラーとなります。
@@ -317,6 +319,17 @@ namespace Bakera.RedFace{
 		// 渡されたXmlElementに対応するTagTokenを返します。
 		public TagToken GetToken(XmlElement e){
 			return myCreatedElementToken[e];
+		}
+
+
+		// XMLで使用できない文字を置き換えます。
+
+		//NameStartChar  ::= ":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
+		//NameChar  ::=   NameStartChar | "-" | "." | [0-9] | #xB7 | [#x0300-#x036F] | [#x203F-#x2040]
+
+		public static string ReplaceInvalidXmlName(string s){
+			string result = s.Replace('"', '_');
+			return result;
 		}
 
 	}

@@ -91,17 +91,17 @@ namespace Bakera.RedFace{
 
 		public void WriteEvent(Object sender, ParserEventArgs e){
 			if(e.Level >= myEventLevel){
-				Console.Write("{0}: ", e.Level);
+				Console.WriteLine("[{0}] ", e.Level);
 				if(e.OriginalSender != null){
-					Console.Write("{0}:", e.OriginalSender.GetType());
+					Console.WriteLine(" {0}:", e.OriginalSender.GetType().Name);
 				}
 				if(sender is RedFaceParser){
 					RedFaceParser parser = (RedFaceParser)sender;
-					Console.Write("({0}文字目)", parser.InputStream.CurrentPosition);
-					Console.WriteLine(" {0}", parser.InputStream.GetRecentString(20));
+					Console.Write(" {0}", parser.InputStream.GetRecentString(40));
+					Console.Write(" ({0}文字目)", parser.InputStream.CurrentPosition);
+					Console.WriteLine();
 				}
-				if(!string.IsNullOrEmpty(e.Message)) Console.Write(e.Message);
-				Console.WriteLine();
+				if(!string.IsNullOrEmpty(e.Message)) Console.WriteLine(e.Message);
 			}
 		}
 
