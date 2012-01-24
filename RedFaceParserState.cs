@@ -20,6 +20,7 @@ namespace Bakera.RedFace{
 			ParserEventArgs args = new ParserEventArgs(EventLevel.Information);
 			args.Element = e;
 			args.Token = t;
+			args.Message = string.Format("省略されている終了タグを補いました。: {0}", e.Name);
 			OnParserEventRaised(args);
 		}
 
