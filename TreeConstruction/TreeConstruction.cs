@@ -329,6 +329,8 @@ namespace Bakera.RedFace{
 
 		public static string ReplaceInvalidXmlName(string s){
 			string result = s.Replace('"', '_');
+			result = result.Replace(':', '_');
+			result = result.Replace(';', '_');
 			return result;
 		}
 
