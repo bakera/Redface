@@ -55,6 +55,16 @@ namespace Bakera.RedFace{
 			return true;
 		}
 
+
+
+
+		// XMLで使用できない文字を置き換えます。
+		public static string ReplaceInvalidXmlName(string s){
+			string result = s.Replace('"', '_');
+			result = result.Replace(';', '_');
+			return result;
+		}
+
 	}
 
 }
