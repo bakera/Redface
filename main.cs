@@ -44,13 +44,20 @@ namespace Bakera.RedFace{
 		}
 
 		private int ParseFromFile(string path){
-
 			FileInfo file = new FileInfo(path);
-			if(!file.Exists){
-				Console.WriteLine("指定されたファイルがみつかりませんでした: {0}", file.FullName);
-				return 1;
+			if(file.Exists){
+				return ParseFromFile(file);
 			}
+			DirectoryInfo dir = new DirectoryInfo(path);
+			if(dir.Exists){
+				return ParseFromDirectory(dir);
+			}
+			Console.WriteLine("指定されたファイルがみつかりませんでした: {0}", file.FullName);
+			return 1;
+		}
 
+		private int ParseFromFile(FileInfo file){
+			Console.WriteLine("ファイル: <{0}> をパースします。", file.FullName);
 			RedFaceParser p = new RedFaceParser();
 			p.ParserEventRaised += WriteEvent;
 
@@ -60,6 +67,17 @@ namespace Bakera.RedFace{
 			PrintResult(p);
 			return 0;
 		}
+
+		private int ParseFromDirectory(DirectoryInfo dir){
+			foreach(DirectoryInfo subdir in dir.GetDirectories()){
+				ParseFromDirectory(subdir);
+			}
+			foreach(FileInfo file in dir.GetFiles()){
+				ParseFromFile(file);
+			}
+			return 0;
+		}
+
 
 		private int Execute(string[] args){
 			if(myTargetPath == null){
@@ -91,24 +109,21 @@ namespace Bakera.RedFace{
 
 		public void WriteEvent(Object sender, ParserEventArgs e){
 			if(e.Level >= myEventLevel){
-				Console.WriteLine("[{0}] ", e.Level);
-				if(e.OriginalSender != null){
-					Console.WriteLine(" {0}:", e.OriginalSender.GetType().Name);
-				}
-				if(sender is RedFaceParser){
+				Console.Write("[{0}] ", e.Level);
+				if(!string.IsNullOrEmpty(e.Message)) Console.WriteLine(e.Message);
+				if(sender is RedFaceParser && e.Level > EventLevel.Information){
+					if(e.OriginalSender != null){
+						Console.WriteLine(" {0}:", e.OriginalSender.GetType().Name);
+					}
 					RedFaceParser parser = (RedFaceParser)sender;
 					Console.Write(" {0}", parser.InputStream.GetRecentString(40));
-
 					string allstr = parser.InputStream.GetAllString();
 					string[] lines = allstr.Split('\n');
 					Console.Write(" ({0}行目", lines.Length);
 					Console.Write(" {0}文字目)", lines[lines.Length-1].Length);
 
-//					Console.Write(" ({0}文字目)", parser.InputStream.CurrentPosition);
-
 					Console.WriteLine();
 				}
-				if(!string.IsNullOrEmpty(e.Message)) Console.WriteLine(e.Message);
 			}
 		}
 
