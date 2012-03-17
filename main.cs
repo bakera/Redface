@@ -98,7 +98,14 @@ namespace Bakera.RedFace{
 				if(sender is RedFaceParser){
 					RedFaceParser parser = (RedFaceParser)sender;
 					Console.Write(" {0}", parser.InputStream.GetRecentString(40));
-					Console.Write(" ({0}文字目)", parser.InputStream.CurrentPosition);
+
+					string allstr = parser.InputStream.GetAllString();
+					string[] lines = allstr.Split('\n');
+					Console.Write(" ({0}行目", lines.Length);
+					Console.Write(" {0}文字目)", lines[lines.Length-1].Length);
+
+//					Console.Write(" ({0}文字目)", parser.InputStream.CurrentPosition);
+
 					Console.WriteLine();
 				}
 				if(!string.IsNullOrEmpty(e.Message)) Console.WriteLine(e.Message);

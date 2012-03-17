@@ -3,7 +3,8 @@ using System.Text;
 
 namespace Bakera.RedFace{
 
-	public class Line{
+	// InputStreamの現在の行に関する情報を保持するクラスです。
+	public class LineInfo{
 
 // フィールド
 
@@ -21,10 +22,10 @@ namespace Bakera.RedFace{
 
 
 // コンストラクタ
-		public Line(int lineNumber){
+		public LineInfo(int lineNumber){
 			myNumber = lineNumber;
 		}
-		public Line(Line prevLine){
+		public LineInfo(LineInfo prevLine){
 			myNumber = prevLine.Number+1;
 		}
 

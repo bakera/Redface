@@ -69,6 +69,16 @@ namespace Bakera.RedFace{
 			}
 		}
 
+		// すべての文字列を取得します。
+		public string GetAllString(){
+			return myConsumedChars.ToString();
+		}
+
+		// 現在位置の行情報を取得します。
+		public LineInfo GetCurrentLineInfo(){
+			return null;
+		}
+
 
 
 // メソッド
