@@ -8,6 +8,9 @@ namespace Bakera.RedFace{
 		public ParserEventArgs(EventLevel level){
 			this.Level = level;
 		}
+		public ParserEventArgs(ParserMessage message){
+			this.Level = EventLevel.ParseError;
+		}
 		public RedFaceParser Parser{get; set;}
 		public XmlElement Element{get; set;}
 		public Token Token{get; set;}

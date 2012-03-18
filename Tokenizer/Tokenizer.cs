@@ -98,7 +98,7 @@ namespace Bakera.RedFace{
 				bool alreadyAttrErrorRaised = tt.IsDroppedAttribute;
 				bool attrFixResult = tt.FixAttribute();
 				if(!attrFixResult && !alreadyAttrErrorRaised){
-					OnParseErrorRaised(string.Format("属性が重複しています。{0}", tt.Name));
+					OnMessageRaised(new DuplicateAttributeError(tt.Name));
 				}
 				if(t is StartTagToken) LastStartTag = (StartTagToken)t;
 			}

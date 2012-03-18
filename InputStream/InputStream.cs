@@ -127,7 +127,7 @@ namespace Bakera.RedFace{
 				// noncharactersはパースエラー
 				// HTML5 spec ではエラー後の処理が未定義だがとりあえず無視する (バッファに取り込まない)
 				if(Chars.IsErrorChar(charNum)){
-					OnParseErrorRaised(string.Format("非Unicode文字 (noncharacters) が含まれています。: {0}", charNum));
+					OnMessageRaised(new NonCharactersError(charNum));
 					continue;
 				}
 

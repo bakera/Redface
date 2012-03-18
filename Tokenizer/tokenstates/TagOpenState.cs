@@ -15,7 +15,7 @@ namespace Bakera.RedFace{
 					t.ChangeTokenState<EndTagOpenState>();
 					return;
 				case Chars.QUESTION_MARK:
-					OnParseErrorRaised(string.Format("処理命令を検出しました。"));
+					OnMessageRaised(new ProcessingInstructionError());
 					t.ChangeTokenState<BogusCommentState>();
 					return;
 			}

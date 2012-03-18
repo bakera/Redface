@@ -1,0 +1,57 @@
+<messages>
+
+<item>
+	<id>NonCharactersError</id>
+	<level>ParseError</level>
+	<message>制御コード、あるいは未定義の文字 (noncharacters) が含まれています。: {0}</message>
+	<params>文字コード</params>
+	<description>
+<p>扱えない文字が出現しました。</p>
+<p>HTML5では、制御コード、あるいは未定義の文字が出現した場合にはパースエラーとなります。具体的には以下のように規定されています。</p>
+<bq title="HTML5 8.2.2.3 Preprocessing the input stream" cite="http://www.w3.org/TR/html5/parsing.html#the-input-stream">
+Any occurrences of any characters in the ranges U+0001 to U+0008, U+000E to U+001F, U+007F to U+009F, U+FDD0 to U+FDEF, and characters U+000B, U+FFFE, U+FFFF, U+1FFFE, U+1FFFF, U+2FFFE, U+2FFFF, U+3FFFE, U+3FFFF, U+4FFFE, U+4FFFF, U+5FFFE, U+5FFFF, U+6FFFE, U+6FFFF, U+7FFFE, U+7FFFF, U+8FFFE, U+8FFFF, U+9FFFE, U+9FFFF, U+AFFFE, U+AFFFF, U+BFFFE, U+BFFFF, U+CFFFE, U+CFFFF, U+DFFFE, U+DFFFF, U+EFFFE, U+EFFFF, U+FFFFE, U+FFFFF, U+10FFFE, and U+10FFFF are parse errors. These are all control characters or permanently undefined Unicode characters (noncharacters).
+</bq>
+<p>パースエラーとなった後にどう扱うかは明確には書かれていませんが、RedFaceはこれを無視して処理を続けます。</p>
+	</description>
+</item>
+
+<item>
+	<id>ZWNBSPInformation</id>
+	<level>Warning</level>
+	<message>文中に U+FEFF (BYTE ORDER MARK / ZERO WIDTH NO BREAK SPACE) を検出しましたが、無視します。: {0}</message>
+	<params>文字コード</params>
+	<description>
+<p>文中に U+FEFF (BYTE ORDER MARK / ZERO WIDTH NO BREAK SPACE) が出現しました。</p>
+<p>HTML5では、文中の U+FEFF は単に無視されます。</p>
+<bq title="HTML5 8.2.2.3 Preprocessing the input stream" cite="http://www.w3.org/TR/html5/parsing.html#the-input-stream">
+One leading U+FEFF BYTE ORDER MARK character must be ignored if any are present.
+Note: 
+The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whether that character was used to determine the byte order is a willful violation of Unicode, motivated by a desire to increase the resilience of user agents in the face of naïve transcoders.
+</bq>
+<p>これはパースエラーではありませんが、文中にU+FEFFが含まれるのは、ほとんどの場合意図しない挙動のはずです。一部の携帯端末では文字化け表示されたりすることもあります。そのため、RedFaceでは念のため注意を促すようにしています。</p>
+	</description>
+</item>
+
+<item>
+	<id>ProcessingInstructionError</id>
+	<level>ParseError</level>
+	<message>処理命令を検出しました。</message>
+	<description>
+<p>"&lt;?" という文字列があるとこのエラーが発生します。</p>
+<p>"&lt;?" はSGMLやXMLでは処理命令の開始を表しますが、HTML5では処理命令を扱うことはできません。処理命令のような文字列が存在するとパースエラーとなり、その部分はコメントとして扱われます。</p>
+	</description>
+</item>
+
+<item>
+	<id>DuplicateAttributeError</id>
+	<level>ParseError</level>
+	<message>属性が重複しています。: {0}</message>
+	<params>属性名</params>
+	<description>
+<p>一つの要素に同名の属性が複数指定されています。同名の属性を複数持つことはできません。</p>
+	</description>
+</item>
+
+
+
+</messages>
