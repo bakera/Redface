@@ -23,7 +23,7 @@ namespace Bakera.RedFace{
 					return;
 				case Chars.NULL:
 					if(t.CurrentTagToken.FixAttribute() == false){
-						OnParseErrorRaised(string.Format("属性名が重複しています。:", t.CurrentTagToken.CurrentAttribute.Name));
+						OnMessageRaised(new DuplicateAttributeError(t.CurrentTagToken.CurrentAttribute.Name));
 						t.CurrentTagToken.CurrentAttribute = null;
 					}
 					OnParseErrorRaised(string.Format("属性名にNUL文字が含まれています。"));
@@ -43,7 +43,7 @@ namespace Bakera.RedFace{
 					goto default;
 				default:
 					if(t.CurrentTagToken.FixAttribute() == false){
-						OnParseErrorRaised(string.Format("属性名が重複しています。:", t.CurrentTagToken.CurrentAttribute.Name));
+						OnMessageRaised(new DuplicateAttributeError(t.CurrentTagToken.CurrentAttribute.Name));
 						t.CurrentTagToken.CurrentAttribute = null;
 					}
 					if(c.IsLatinCapitalLetter()){

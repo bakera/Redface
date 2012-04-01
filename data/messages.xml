@@ -45,7 +45,7 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 <item>
 	<id>DuplicateAttributeError</id>
 	<level>ParseError</level>
-	<message>属性が重複しています。: {0}</message>
+	<message>同じ名前の属性が複数指定されています。: {0}</message>
 	<params>属性名</params>
 	<description>
 <p>一つの要素に同名の属性が複数指定されています。同名の属性を複数持つことはできません。</p>

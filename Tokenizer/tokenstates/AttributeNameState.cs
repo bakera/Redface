@@ -58,7 +58,7 @@ namespace Bakera.RedFace{
 		private void CheckDuplicateAttribute(Tokenizer t){
 			if(t.CurrentTagToken.IsDuplicateAttribute){
 				t.CurrentTagToken.DropAttribute();
-				OnParseErrorRaised(string.Format("属性名が重複しています。: {0}", t.CurrentTagToken.CurrentAttribute.Name));
+				OnMessageRaised(new DuplicateAttributeError(t.CurrentTagToken.CurrentAttribute.Name));
 			}
 		}
 
