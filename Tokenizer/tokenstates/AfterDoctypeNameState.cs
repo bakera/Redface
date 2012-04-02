@@ -19,7 +19,7 @@ namespace Bakera.RedFace{
 					t.EmitToken();
 					return;
 				case null:{
-					OnParseErrorRaised(string.Format("DOCTYPE nameの解析中に終端に達しました。"));
+					OnMessageRaised(new SuddenlyEndAtDoctypeError());
 					DoctypeToken result = (DoctypeToken)t.CurrentToken;
 					result.ForceQuirks = true;
 					t.UnConsume(1);

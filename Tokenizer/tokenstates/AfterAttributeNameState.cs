@@ -28,16 +28,16 @@ namespace Bakera.RedFace{
 						OnMessageRaised(new DuplicateAttributeError(t.CurrentTagToken.CurrentAttribute.Name));
 						t.CurrentTagToken.CurrentAttribute = null;
 					}
-					OnParseErrorRaised(string.Format("属性名にNUL文字が含まれています。"));
+					OnMessageRaised(new NullInAttributeNameError());
 					t.CurrentTagToken.CreateAttribute(Chars.REPLACEMENT_CHARACTER, "");
 					return;
 				case Chars.QUOTATION_MARK:
 				case Chars.APOSTROPHE:
 				case Chars.LESS_THAN_SIGN:
-					OnParseErrorRaised(string.Format("属性名の後に不正な文字を検出しました。: {0} ({1}属性)", c,  t.CurrentTagToken.CurrentAttribute.Name));
+					OnMessageRaised(new InvaridCharAtAfterAttributeNameError(c,  t.CurrentTagToken.CurrentAttribute.Name));
 					goto default;
 				case null:
-					OnParseErrorRaised(string.Format("属性名の解析中に終端に達しました。"));
+					OnMessageRaised(new SuddenlyEndAtAttributeError());
 					t.UnConsume(1);
 					t.ChangeTokenState<DataState>();
 					return;

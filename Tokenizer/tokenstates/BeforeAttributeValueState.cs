@@ -38,7 +38,7 @@ namespace Bakera.RedFace{
 					OnParseErrorRaised(string.Format("属性値に不正な文字を検出しました。: {0}", c));
 					goto default;
 				case null:
-					OnParseErrorRaised(string.Format("属性値の解析中に終端に達しました。"));
+					OnMessageRaised(new SuddenlyEndAtAttributeError());
 					t.UnConsume(1);
 					t.ChangeTokenState<DataState>();
 					return;

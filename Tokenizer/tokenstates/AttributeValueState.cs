@@ -20,11 +20,11 @@ namespace Bakera.RedFace{
 					t.ChangeTokenState<CharacterReferenceInAttributeState>();
 					return;
 				case Chars.NULL:
-					OnParseErrorRaised(string.Format("属性値にNUL文字が含まれています。"));
+					OnMessageRaised(new NullInAttributeValueError());
 					t.CurrentTagToken.CurrentAttribute.Value += Chars.REPLACEMENT_CHARACTER;
 					return;
 				case null:
-					OnParseErrorRaised(string.Format("属性値の解析中に終端に達しました。"));
+					OnMessageRaised(new SuddenlyEndAtAttributeError());
 					t.UnConsume(1);
 					t.ChangeTokenState<DataState>();
 					return;

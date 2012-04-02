@@ -34,7 +34,7 @@ namespace Bakera.RedFace{
 					OnParseErrorRaised(string.Format("引用符でくくられていない属性値の中に出現できない文字が出現しました。: {0}", c));
 					goto default;
 				case null:
-					OnParseErrorRaised(string.Format("属性値の解析中に終端に達しました。"));
+					OnMessageRaised(new SuddenlyEndAtAttributeError());
 					t.UnConsume(1);
 					t.ChangeTokenState<DataState>();
 					return;

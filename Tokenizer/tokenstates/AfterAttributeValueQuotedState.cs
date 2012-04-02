@@ -22,12 +22,12 @@ namespace Bakera.RedFace{
 					t.EmitToken();
 					return;
 				case null:
-					OnParseErrorRaised(string.Format("属性値の解析中に終端に達しました。"));
+					OnMessageRaised(new SuddenlyEndAtAttributeError());
 					t.UnConsume(1);
 					t.ChangeTokenState<DataState>();
 					return;
 				default:
-					OnParseErrorRaised(string.Format("属性値の解析中に不明な文字を検出しました。: {0}", c));
+					OnMessageRaised(new MissingSpaceAfterAttributeValueError(c));
 					t.UnConsume(1);
 					t.ChangeTokenState<BeforeAttributeNameState>();
 					return;

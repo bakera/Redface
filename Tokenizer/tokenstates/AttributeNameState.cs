@@ -29,7 +29,7 @@ namespace Bakera.RedFace{
 					t.EmitToken();
 					return;
 				case Chars.NULL:
-					OnParseErrorRaised(string.Format("属性名の解析中にNULL文字を検出しました。"));
+					OnMessageRaised(new NullInAttributeNameError());
 					t.CurrentTagToken.CurrentAttribute.Name += Chars.REPLACEMENT_CHARACTER;
 					return;
 				case Chars.QUOTATION_MARK:
@@ -38,7 +38,7 @@ namespace Bakera.RedFace{
 					OnParseErrorRaised(string.Format("属性名として不正な文字を検出しました。: {0}", c));
 					goto default;
 				case null:
-					OnParseErrorRaised(string.Format("属性名の解析中に終端に達しました。"));
+					OnMessageRaised(new SuddenlyEndAtAttributeError());
 					t.UnConsume(1);
 					CheckDuplicateAttribute(t);
 					t.ChangeTokenState<DataState>();

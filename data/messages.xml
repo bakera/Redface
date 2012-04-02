@@ -28,9 +28,80 @@ One leading U+FEFF BYTE ORDER MARK character must be ignored if any are present.
 Note: 
 The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whether that character was used to determine the byte order is a willful violation of Unicode, motivated by a desire to increase the resilience of user agents in the face of naïve transcoders.
 </bq>
-<p>これはパースエラーではありませんが、文中にU+FEFFが含まれるのは、ほとんどの場合意図しない挙動のはずです。一部の携帯端末では文字化け表示されたりすることもあります。そのため、RedFaceでは念のため注意を促すようにしています。</p>
+<p>これはパースエラーではありませんが、ほとんどの場合、文中にU+FEFFが含まれるのは意図していない挙動のはずです。一部の携帯端末では文字化けして表示されることもありますので、念のため注意を促すようにしています。</p>
 	</description>
 </item>
+
+<item>
+	<id>NullInAttributeNameError</id>
+	<level>ParseError</level>
+	<message>属性名にNULL文字が含まれています。</message>
+	<description>
+<p>属性名にNULL (0x00) が含まれているとこのエラーが発生します。</p>
+<p>属性名にNULLを含むことはできません。NULLが含まれているとパースエラーとなりますが、NULLをREPLACEMENT CHARACTERに置き換えて処理を続行します。</p>
+	</description>
+</item>
+
+<item>
+	<id>NullInAttributeValueError</id>
+	<level>ParseError</level>
+	<message>属性値にNULL文字が含まれています。</message>
+	<description>
+<p>属性値にNULL (0x00) が含まれているとこのエラーが発生します。</p>
+<p>属性値にNULLを含むことはできません。NULLが含まれているとパースエラーとなりますが、NULLをREPLACEMENT CHARACTERに置き換えて処理を続行します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>InvaridCharAtAfterAttributeNameError</id>
+	<level>ParseError</level>
+	<message>属性名 {0} の後に = がなく、{1} が出現しました。</message>
+	<params>属性名,文字</params>
+	<description>
+<p>属性名の後に = がなく、QUOTATION MARK, APOSTROPHE, LESS THAN SIGN のいずれかが出現するとこのエラーが発生します。</p>
+<p>属性名が出現したあと、その後には = が出現して属性値が書かれるか、スペースで区切られて別の属性値が書かれるか、/ もしくは > でタグが終了するか、のいずれかが期待されます。</p>
+<p>パースエラーになりますが、そういう名前の属性が指定されているものとみなして処理を続行することになっています。ただし、この名前はXMLとの互換性がないため、RedFaceではうまく扱うことができません。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>MissingSpaceAfterAttributeValueError</id>
+	<level>ParseError</level>
+	<message>属性値の後にスペースがなく、{1} が出現しました。</message>
+	<params>文字</params>
+	<description>
+<p>引用符で括られた属性値の後ろにスペースがなく、続けて別の属性名が書かれている場合にこのエラーが発生します。</p>
+<p>引用符で括られた属性値の後には、空白類、/、> しか書くことができません。</p><!-- これはSGMLよりも厳しい。 -->
+<p>それ以外の文字が出現した場合はパースエラーとなりますが、出現した文字は属性名の最初の文字とみなされて、そのまま処理を続行します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>SuddenlyEndAtAttributeError</id>
+	<level>ParseError</level>
+	<message>属性の解析中にファイル終端に達しました。</message>
+	<description>
+<p>属性の解析の途中でファイルの終端に達するとこのエラーが発生します。</p>
+<p>ファイルが途中で切れている、通信が途中で切れてしまったといった場合のほかに、タグの終了区切り子 ">" が漏れている場合にもこのエラーになる場合があります。</p>
+<p>パースエラーとなりつつも処理を続行しますが、既にファイル終端に達しているので、たいていはそのまま処理を終了します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>SuddenlyEndAtDoctypeError</id>
+	<level>ParseError</level>
+	<message>文書型宣言の解析中にファイル終端に達しました。</message>
+	<description>
+<p>文書型宣言の解析の途中でファイルの終端に達するとこのエラーが発生します。</p>
+<p>ファイルが途中で切れている、通信が途中で切れてしまったといった場合のほかに、文書型宣言の終了区切り子 ">" が漏れている場合にもこのエラーになる場合があります。</p>
+<p>パースエラーとなりつつも処理を続行しますが、既にファイル終端に達しているので、たいていはそのまま処理を終了します。</p>
+	</description>
+</item>
+
 
 <item>
 	<id>ProcessingInstructionError</id>

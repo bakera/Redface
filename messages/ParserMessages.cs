@@ -12,6 +12,38 @@ public override EventLevel Level{get{return EventLevel.Warning;}}
 public override string MessageTemplate{get{return "文中に U+FEFF (BYTE ORDER MARK / ZERO WIDTH NO BREAK SPACE) を検出しましたが、無視します。: {0}";}}
 } // ZWNBSPInformation
 
+public class NullInAttributeNameError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "属性名にNULL文字が含まれています。";}}
+} // NullInAttributeNameError
+
+public class NullInAttributeValueError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "属性値にNULL文字が含まれています。";}}
+} // NullInAttributeValueError
+
+public class InvaridCharAtAfterAttributeNameError : ParserMessage{
+public InvaridCharAtAfterAttributeNameError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "属性名 {0} の後に = がなく、{1} が出現しました。";}}
+} // InvaridCharAtAfterAttributeNameError
+
+public class MissingSpaceAfterAttributeValueError : ParserMessage{
+public MissingSpaceAfterAttributeValueError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "属性値の後にスペースがなく、{1} が出現しました。";}}
+} // MissingSpaceAfterAttributeValueError
+
+public class SuddenlyEndAtAttributeError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "属性の解析中にファイル終端に達しました。";}}
+} // SuddenlyEndAtAttributeError
+
+public class SuddenlyEndAtDoctypeError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "文書型宣言の解析中にファイル終端に達しました。";}}
+} // SuddenlyEndAtDoctypeError
+
 public class ProcessingInstructionError : ParserMessage{
 public override EventLevel Level{get{return EventLevel.ParseError;}}
 public override string MessageTemplate{get{return "処理命令を検出しました。";}}
@@ -20,7 +52,7 @@ public override string MessageTemplate{get{return "処理命令を検出しました。";}}
 public class DuplicateAttributeError : ParserMessage{
 public DuplicateAttributeError(params Object[] o){this.Params = o;}
 public override EventLevel Level{get{return EventLevel.ParseError;}}
-public override string MessageTemplate{get{return "属性が重複しています。: {0}";}}
+public override string MessageTemplate{get{return "同じ名前の属性が複数指定されています。: {0}";}}
 } // DuplicateAttributeError
 
 } // namespace

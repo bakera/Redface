@@ -22,7 +22,7 @@ namespace Bakera.RedFace{
 					((DoctypeToken)t.CurrentToken).Name += Chars.REPLACEMENT_CHARACTER;
 					return;
 				case null:
-					OnParseErrorRaised(string.Format("DOCTYPE nameの解析中に終端に達しました。"));
+					OnMessageRaised(new SuddenlyEndAtDoctypeError());
 					((DoctypeToken)t.CurrentToken).ForceQuirks = true;
 					t.UnConsume(1);
 					t.ChangeTokenState<DataState>();

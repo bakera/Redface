@@ -20,7 +20,7 @@ namespace Bakera.RedFace{
 					return;
 				}
 				case null:
-					OnParseErrorRaised(string.Format("DOCTYPEのシステム識別子の後で終端に達しました。"));
+					OnMessageRaised(new SuddenlyEndAtDoctypeError());
 					((DoctypeToken)t.CurrentToken).ForceQuirks = true;
 					t.UnConsume(1);
 					t.ChangeTokenState<DataState>();

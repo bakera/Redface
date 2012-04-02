@@ -30,7 +30,7 @@ namespace Bakera.RedFace{
 					t.ChangeTokenState<DoctypeSystemIdentifierState<SingleQuoted>>();
 					return;
 				case null:
-					OnParseErrorRaised(string.Format("DOCTYPEの公開識別子の後で終端に達しました。"));
+					OnMessageRaised(new SuddenlyEndAtDoctypeError());
 					((DoctypeToken)t.CurrentToken).ForceQuirks = true;
 					t.UnConsume(1);
 					t.ChangeTokenState<DataState>();
