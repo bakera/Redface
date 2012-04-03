@@ -14,11 +14,11 @@ namespace Bakera.RedFace{
 
 			switch(c){
 				case Chars.NULL:
-					OnParseErrorRaised(string.Format("DOCTYPE システム識別子の解析中にNULL文字を検出しました。"));
+					OnMessageRaised(new NullInDoctypeError());
 					((DoctypeToken)t.CurrentToken).SystemIdentifier += Chars.REPLACEMENT_CHARACTER;
 					return;
 				case Chars.GREATER_THAN_SIGN:
-					OnParseErrorRaised(string.Format("DOCTYPE システム識別子の解析中に U+003E GREATER THAN SIGN を検出しました。"));
+					OnMessageRaised(new GreaterThanSignInIdentifierError());
 					((DoctypeToken)t.CurrentToken).ForceQuirks = true;
 					t.ChangeTokenState<DataState>();
 					t.EmitToken();

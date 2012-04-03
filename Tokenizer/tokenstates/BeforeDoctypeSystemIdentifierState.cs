@@ -24,13 +24,13 @@ namespace Bakera.RedFace{
 					t.ChangeTokenState<DoctypeSystemIdentifierState<SingleQuoted>>();
 					return;
 				case Chars.GREATER_THAN_SIGN:
-					OnParseErrorRaised(string.Format("DOCTYPE の SYSTEM キーワードの後に識別子がありません。"));
+					OnMessageRaised(new MissingSystemIdentifierError());
 					((DoctypeToken)t.CurrentToken).ForceQuirks = true;
 					t.ChangeTokenState<DataState>();
 					t.EmitToken();
 					return;
 				case null:{
-					OnParseErrorRaised(string.Format("DOCTYPEの公開識別子の後で終端に達しました。"));
+					OnMessageRaised(new SuddenlyEndAtDoctypeError());
 					((DoctypeToken)t.CurrentToken).ForceQuirks = true;
 					t.UnConsume(1);
 					t.ChangeTokenState<DataState>();
@@ -38,7 +38,7 @@ namespace Bakera.RedFace{
 					return;
 				}
 				default:
-					OnParseErrorRaised(string.Format("DOCTYPEの解析中に不明な文字を検出しました。"));
+					OnMessageRaised(new MissingQuoteIdentifierError());
 					((DoctypeToken)t.CurrentToken).ForceQuirks = true;
 					t.ChangeTokenState<BogusDoctypeState>();
 					return;

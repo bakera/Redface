@@ -20,12 +20,12 @@ namespace Bakera.RedFace{
 					return;
 				}
 				case Chars.QUOTATION_MARK:
-					OnParseErrorRaised(string.Format("DOCTYPEのSYSTEM識別子の前にスペースがありません。"));
+					OnMessageRaised(new MissingSpaceBeforeDoctypeIdentifierError());
 					((DoctypeToken)t.CurrentToken).SystemIdentifier = "";
 					t.ChangeTokenState<DoctypeSystemIdentifierState<DoubleQuoted>>();
 					return;
 				case Chars.APOSTROPHE:
-					OnParseErrorRaised(string.Format("DOCTYPEのSYSTEM識別子の前にスペースがありません。"));
+					OnMessageRaised(new MissingSpaceBeforeDoctypeIdentifierError());
 					((DoctypeToken)t.CurrentToken).SystemIdentifier = "";
 					t.ChangeTokenState<DoctypeSystemIdentifierState<SingleQuoted>>();
 					return;
@@ -37,7 +37,7 @@ namespace Bakera.RedFace{
 					t.EmitToken();
 					return;
 				default:
-					OnParseErrorRaised(string.Format("DOCTYPEの解析中に不明な文字を検出しました。"));
+					OnMessageRaised(new UnknownIdentifierInDoctypeError());
 					((DoctypeToken)t.CurrentToken).ForceQuirks = true;
 					t.ChangeTokenState<BogusDoctypeState>();
 					return;

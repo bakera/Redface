@@ -16,17 +16,17 @@ namespace Bakera.RedFace{
 					t.ChangeTokenState<BeforeDoctypePublicIdentifierState>();
 					return;
 				case Chars.QUOTATION_MARK:
-					OnParseErrorRaised(string.Format("DOCTYPE の PUBLIC キーワードの後にスペースがありません。"));
+					OnMessageRaised(new MissingSpaceBeforeDoctypeIdentifierError());
 					((DoctypeToken)t.CurrentToken).PublicIdentifier = "";
 					t.ChangeTokenState<DoctypePublicIdentifierState<DoubleQuoted>>();
 					return;
 				case Chars.APOSTROPHE:
-					OnParseErrorRaised(string.Format("DOCTYPE の PUBLIC キーワードの後にスペースがありません。"));
+					OnMessageRaised(new MissingSpaceBeforeDoctypeIdentifierError());
 					((DoctypeToken)t.CurrentToken).PublicIdentifier = "";
 					t.ChangeTokenState<DoctypePublicIdentifierState<SingleQuoted>>();
 					return;
 				case Chars.GREATER_THAN_SIGN:
-					OnParseErrorRaised(string.Format("DOCTYPE の PUBLIC キーワードの後に識別子がありません。"));
+					OnMessageRaised(new MissingPublicIdentifierError());
 					((DoctypeToken)t.CurrentToken).ForceQuirks = true;
 					t.ChangeTokenState<DataState>();
 					t.EmitToken();
@@ -39,7 +39,7 @@ namespace Bakera.RedFace{
 					t.EmitToken();
 					return;
 				default:
-					OnParseErrorRaised(string.Format("DOCTYPEの解析中に不明な文字を検出しました。"));
+					OnMessageRaised(new UnknownIdentifierInDoctypeError());
 					((DoctypeToken)t.CurrentToken).ForceQuirks = true;
 					t.ChangeTokenState<BogusDoctypeState>();
 					return;

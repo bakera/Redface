@@ -38,7 +38,7 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 	<message>属性名にNULL文字が含まれています。</message>
 	<description>
 <p>属性名にNULL (0x00) が含まれているとこのエラーが発生します。</p>
-<p>属性名にNULLを含むことはできません。NULLが含まれているとパースエラーとなりますが、NULLをREPLACEMENT CHARACTERに置き換えて処理を続行します。</p>
+<p>属性名にNULLを含むことはできません。パースエラーとなりますが、NULLをREPLACEMENT CHARACTERに置き換えて処理を続行します。</p>
 	</description>
 </item>
 
@@ -48,7 +48,17 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 	<message>属性値にNULL文字が含まれています。</message>
 	<description>
 <p>属性値にNULL (0x00) が含まれているとこのエラーが発生します。</p>
-<p>属性値にNULLを含むことはできません。NULLが含まれているとパースエラーとなりますが、NULLをREPLACEMENT CHARACTERに置き換えて処理を続行します。</p>
+<p>属性値にNULLを含むことはできません。パースエラーとなりますが、NULLをREPLACEMENT CHARACTERに置き換えて処理を続行します。</p>
+	</description>
+</item>
+
+<item>
+	<id>NullInDoctypeError</id>
+	<level>ParseError</level>
+	<message>文書型宣言にNULL文字が含まれています。</message>
+	<description>
+<p>文書型宣言にNULL (0x00) が含まれているとこのエラーが発生します。</p>
+<p>文書型宣言にNULLを含むことはできません。パースエラーとなりますが、NULLをREPLACEMENT CHARACTERに置き換えて処理を続行します。</p>
 	</description>
 </item>
 
@@ -98,7 +108,98 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 	<description>
 <p>文書型宣言の解析の途中でファイルの終端に達するとこのエラーが発生します。</p>
 <p>ファイルが途中で切れている、通信が途中で切れてしまったといった場合のほかに、文書型宣言の終了区切り子 ">" が漏れている場合にもこのエラーになる場合があります。</p>
-<p>パースエラーとなりつつも処理を続行しますが、既にファイル終端に達しているので、たいていはそのまま処理を終了します。</p>
+<p>パースエラーとなり、Quirks モードになります。</p>
+	</description>
+</item>
+
+
+
+<item>
+	<id>EmptyDoctypeError</id>
+	<level>ParseError</level>
+	<message>文書型宣言が空です。</message>
+	<description>
+<p>文書型宣言の名前の部分が空、すなわち &lt;!> と書いてある場合にこのエラーが発生します。文書型宣言の中身がスペースだけの場合もこのエラーになります。</p>
+<p>パースエラーとなり、Quirks モードになります。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>UnknownIdentifierInDoctypeError</id>
+	<level>ParseError</level>
+	<message>文書型宣言の中に不明な文字があります。</message>
+	<description>
+<p>文書型宣言に公開識別子でもシステム識別子でもない何かが含まれていると、このエラーが発生します。</p>
+<p>パースエラーとなり、偽文書型宣言 (BogusDoctype) が指定されているとみなして Quirks モードになります。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>UnknownIdentifierAfterDoctypeError</id>
+	<level>ParseError</level>
+	<message>文書型宣言の末尾に不明な文字があります。</message>
+	<description>
+<p>文書型宣言の末尾に公開識別子でもシステム識別子でもない何かが含まれていると、このエラーが発生します。</p>
+<p>文書型定義が直接書いてあるような文書型宣言をパースした場合も、末尾に [……] が含まれていますので、このエラーが発生します。</p>
+<p>パースエラーとなり、偽文書型宣言 (BogusDoctype) が指定されているとみなしますが、Quirks モードにはなりません。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>MissingSpaceBeforeDoctypeIdentifierError</id>
+	<level>ParseError</level>
+	<message>文書型宣言の識別子の前にスペースがありません。</message>
+	<description>
+<p>文書型宣言の公開識別子やSYSTEM識別子の前にはスペースが必要です。そのスペースがなく、いきなり引用符が出現するとこのエラーが発生します。</p>
+<p>パースエラーとなりますが、そのまま処理を続行します。Quirks モードにはなりません。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>MissingPublicIdentifierError</id>
+	<level>ParseError</level>
+	<message>文書型宣言の公開識別子がありません。</message>
+	<description>
+<p>文書型宣言のPUBLICキーワードの後には公開識別子が必要です。PUBLICと書いたのに識別子が書かれていない場合、このエラーが発生します。</p>
+<p>パースエラーとなり、Quirks モードになります。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>GreaterThanSignInIdentifierError</id>
+	<level>ParseError</level>
+	<message>文書型宣言の識別子の引用符が閉じていません。</message>
+	<description>
+<p>文書型宣言の公開識別子やシステム識別子の解析中に U+003E GREATER THAN SIGN を検出すると、このエラーが発生します。</p>
+<p>識別子に > を含めることはできません。 &lt;!DOCTYPE SYSTEM "http://example.com?>foo"> という 記述があった場合、fooの前の > で文書型宣言が終わっているものとみなします。</p>
+<p>パースエラーとなり、Quirks モードになります。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>MissingSystemIdentifierError</id>
+	<level>ParseError</level>
+	<message>文書型宣言のシステム識別子がありません。</message>
+	<description>
+<p>文書型宣言のSYSTEMキーワードの後にはシステム識別子が必要です。識別子がないと、このエラーが発生します。</p>
+<p>パースエラーとなり、Quirks モードになります。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>MissingQuoteIdentifierError</id>
+	<level>ParseError</level>
+	<message>文書型宣言の識別子が引用符で括られていません。</message>
+	<description>
+<p>文書型宣言の公開識別子やシステム識別子は引用符で括る必要があります。識別子の出現を期待している文脈で、引用符や > 以外の文字が出現するとこのエラーが発生します。</p>
+<p>パースエラーとなり、偽文書型宣言 (BogusDoctype) が指定されているとみなして Quirks モードになります。</p>
 	</description>
 </item>
 
@@ -109,9 +210,10 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 	<message>処理命令を検出しました。</message>
 	<description>
 <p>"&lt;?" という文字列があるとこのエラーが発生します。</p>
-<p>"&lt;?" はSGMLやXMLでは処理命令の開始を表しますが、HTML5では処理命令を扱うことはできません。処理命令のような文字列が存在するとパースエラーとなり、その部分はコメントとして扱われます。</p>
+<p>"&lt;?" はSGMLやXMLでは処理命令の開始を表しますが、HTML5のHTML構文では処理命令を扱うことはできません。処理命令のような文字列が存在するとパースエラーとなり、その部分はコメントとして扱われます。</p>
 	</description>
 </item>
+
 
 <item>
 	<id>DuplicateAttributeError</id>

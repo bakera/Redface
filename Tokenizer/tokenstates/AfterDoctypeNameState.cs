@@ -36,7 +36,7 @@ namespace Bakera.RedFace{
 						t.ChangeTokenState<AfterDoctypeSystemKeywordState>();
 						return;
 					} else {
-						OnParseErrorRaised(string.Format("DOCTYPE に PUBLIC, SYSTEM 以外の識別子が含まれています。"));
+						OnMessageRaised(new UnknownIdentifierInDoctypeError());
 						((DoctypeToken)t.CurrentToken).ForceQuirks = true;
 						t.ChangeTokenState<BogusDoctypeState>();
 						return;

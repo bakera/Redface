@@ -21,20 +21,20 @@ namespace Bakera.RedFace{
 					t.ChangeTokenState<DoctypePublicIdentifierState<SingleQuoted>>();
 					return;
 				case Chars.GREATER_THAN_SIGN:
-					OnParseErrorRaised(string.Format("DOCTYPE の PUBLIC キーワードの後に識別子がありません。"));
+					OnMessageRaised(new MissingPublicIdentifierError());
 					((DoctypeToken)t.CurrentToken).ForceQuirks = true;
 					t.ChangeTokenState<DataState>();
 					t.EmitToken();
 					return;
 				case null:
-					OnParseErrorRaised(string.Format("DOCTYPE の PUBLIC キーワードの後で終端に達しました。"));
+					OnMessageRaised(new SuddenlyEndAtDoctypeError());
 					((DoctypeToken)t.CurrentToken).ForceQuirks = true;
 					t.UnConsume(1);
 					t.ChangeTokenState<DataState>();
 					t.EmitToken();
 					return;
 				default:
-					OnParseErrorRaised(string.Format("DOCTYPEの解析中に不明な文字を検出しました。"));
+					OnMessageRaised(new MissingQuoteIdentifierError());
 					((DoctypeToken)t.CurrentToken).ForceQuirks = true;
 					t.ChangeTokenState<BogusDoctypeState>();
 					return;

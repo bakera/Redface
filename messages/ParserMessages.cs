@@ -22,6 +22,11 @@ public override EventLevel Level{get{return EventLevel.ParseError;}}
 public override string MessageTemplate{get{return "属性値にNULL文字が含まれています。";}}
 } // NullInAttributeValueError
 
+public class NullInDoctypeError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "文書型宣言にNULL文字が含まれています。";}}
+} // NullInDoctypeError
+
 public class InvaridCharAtAfterAttributeNameError : ParserMessage{
 public InvaridCharAtAfterAttributeNameError(params Object[] o){this.Params = o;}
 public override EventLevel Level{get{return EventLevel.ParseError;}}
@@ -43,6 +48,46 @@ public class SuddenlyEndAtDoctypeError : ParserMessage{
 public override EventLevel Level{get{return EventLevel.ParseError;}}
 public override string MessageTemplate{get{return "文書型宣言の解析中にファイル終端に達しました。";}}
 } // SuddenlyEndAtDoctypeError
+
+public class EmptyDoctypeError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "文書型宣言が空です。";}}
+} // EmptyDoctypeError
+
+public class UnknownIdentifierInDoctypeError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "文書型宣言の中に不明な文字があります。";}}
+} // UnknownIdentifierInDoctypeError
+
+public class UnknownIdentifierAfterDoctypeError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "文書型宣言の末尾に不明な文字があります。";}}
+} // UnknownIdentifierAfterDoctypeError
+
+public class MissingSpaceBeforeDoctypeIdentifierError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "文書型宣言の識別子の前にスペースがありません。";}}
+} // MissingSpaceBeforeDoctypeIdentifierError
+
+public class MissingPublicIdentifierError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "文書型宣言の公開識別子がありません。";}}
+} // MissingPublicIdentifierError
+
+public class GreaterThanSignInIdentifierError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "文書型宣言の識別子の引用符が閉じていません。";}}
+} // GreaterThanSignInIdentifierError
+
+public class MissingSystemIdentifierError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "文書型宣言のシステム識別子がありません。";}}
+} // MissingSystemIdentifierError
+
+public class MissingQuoteIdentifierError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "文書型宣言の識別子が引用符で括られていません。";}}
+} // MissingQuoteIdentifierError
 
 public class ProcessingInstructionError : ParserMessage{
 public override EventLevel Level{get{return EventLevel.ParseError;}}

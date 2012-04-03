@@ -14,17 +14,17 @@ namespace Bakera.RedFace{
 				case Chars.SPACE:
 					return;
 				case Chars.NULL:
-					OnParseErrorRaised(string.Format("DOCTYPEの解析中にNULL文字を検出しました。"));
+					OnMessageRaised(new NullInDoctypeError());
 					t.ChangeTokenState<DoctypeNameState>();
 					t.CurrentToken = new DoctypeToken(){Name = Chars.REPLACEMENT_CHARACTER.ToString()};
 					return;
 				case Chars.GREATER_THAN_SIGN:
-					OnParseErrorRaised(string.Format("DOCTYPEのNameが空です。"));
+					OnMessageRaised(new EmptyDoctypeError());
 					t.ChangeTokenState<DataState>();
 					t.EmitToken(new DoctypeToken(){ForceQuirks = true});
 					return;
 				case null:{
-					OnParseErrorRaised(string.Format("DOCTYPEの解析中に終端に達しました。"));
+					OnMessageRaised(new SuddenlyEndAtDoctypeError());
 					t.UnConsume(1);
 					t.ChangeTokenState<DataState>();
 					t.EmitToken(new DoctypeToken(){ForceQuirks = true});

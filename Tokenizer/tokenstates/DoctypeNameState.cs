@@ -18,7 +18,7 @@ namespace Bakera.RedFace{
 					t.EmitToken();
 					return;
 				case Chars.NULL:
-					OnParseErrorRaised(string.Format("DOCTYPE nameの解析中にNULL文字を検出しました。"));
+					OnMessageRaised(new NullInDoctypeError());
 					((DoctypeToken)t.CurrentToken).Name += Chars.REPLACEMENT_CHARACTER;
 					return;
 				case null:

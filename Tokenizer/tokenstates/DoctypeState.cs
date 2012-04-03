@@ -14,13 +14,13 @@ namespace Bakera.RedFace{
 					t.ChangeTokenState<BeforeDoctypeNameState>();
 					return;
 				case null:
-					OnParseErrorRaised(string.Format("DOCTYPEの解析中に終端に達しました。"));
+					OnMessageRaised(new SuddenlyEndAtAttributeError());
 					t.UnConsume(1);
 					t.ChangeTokenState<DataState>();
 					t.EmitToken(new DoctypeToken(){ForceQuirks = true});
 					return;
 				default:
-					OnParseErrorRaised(string.Format("文書型宣言のDOCTYPEの後ろにスペースがありません。出現した文字: {0}", c));
+					OnMessageRaised(new MissingSpaceBeforeDoctypeIdentifierError());
 					t.UnConsume(1);
 					t.ChangeTokenState<BeforeDoctypeNameState>();
 					return;

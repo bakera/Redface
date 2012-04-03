@@ -27,7 +27,7 @@ namespace Bakera.RedFace{
 					t.EmitToken();
 					return;
 				default:
-					OnParseErrorRaised(string.Format("DOCTYPEの解析中に不明な文字を検出しました。"));
+					OnMessageRaised(new UnknownIdentifierAfterDoctypeError());
 					t.ChangeTokenState<BogusDoctypeState>();
 					return;
 			}
