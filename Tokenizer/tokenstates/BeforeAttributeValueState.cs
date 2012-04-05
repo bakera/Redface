@@ -23,19 +23,19 @@ namespace Bakera.RedFace{
 					t.ChangeTokenState<AttributeValueState<SingleQuoted>>();
 					return;
 				case Chars.NULL:
-					OnParseErrorRaised(string.Format("属性値にNUL文字が含まれています。"));
+					OnMessageRaised(new NullInAttributeValueError());
 					t.CurrentTagToken.CurrentAttribute.Value += Chars.REPLACEMENT_CHARACTER;
 					t.ChangeTokenState<AttributeValueUnQuotedState>();
 					return;
 				case Chars.GREATER_THAN_SIGN:
-					OnParseErrorRaised(string.Format("属性値がありません。"));
+					OnMessageRaised(new MissingAttributeValueError());
 					t.ChangeTokenState<DataState>();
 					t.EmitToken();
 					return;
 				case Chars.LESS_THAN_SIGN:
 				case Chars.EQUALS_SIGN:
 				case Chars.GRAVE_ACCENT:
-					OnParseErrorRaised(string.Format("属性値に不正な文字を検出しました。: {0}", c));
+					OnMessageRaised(new InvalidCharInUnquotedAttributeValueError(c));
 					goto default;
 				case null:
 					OnMessageRaised(new SuddenlyEndAtAttributeError());

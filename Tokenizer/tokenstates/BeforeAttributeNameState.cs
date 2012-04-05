@@ -39,7 +39,7 @@ namespace Bakera.RedFace{
 				case Chars.APOSTROPHE:
 				case Chars.LESS_THAN_SIGN:
 				case Chars.EQUALS_SIGN:
-					OnParseErrorRaised(string.Format("属性名に使用できない文字です。{0}", c));
+					OnMessageRaised(new InvaridCharAtBeforeAttributeNameError(c));
 					goto default;
 				default:
 					if(t.CurrentTagToken.FixAttribute() == false){

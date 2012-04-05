@@ -23,7 +23,7 @@ namespace Bakera.RedFace{
 					t.EmitToken();
 					return;
 				case Chars.NULL:
-					OnParseErrorRaised(string.Format("属性値にNUL文字が含まれています。"));
+					OnMessageRaised(new NullInAttributeValueError());
 					t.CurrentTagToken.CurrentAttribute.Value += Chars.REPLACEMENT_CHARACTER;
 					return;
 				case Chars.QUOTATION_MARK:
@@ -31,7 +31,7 @@ namespace Bakera.RedFace{
 				case Chars.LESS_THAN_SIGN:
 				case Chars.EQUALS_SIGN:
 				case Chars.GRAVE_ACCENT:
-					OnParseErrorRaised(string.Format("引用符でくくられていない属性値の中に出現できない文字が出現しました。: {0}", c));
+					OnMessageRaised(new InvalidCharInUnquotedAttributeValueError(c));
 					goto default;
 				case null:
 					OnMessageRaised(new SuddenlyEndAtAttributeError());

@@ -11,19 +11,19 @@ namespace Bakera.RedFace{
 					t.ChangeTokenState<CommentEndState>();
 					return;
 				case Chars.NULL:
-					OnParseErrorRaised(string.Format("コメント中にNULL文字が含まれています。"));
+					OnMessageRaised(new NullInCommentError());
 					t.CurrentCommentToken.Append(Chars.HYPHEN_MINUS);
 					t.CurrentCommentToken.Append(Chars.REPLACEMENT_CHARACTER);
 
 					t.ChangeTokenState<CommentState>();
 					return;
 				case Chars.GREATER_THAN_SIGN:
-					OnParseErrorRaised(string.Format("コメント開始直後に -> が出現しました。"));
+					OnMessageRaised(new LessHyphenCommentError());
 					t.EmitToken();
 					t.ChangeTokenState<DataState>();
 					return;
 				case null:
-					OnParseErrorRaised(string.Format("コメントの解析中に終端に達しました。"));
+					OnMessageRaised(new SuddenlyEndAtCommentError());
 					t.EmitToken();
 					t.UnConsume(1);
 					t.ChangeTokenState<DataState>();

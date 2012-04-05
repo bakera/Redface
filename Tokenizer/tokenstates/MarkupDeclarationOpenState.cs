@@ -19,7 +19,7 @@ namespace Bakera.RedFace{
 				t.ChangeTokenState<CDATASectionState>();
 				return;
 			}
-			OnParseErrorRaised(string.Format("マーク宣言開始区切り子の後に識別子でない文字が出現しました。"));
+			OnMessageRaised(new UnknownMarkupDeclarationError());
 			t.ChangeTokenState<BogusCommentState>();
 			return;
 		}

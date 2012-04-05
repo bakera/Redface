@@ -11,12 +11,12 @@ namespace Bakera.RedFace{
 					t.ChangeTokenState<CommentEndDashState>();
 					return;
 				case Chars.NULL:
-					OnParseErrorRaised(string.Format("コメント中にNULL文字が含まれています。"));
+					OnMessageRaised(new NullInCommentError());
 					t.CurrentCommentToken.Append(Chars.REPLACEMENT_CHARACTER);
 
 					return;
 				case null:
-					OnParseErrorRaised(string.Format("コメントの解析中に終端に達しました。"));
+					OnMessageRaised(new SuddenlyEndAtCommentError());
 					t.EmitToken();
 					t.UnConsume(1);
 					t.ChangeTokenState<DataState>();

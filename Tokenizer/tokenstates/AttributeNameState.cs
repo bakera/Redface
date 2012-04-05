@@ -35,7 +35,7 @@ namespace Bakera.RedFace{
 				case Chars.QUOTATION_MARK:
 				case Chars.APOSTROPHE:
 				case Chars.LESS_THAN_SIGN:
-					OnParseErrorRaised(string.Format("属性名として不正な文字を検出しました。: {0}", c));
+					OnMessageRaised(new InvaridCharAtAfterAttributeNameError(c));
 					goto default;
 				case null:
 					OnMessageRaised(new SuddenlyEndAtAttributeError());

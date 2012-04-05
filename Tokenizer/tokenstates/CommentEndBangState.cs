@@ -19,7 +19,7 @@ namespace Bakera.RedFace{
 					t.ChangeTokenState<DataState>();
 					return;
 				case Chars.NULL:
-					OnParseErrorRaised(string.Format("コメント終了区切り子の後にNUL文字が出現しました。"));
+					OnMessageRaised(new NullInCommentError());
 					t.CurrentCommentToken.Append(Chars.HYPHEN_MINUS);
 					t.CurrentCommentToken.Append(Chars.HYPHEN_MINUS);
 					t.CurrentCommentToken.Append(Chars.EXCLAMATION_MARK);
@@ -27,7 +27,8 @@ namespace Bakera.RedFace{
 					t.ChangeTokenState<CommentState>();
 					return;
 				case null:
-					OnParseErrorRaised(string.Format("コメント終了区切り子の後に終端に達しました。"));
+					OnMessageRaised(new SuddenlyEndAtCommentError());
+
 					t.EmitToken();
 					t.UnConsume(1);
 					t.ChangeTokenState<DataState>();

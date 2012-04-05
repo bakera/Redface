@@ -62,6 +62,27 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 	</description>
 </item>
 
+<item>
+	<id>NullInCommentError</id>
+	<level>ParseError</level>
+	<message>コメントにNULL文字が含まれています。</message>
+	<description>
+<p>コメントにNULL (0x00) が含まれているとこのエラーが発生します。</p>
+<p>コメントの中といえどもNULLを含むことはできません。パースエラーとなりますが、NULLをREPLACEMENT CHARACTERに置き換えて処理を続行します。</p>
+	</description>
+</item>
+
+<item>
+	<id>InvaridCharAtBeforeAttributeNameError</id>
+	<level>ParseError</level>
+	<message>属性名がなく、{0} が出現しました。</message>
+	<params>文字</params>
+	<description>
+<p>タグの解析中に、属性名なしにQUOTATION MARK, APOSTROPHE, LESS THAN SIGN, EQUALS SIGNのいずれかが出現するとこのエラーが発生します。</p>
+<p>パースエラーになりますが、そういう文字を含む名前の属性とみなして処理を続行することになっています。ただし、この名前はXMLとの互換性がないため、RedFaceではうまく扱うことができません。</p>
+	</description>
+</item>
+
 
 <item>
 	<id>InvaridCharAtAfterAttributeNameError</id>
@@ -71,7 +92,18 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 	<description>
 <p>属性名の後に = がなく、QUOTATION MARK, APOSTROPHE, LESS THAN SIGN のいずれかが出現するとこのエラーが発生します。</p>
 <p>属性名が出現したあと、その後には = が出現して属性値が書かれるか、スペースで区切られて別の属性値が書かれるか、/ もしくは > でタグが終了するか、のいずれかが期待されます。</p>
-<p>パースエラーになりますが、そういう名前の属性が指定されているものとみなして処理を続行することになっています。ただし、この名前はXMLとの互換性がないため、RedFaceではうまく扱うことができません。</p>
+<p>パースエラーになりますが、そういう文字を含む名前の属性とみなして処理を続行することになっています。ただし、この名前はXMLとの互換性がないため、RedFaceではうまく扱うことができません。</p>
+	</description>
+</item>
+
+<item>
+	<id>MissingAttributeValueError</id>
+	<level>ParseError</level>
+	<message>属性の = の後ろに属性値が指定されていません。</message>
+	<description>
+<p>属性名の後に = があり、そのあとに開始タグ終了区切り子 > が出現するとこのエラーが発生します。</p>
+<p>属性名の = の後には属性値を書く必要があります。</p>
+<p>パースエラーになりますが、= が書かれていないものとみなしてそのまま処理を続行します。</p>
 	</description>
 </item>
 
@@ -90,9 +122,21 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 
 
 <item>
+	<id>InvalidCharInUnquotedAttributeValueError</id>
+	<level>ParseError</level>
+	<message>引用符でくくられていない属性値の中に、使用できない文字 {0} が出現しました。</message>
+	<params>文字</params>
+	<description>
+<p>引用符で括られていない属性値を解析中に、QUOTATION MARK、APOSTROPHE、LESS THAN SIGN、EQUALS SIGN、GRAVE ACCENT のいずれかが出現するとこのエラーが発生します。</p>
+<p>引用符で括られていない属性値には、これらの文字を使用することはできません。</p>
+<p>パースエラーとなりますが、出現した文字は属性値の一部とみなされて、そのまま処理を続行します。</p>
+	</description>
+</item>
+
+<item>
 	<id>SuddenlyEndAtAttributeError</id>
 	<level>ParseError</level>
-	<message>属性の解析中にファイル終端に達しました。</message>
+	<message>属性が終了していません。</message>
 	<description>
 <p>属性の解析の途中でファイルの終端に達するとこのエラーが発生します。</p>
 <p>ファイルが途中で切れている、通信が途中で切れてしまったといった場合のほかに、タグの終了区切り子 ">" が漏れている場合にもこのエラーになる場合があります。</p>
@@ -104,11 +148,23 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 <item>
 	<id>SuddenlyEndAtDoctypeError</id>
 	<level>ParseError</level>
-	<message>文書型宣言の解析中にファイル終端に達しました。</message>
+	<message>文書型宣言が終了していません。</message>
 	<description>
 <p>文書型宣言の解析の途中でファイルの終端に達するとこのエラーが発生します。</p>
-<p>ファイルが途中で切れている、通信が途中で切れてしまったといった場合のほかに、文書型宣言の終了区切り子 ">" が漏れている場合にもこのエラーになる場合があります。</p>
+<p>ファイルが途中で切れている、通信が途中で切れてしまったといった場合にこのエラーになる場合があります。</p>
 <p>パースエラーとなり、Quirks モードになります。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>SuddenlyEndAtCommentError</id>
+	<level>ParseError</level>
+	<message>コメントが終了していません。</message>
+	<description>
+<p>コメントの解析の途中でファイルの終端に達するとこのエラーが発生します。</p>
+<p>ファイルが途中で切れている、通信が途中で切れてしまったといった場合のほかに、コメントの終了区切り子 "-->" が漏れている場合にもこのエラーになる場合があります。</p>
+<p>パースエラーとなりつつも処理を続行しますが、既にファイル終端に達しているので、たいていはそのまま処理を終了します。</p>
 	</description>
 </item>
 
@@ -205,12 +261,59 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 
 
 <item>
+	<id>UnknownMarkupDeclarationError</id>
+	<level>ParseError</level>
+	<message>不明なマーク宣言です。</message>
+	<description>
+<p>&lt;! の後に、文書型宣言、コメント、CDATA区間のいずれでもない識別子が出現すると、このエラーが発生します。</p>
+<p>HTML5では、文書型宣言、コメント、CDATA区間以外のマーク宣言は使用できません。 </p>
+<p>パースエラーとなり、その部分はコメント (BogusComment) として扱われます。</p>
+	</description>
+</item>
+
+
+<item>
 	<id>ProcessingInstructionError</id>
 	<level>ParseError</level>
 	<message>処理命令を検出しました。</message>
 	<description>
 <p>"&lt;?" という文字列があるとこのエラーが発生します。</p>
-<p>"&lt;?" はSGMLやXMLでは処理命令の開始を表しますが、HTML5のHTML構文では処理命令を扱うことはできません。処理命令のような文字列が存在するとパースエラーとなり、その部分はコメントとして扱われます。</p>
+<p>"&lt;?" はSGMLやXMLでは処理命令の開始を表しますが、HTML5のHTML構文では処理命令を扱うことはできません。処理命令のような文字列が存在するとパースエラーとなり、その部分はコメント (BogusComment) として扱われます。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>HyphenTooMuchCommentError</id>
+	<level>ParseError</level>
+	<message>コメントの中に余計なハイフンがあります。</message>
+	<description>
+<p>HTML5のコメントは &lt;!-- …… --> の形で、ハイフンは2つずつとなります。このハイフンが多すぎるとこのエラーになります。</p>
+<p>パースエラーとなりつつも、コメントに - が含まれるものとして処理を続行します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>DoubleHyphenInCommentError</id>
+	<level>ParseError</level>
+	<message>コメントの途中に -- を含めることはできません。</message>
+	<description>
+<p>HTML5のコメントは &lt;!-- …… --> の形ですが、末尾の -- と > の間にはスペースと ! しか入れることができません。それ以外の文字が出現するとこのエラーになります。</p>
+<p>このエラーの多くは、コメントの中に -- を入れようとしたケースです。</p>
+<p>パースエラーとなりつつ、コメントに -- が含まれるものとして処理を続行します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>LessHyphenCommentError</id>
+	<level>ParseError</level>
+	<message>コメントにはハイフンが4つ必要です。</message>
+	<description>
+<p>&lt;!--> や &lt;!---> という文字列があるとこのエラーになります。</p>
+<p>空のコメントを書く場合は&lt;!----> としなければなりません。</p>
+<p>パースエラーとなりつつも、コメントに - が含まれるものとして処理を続行します。</p>
 	</description>
 </item>
 
