@@ -22,11 +22,11 @@ namespace Bakera.RedFace{
 					t.EmitToken();
 					return;
 				case Chars.NULL:
-					OnParseErrorRaised(string.Format("開始タグの解析中にNULL文字を検出しました。"));
+					OnMessageRaised(new NullInElementNameError());
 					t.CurrentTagToken.Name += Chars.REPLACEMENT_CHARACTER;
 					return;
 				case null:
-					OnParseErrorRaised(string.Format("開始タグの解析中に終端に達しました。"));
+					OnMessageRaised(new SuddenlyEndAtTagError());
 					t.UnConsume(1);
 					t.ChangeTokenState<DataState>();
 					return;

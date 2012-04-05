@@ -13,12 +13,12 @@ namespace Bakera.RedFace{
 					t.ChangeTokenState<DataState>();
 					return;
 				case null:
-					OnParseErrorRaised(string.Format("空要素タグの解析中に終端に達しました。"));
+					OnMessageRaised(new SuddenlyEndAtScriptError());
 					t.UnConsume(1);
 					t.ChangeTokenState<DataState>();
 					return;
 				default:
-					OnParseErrorRaised(string.Format("タグの解析中に / に続いて不明な文字を検出しました。"));
+					OnMessageRaised(new InvaridAttributeInSelfClosingTagError());
 					t.UnConsume(1);
 					t.ChangeTokenState<BeforeAttributeNameState>();
 					return;

@@ -14,7 +14,7 @@ namespace Bakera.RedFace{
 					t.ChangeTokenState<TagOpenState>();
 					break;
 				case Chars.NULL:
-					OnParseErrorRaised(string.Format("NULL文字が検出されました。"));
+					OnMessageRaised(new NullInDataError());
 					t.EmitToken(c);
 					return;
 				case null:

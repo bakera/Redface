@@ -8,7 +8,7 @@ namespace Bakera.RedFace{
 			char? c = t.ConsumeChar();
 			switch(c){
 				case Chars.NULL:
-					OnParseErrorRaised(string.Format("NULL文字が検出されました。"));
+					OnMessageRaised(new NullInDataError());
 					t.EmitToken(Chars.REPLACEMENT_CHARACTER);
 					return;
 				case null:

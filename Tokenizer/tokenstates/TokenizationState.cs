@@ -65,6 +65,7 @@ namespace Bakera.RedFace{
 				case Chars.LESS_THAN_SIGN:
 				case null:
 					// Not a character reference. No characters are consumed, and nothing is returned. (This is not an error, either.)
+					OnMessageRaised(new RawAmpersandWarning());
 					t.UnConsume(1);
 					return null;
 				case Chars.NUMBER_SIGN:
@@ -89,7 +90,7 @@ If the character reference is being consumed as part of an attribute, and the la
 			while(c.IsNameToken()){
 				matchResult.Append(c);
 				c = t.ConsumeChar();
-				if(matchResult.Length > Chars.NameMaxLength) break;
+//				if(matchResult.Length > Chars.NameMaxLength) break;
 			}
 			if(c == Chars.SEMICOLON){
 				matchResult.Append(c);

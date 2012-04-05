@@ -12,6 +12,11 @@ public override EventLevel Level{get{return EventLevel.Warning;}}
 public override string MessageTemplate{get{return "•¶’†‚É U+FEFF (BYTE ORDER MARK / ZERO WIDTH NO BREAK SPACE) ‚ğŒŸo‚µ‚Ü‚µ‚½‚ªA–³‹‚µ‚Ü‚·B: {0}";}}
 } // ZWNBSPInformation
 
+public class NullInElementNameError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "—v‘f–¼‚ÉNULL•¶š‚ªŠÜ‚Ü‚ê‚Ä‚¢‚Ü‚·B";}}
+} // NullInElementNameError
+
 public class NullInAttributeNameError : ParserMessage{
 public override EventLevel Level{get{return EventLevel.ParseError;}}
 public override string MessageTemplate{get{return "‘®«–¼‚ÉNULL•¶š‚ªŠÜ‚Ü‚ê‚Ä‚¢‚Ü‚·B";}}
@@ -29,8 +34,18 @@ public override string MessageTemplate{get{return "•¶‘Œ^éŒ¾‚ÉNULL•¶š‚ªŠÜ‚Ü‚ê‚
 
 public class NullInCommentError : ParserMessage{
 public override EventLevel Level{get{return EventLevel.ParseError;}}
-public override string MessageTemplate{get{return "ƒRƒƒ“ƒg‚ÉNULL•¶š‚ªŠÜ‚Ü‚ê‚Ä‚¢‚Ü‚·B";}}
+public override string MessageTemplate{get{return "ƒRƒƒ“ƒg‚Ì’†‚ÉNULL•¶š‚ªŠÜ‚Ü‚ê‚Ä‚¢‚Ü‚·B";}}
 } // NullInCommentError
+
+public class NullInDataError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "ƒf[ƒ^‚ÉNULL•¶š‚ªŠÜ‚Ü‚ê‚Ä‚¢‚Ü‚·B";}}
+} // NullInDataError
+
+public class NullInScriptError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "ƒXƒNƒŠƒvƒg‚Ìƒf[ƒ^‚ÉNULL•¶š‚ªŠÜ‚Ü‚ê‚Ä‚¢‚Ü‚·B";}}
+} // NullInScriptError
 
 public class InvaridCharAtBeforeAttributeNameError : ParserMessage{
 public InvaridCharAtBeforeAttributeNameError(params Object[] o){this.Params = o;}
@@ -75,6 +90,16 @@ public class SuddenlyEndAtCommentError : ParserMessage{
 public override EventLevel Level{get{return EventLevel.ParseError;}}
 public override string MessageTemplate{get{return "ƒRƒƒ“ƒg‚ªI—¹‚µ‚Ä‚¢‚Ü‚¹‚ñB";}}
 } // SuddenlyEndAtCommentError
+
+public class SuddenlyEndAtTagError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "ƒ^ƒO‚ªI—¹‚µ‚Ä‚¢‚Ü‚¹‚ñB";}}
+} // SuddenlyEndAtTagError
+
+public class SuddenlyEndAtScriptError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "ƒXƒNƒŠƒvƒg‚ªI—¹‚µ‚Ä‚¢‚Ü‚¹‚ñB";}}
+} // SuddenlyEndAtScriptError
 
 public class EmptyDoctypeError : ParserMessage{
 public override EventLevel Level{get{return EventLevel.ParseError;}}
@@ -146,6 +171,37 @@ public DuplicateAttributeError(params Object[] o){this.Params = o;}
 public override EventLevel Level{get{return EventLevel.ParseError;}}
 public override string MessageTemplate{get{return "“¯‚¶–¼‘O‚Ì‘®«‚ª•¡”w’è‚³‚ê‚Ä‚¢‚Ü‚·B: {0}";}}
 } // DuplicateAttributeError
+
+public class InvaridAttributeInSelfClosingTagError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "SelfClosingTag‚Ì / ‚ÌŒã‚É‘®«‚ª‘‚©‚ê‚Ä‚¢‚Ü‚·B";}}
+} // InvaridAttributeInSelfClosingTagError
+
+public class EmptyEndTagError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "‹ó‚ÌI—¹ƒ^ƒO‚ªg‚í‚ê‚Ä‚¢‚Ü‚·B";}}
+} // EmptyEndTagError
+
+public class UnknownEndTagError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "•s–¾‚ÈI—¹ƒ^ƒO‚ª‚ ‚è‚Ü‚·B";}}
+} // UnknownEndTagError
+
+public class UnknownMarkupError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "•s–¾‚È < ‚ª‚ ‚è‚Ü‚·B";}}
+} // UnknownMarkupError
+
+public class UnknownNamedCharacterError : ParserMessage{
+public UnknownNamedCharacterError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "–¼‘O‚Â‚«•¶šQÆ {0} ‚Í•s–¾‚È•¶šQÆ‚Å‚·B";}}
+} // UnknownNamedCharacterError
+
+public class RawAmpersandWarning : ParserMessage{
+public override EventLevel Level{get{return EventLevel.Warning;}}
+public override string MessageTemplate{get{return "•¶šQÆ‚Å‚Í‚È‚¢ & ‚ªoŒ»‚µ‚Ü‚µ‚½B";}}
+} // RawAmpersandWarning
 
 } // namespace
 

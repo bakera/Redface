@@ -15,11 +15,11 @@ namespace Bakera.RedFace{
 					t.ChangeTokenState<ScriptDataEscapedLessThanSignState>();
 					return;
 				case Chars.NULL:
-					OnParseErrorRaised(string.Format("NULL文字が検出されました。"));
+					OnMessageRaised(new NullInDataError());
 					t.EmitToken(Chars.REPLACEMENT_CHARACTER);
 					return;
 				case null:
-					OnParseErrorRaised(string.Format("script要素の内容を解析中に終端に達しました。"));
+					OnMessageRaised(new SuddenlyEndAtScriptError());
 					t.UnConsume(1);
 					t.ChangeTokenState<DataState>();
 					return;

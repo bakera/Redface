@@ -9,11 +9,11 @@ namespace Bakera.RedFace{
 			char? c = t.ConsumeChar();
 			switch(c){
 				case Chars.GREATER_THAN_SIGN:
-					OnParseErrorRaised(string.Format("空の終了タグを検出しました。"));
+					OnMessageRaised(new EmptyEndTagError());
 					t.ChangeTokenState<DataState>();
 					return;
 				case null:
-					OnParseErrorRaised(string.Format("終了タグの解析中に終端に達しました。"));
+					OnMessageRaised(new SuddenlyEndAtTagError());
 					t.EmitToken(Chars.LESS_THAN_SIGN);
 					t.EmitToken(Chars.SOLIDUS);
 					t.UnConsume(1);
@@ -29,7 +29,7 @@ namespace Bakera.RedFace{
 				t.ChangeTokenState<TagNameState>();
 				return;
 			}
-			OnParseErrorRaised(string.Format("終了タグの中に不明な文字があります。"));
+			OnMessageRaised(new UnknownEndTagError());
 			t.ChangeTokenState<BogusCommentState>();
 			return;
 		}

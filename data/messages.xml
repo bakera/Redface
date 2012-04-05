@@ -33,11 +33,21 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 </item>
 
 <item>
+	<id>NullInElementNameError</id>
+	<level>ParseError</level>
+	<message>要素名にNULL文字が含まれています。</message>
+	<description>
+<p>タグ中の要素名にNULL (0x00) が含まれているとこのエラーが発生します。</p>
+<p>要素名にNULLを含むことはできません。パースエラーとなりますが、NULLをREPLACEMENT CHARACTERに置き換えて処理を続行します。</p>
+	</description>
+</item>
+
+<item>
 	<id>NullInAttributeNameError</id>
 	<level>ParseError</level>
 	<message>属性名にNULL文字が含まれています。</message>
 	<description>
-<p>属性名にNULL (0x00) が含まれているとこのエラーが発生します。</p>
+<p>タグ中の属性名にNULL (0x00) が含まれているとこのエラーが発生します。</p>
 <p>属性名にNULLを含むことはできません。パースエラーとなりますが、NULLをREPLACEMENT CHARACTERに置き換えて処理を続行します。</p>
 	</description>
 </item>
@@ -47,7 +57,7 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 	<level>ParseError</level>
 	<message>属性値にNULL文字が含まれています。</message>
 	<description>
-<p>属性値にNULL (0x00) が含まれているとこのエラーが発生します。</p>
+<p>タグ中の属性値にNULL (0x00) が含まれているとこのエラーが発生します。</p>
 <p>属性値にNULLを含むことはできません。パースエラーとなりますが、NULLをREPLACEMENT CHARACTERに置き換えて処理を続行します。</p>
 	</description>
 </item>
@@ -65,12 +75,35 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 <item>
 	<id>NullInCommentError</id>
 	<level>ParseError</level>
-	<message>コメントにNULL文字が含まれています。</message>
+	<message>コメントの中にNULL文字が含まれています。</message>
 	<description>
 <p>コメントにNULL (0x00) が含まれているとこのエラーが発生します。</p>
 <p>コメントの中といえどもNULLを含むことはできません。パースエラーとなりますが、NULLをREPLACEMENT CHARACTERに置き換えて処理を続行します。</p>
 	</description>
 </item>
+
+<item>
+	<id>NullInDataError</id>
+	<level>ParseError</level>
+	<message>データにNULL文字が含まれています。</message>
+	<description>
+<p>データにNULL (0x00) が含まれているとこのエラーが発生します。</p>
+<p>パースエラーとなりますが、NULLをREPLACEMENT CHARACTERに置き換えて処理を続行します。</p>
+	</description>
+</item>
+
+<item>
+	<id>NullInScriptError</id>
+	<level>ParseError</level>
+	<message>スクリプトのデータにNULL文字が含まれています。</message>
+	<description>
+<p>スクリプトのデータにNULL (0x00) が含まれているとこのエラーが発生します。</p>
+<p>パースエラーとなりますが、NULLをREPLACEMENT CHARACTERに置き換えて処理を続行します。</p>
+	</description>
+</item>
+
+
+
 
 <item>
 	<id>InvaridCharAtBeforeAttributeNameError</id>
@@ -164,6 +197,30 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 	<description>
 <p>コメントの解析の途中でファイルの終端に達するとこのエラーが発生します。</p>
 <p>ファイルが途中で切れている、通信が途中で切れてしまったといった場合のほかに、コメントの終了区切り子 "-->" が漏れている場合にもこのエラーになる場合があります。</p>
+<p>パースエラーとなりつつも処理を続行しますが、既にファイル終端に達しているので、たいていはそのまま処理を終了します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>SuddenlyEndAtTagError</id>
+	<level>ParseError</level>
+	<message>タグが終了していません。</message>
+	<description>
+<p>タグの解析の途中でファイルの終端に達するとこのエラーが発生します。</p>
+<p>ファイルが途中で切れている、通信が途中で切れてしまったといった場合のほかに、タグの終了区切り子 ">" が漏れている場合にもこのエラーになる場合があります。</p>
+<p>パースエラーとなりつつも処理を続行しますが、既にファイル終端に達しているので、たいていはそのまま処理を終了します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>SuddenlyEndAtScriptError</id>
+	<level>ParseError</level>
+	<message>スクリプトが終了していません。</message>
+	<description>
+<p>script要素の解析の途中でファイルの終端に達するとこのエラーが発生します。</p>
+<p>script要素の終了タグがない場合にこのエラーになります。</p>
 <p>パースエラーとなりつつも処理を続行しますが、既にファイル終端に達しているので、たいていはそのまま処理を終了します。</p>
 	</description>
 </item>
@@ -327,6 +384,83 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 <p>一つの要素に同名の属性が複数指定されています。同名の属性を複数持つことはできません。</p>
 	</description>
 </item>
+
+<item>
+	<id>InvaridAttributeInSelfClosingTagError</id>
+	<level>ParseError</level>
+	<message>SelfClosingTagの / の後に属性が書かれています。</message>
+	<description>
+<p>空要素を &lt;foo……/> のようなSelfClosingTagで表現することができますが、この / のあとに何か文字が出現するとこのエラーになります。</p>
+<p>属性などを書く場合は / の前に書かなければなりません。また、属性値を引用符で括っていない場合などにこのエラーが出る場合もあります。</p>
+<p>パースエラーとなりますが、指定された文字は属性の指定とみなして処理します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>EmptyEndTagError</id>
+	<level>ParseError</level>
+	<message>空の終了タグが使われています。</message>
+	<description>
+<p>&lt;/> という文字列が出現するとこのエラーになります。HTML5ではエンプティタグを使用することはできません。</p>
+<p>パースエラーとなり、該当のタグは無視されます。</p>
+<p>なお、開始タグにエンプティタグを使用しようとした場合は別のエラーになります。</p>
+	</description>
+</item>
+
+<item>
+	<id>UnknownEndTagError</id>
+	<level>ParseError</level>
+	<message>不明な終了タグがあります。</message>
+	<description>
+<p>終了タグの &lt;/ に続いて英文字以外の文字が出現するとこのエラーになります。</p>
+<p>パースエラーとなり、このタグのような部分はコメント (BogusComment) として扱われます。</p>
+	</description>
+</item>
+
+<item>
+	<id>UnknownMarkupError</id>
+	<level>ParseError</level>
+	<message>不明な &lt; があります。</message>
+	<description>
+<p>&lt; の文字の後に、英文字、!、/、? 以外の文字が出現するとこのエラーになります。&lt;の後に英文字が出現すれば開始タグとみなされますし、!が出現すればマーク宣言やコメント、/が出現すれば終了タグとみなされます。それら以外の記号や数字、スペースなどが出現した場合、このマークアップをどうにも解釈できません。</p>
+<p>このエラーは多くの場合、単にデータ中の &lt; を &amp;lt; などに書き換えるのを忘れたケースでしょう。</p>
+<p>なお、&lt;>と書いたときもこのエラーになります。HTML5ではエンプティタグを使用することはできません。</p>
+<p>パースエラーとなり、単にデータとして &lt; が書いてあるものとみなします。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>UnknownNamedCharacterError</id>
+	<level>ParseError</level>
+	<message>名前つき文字参照 {0} は不明な文字参照です。</message>
+	<params>名前</params>
+	<description>
+<p>名前つき文字参照 (Named Character Reference) が書かれていて、しかしながら指定された名前が存在しないときにこのエラーが発生します。</p>
+<p>名前つき文字参照は「&amp;name;」のように書きますが、このとき name という名前が定義されていないとこのエラーになります。</p>
+
+
+<p>パースエラーとなり、単にデータとして &amp; が書いてあるものとみなします。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>RawAmpersandWarning</id>
+	<level>Warning</level>
+	<message>文字参照ではない &amp; が出現しました。</message>
+	<description>
+<p>&amp; は文字参照の開始区切り子として使われます。HTML5では、直後の文字が &amp; や空白類文字、&lt; などである場合は文字参照とはみなさず、単に &amp; という文字が書かれているものとみなします。</p>
+<p>これはパースエラーではありません。</p>
+<bq cite="http://www.w3.org/TR/html5/tokenization.html#tokenizing-character-references">
+Not a character reference. No characters are consumed, and nothing is returned. (This is not an error, either.)
+</bq>
+<p>しかし、これは以前のHTMLでは許されなかった記述ですので、念のため注意を促すようにしています。</p>
+	</description>
+</item>
+
+
 
 
 

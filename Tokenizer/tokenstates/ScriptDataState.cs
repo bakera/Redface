@@ -11,7 +11,7 @@ namespace Bakera.RedFace{
 					t.ChangeTokenState<ScriptDataLessThanSignState>();
 					break;
 				case Chars.NULL:
-					OnParseErrorRaised(string.Format("NULL文字が検出されました。"));
+					OnMessageRaised(new NullInScriptError());
 					t.EmitToken(Chars.REPLACEMENT_CHARACTER);
 					return;
 				case null:
