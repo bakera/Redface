@@ -115,10 +115,10 @@ If the character reference is being consumed as part of an attribute, and the la
 				if(semicolonFound){
 					// 名前がなく、セミコロンがある場合はパースエラー
 					// if the characters after the U+0026 AMPERSAND character (&) consist of a sequence of one or more characters in the range ASCII digits, lowercase ASCII letters, and uppercase ASCII letters, followed by a ";" (U+003B) character, then this is a parse error.
-					OnMessageRaised(new UnknownNamedCharacterWithSemicolonError(originalString));
+					OnMessageRaised(new UnknownNamedCharacterReferenceWithSemicolonError(originalString));
 				} else {
 					// 名前がなくセミコロンがない場合はパースエラーにならない
-					OnMessageRaised(new UnknownNamedCharacterWithoutSemicolonWarning(originalString));
+					OnMessageRaised(new UnknownNamedCharacterReferenceWithoutSemicolonWarning(originalString));
 				}
 				t.UnConsume(referenceName.Length);
 				return null;
@@ -131,7 +131,7 @@ If the character reference is being consumed as part of an attribute, and the la
 					return null;
 				}
 				// それ以外のセミコロンなし文字参照はエラー
-				OnMessageRaised(new NamedCharacterWithoutSemicolonError(referenceName));
+				OnMessageRaised(new NamedCharacterReferenceWithoutSemicolonError(referenceName));
 			}
 
 			ReferencedCharacterToken resultToken = new ReferencedCharacterToken(matchResult);
@@ -161,7 +161,7 @@ If the character reference is being consumed as part of an attribute, and the la
 				c = t.ConsumeChar();
 			}
 			if(matchResult.Length == 0){
-				OnParseErrorRaised("数値文字参照の数値が空です。");
+				OnMessageRaised(new EmptyNumericCharacterReferenceError());
 				return null;
 			}
 			string numberString = matchResult.ToString();
@@ -170,7 +170,7 @@ If the character reference is being consumed as part of an attribute, and the la
 			if(c == Chars.SEMICOLON){
 				suffix += Chars.SEMICOLON;
 			} else {
-				OnParseErrorRaised(string.Format("文字参照の末尾にセミコロンがありません。"));
+				OnMessageRaised(new NumericCharacterReferenceWithoutSemicolonError());
 				t.UnConsume(1);
 			}
 			string originalString = prefix + numberString + suffix;
@@ -184,22 +184,22 @@ If the character reference is being consumed as part of an attribute, and the la
 		private string GetNumberedChar(Tokenizer t, int num){
 			if(num.IsReplacedChar()){
 				string errorResult = Chars.GetReplacedCharByNumber(num);
-				OnParseErrorRaised(string.Format("参照不可能な文字のコード {0} を参照しようとしました。文字は「{1}」に置換されます。", num, errorResult));
+				OnMessageRaised(new ReplacedNumericCharacterReferenceError(num, errorResult));
 				return errorResult;
 			}
 			if(num.IsSurrogate()){
 				string errorResult = Chars.REPLACEMENT_CHARACTER.ToString();
-				OnParseErrorRaised(string.Format("サロゲート文字のコード {0} を参照しようとしました。文字は「{1}」に置換されます。", num, errorResult));
+				OnMessageRaised(new SurrogateNumericCharacterReferenceError(num));
 				return errorResult;
 			}
 			if(num > 0x10FFFF){
 				string errorResult = Chars.REPLACEMENT_CHARACTER.ToString();
-				OnParseErrorRaised(string.Format("指定された文字のコード {0} はUnicodeの範囲を超えています。文字は「{1}」に置換されます。", num, errorResult));
+				OnMessageRaised(new TooLargeNumericCharacterReferenceError(num));
 				return errorResult;
 			}
 			string result = Chars.GetCharByNumber(num);
 			if(num.IsErrorChar()){
-				OnParseErrorRaised(string.Format("指定された文字のコード {0} は非Unicode文字 (noncharacters) です。", num));
+				OnMessageRaised(new NoncharactersNumericCharacterReferenceError(num));
 			}
 			return result;
 		}

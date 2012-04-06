@@ -192,23 +192,57 @@ public override EventLevel Level{get{return EventLevel.ParseError;}}
 public override string MessageTemplate{get{return "不明な < があります。";}}
 } // UnknownMarkupError
 
-public class UnknownNamedCharacterWithSemicolonError : ParserMessage{
-public UnknownNamedCharacterWithSemicolonError(params Object[] o){this.Params = o;}
+public class EmptyNumericCharacterReferenceError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "数値文字参照の数値が指定されていません。";}}
+} // EmptyNumericCharacterReferenceError
+
+public class NamedCharacterReferenceWithoutSemicolonError : ParserMessage{
+public NamedCharacterReferenceWithoutSemicolonError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "数値文字参照の末尾にはセミコロンが必要です。";}}
+} // NamedCharacterReferenceWithoutSemicolonError
+
+public class UnknownNamedCharacterReferenceWithSemicolonError : ParserMessage{
+public UnknownNamedCharacterReferenceWithSemicolonError(params Object[] o){this.Params = o;}
 public override EventLevel Level{get{return EventLevel.ParseError;}}
 public override string MessageTemplate{get{return "名前つき文字参照 {0} は不明な文字参照です。";}}
-} // UnknownNamedCharacterWithSemicolonError
+} // UnknownNamedCharacterReferenceWithSemicolonError
 
-public class UnknownNamedCharacterWithoutSemicolonWarning : ParserMessage{
-public UnknownNamedCharacterWithoutSemicolonWarning(params Object[] o){this.Params = o;}
+public class UnknownNamedCharacterReferenceWithoutSemicolonWarning : ParserMessage{
+public UnknownNamedCharacterReferenceWithoutSemicolonWarning(params Object[] o){this.Params = o;}
 public override EventLevel Level{get{return EventLevel.ParseError;}}
 public override string MessageTemplate{get{return "名前つき文字参照らしき文字列がありますが、名前 {0} は存在しないため無視します。";}}
-} // UnknownNamedCharacterWithoutSemicolonWarning
+} // UnknownNamedCharacterReferenceWithoutSemicolonWarning
 
-public class NamedCharacterWithoutSemicolonError : ParserMessage{
-public NamedCharacterWithoutSemicolonError(params Object[] o){this.Params = o;}
+public class ReplacedNumericCharacterReferenceError : ParserMessage{
+public ReplacedNumericCharacterReferenceError(params Object[] o){this.Params = o;}
 public override EventLevel Level{get{return EventLevel.ParseError;}}
-public override string MessageTemplate{get{return "名前つき文字参照 {0} の末尾にはセミコロンが必要です。";}}
-} // NamedCharacterWithoutSemicolonError
+public override string MessageTemplate{get{return "使用できない文字 {0} を参照しようとしました。文字は {1} に置き換えられます。";}}
+} // ReplacedNumericCharacterReferenceError
+
+public class SurrogateNumericCharacterReferenceError : ParserMessage{
+public SurrogateNumericCharacterReferenceError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "サロゲート領域の文字 {0} を参照しようとしました。";}}
+} // SurrogateNumericCharacterReferenceError
+
+public class TooLargeNumericCharacterReferenceError : ParserMessage{
+public TooLargeNumericCharacterReferenceError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "数値文字参照で0x10FFFF以降のコード {0} が指定されています。";}}
+} // TooLargeNumericCharacterReferenceError
+
+public class NoncharactersNumericCharacterReferenceError : ParserMessage{
+public NoncharactersNumericCharacterReferenceError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "数値文字参照で非Unicode文字 (noncharacters) のコード {0} が指定されています。";}}
+} // NoncharactersNumericCharacterReferenceError
+
+public class NumericCharacterReferenceWithoutSemicolonError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "数値文字参照の末尾にはセミコロンが必要です。";}}
+} // NumericCharacterReferenceWithoutSemicolonError
 
 public class RawAmpersandWarning : ParserMessage{
 public override EventLevel Level{get{return EventLevel.Warning;}}
