@@ -192,16 +192,34 @@ public override EventLevel Level{get{return EventLevel.ParseError;}}
 public override string MessageTemplate{get{return "不明な < があります。";}}
 } // UnknownMarkupError
 
-public class UnknownNamedCharacterError : ParserMessage{
-public UnknownNamedCharacterError(params Object[] o){this.Params = o;}
+public class UnknownNamedCharacterWithSemicolonError : ParserMessage{
+public UnknownNamedCharacterWithSemicolonError(params Object[] o){this.Params = o;}
 public override EventLevel Level{get{return EventLevel.ParseError;}}
 public override string MessageTemplate{get{return "名前つき文字参照 {0} は不明な文字参照です。";}}
-} // UnknownNamedCharacterError
+} // UnknownNamedCharacterWithSemicolonError
+
+public class UnknownNamedCharacterWithoutSemicolonWarning : ParserMessage{
+public UnknownNamedCharacterWithoutSemicolonWarning(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "名前つき文字参照らしき文字列がありますが、名前 {0} は存在しないため無視します。";}}
+} // UnknownNamedCharacterWithoutSemicolonWarning
+
+public class NamedCharacterWithoutSemicolonError : ParserMessage{
+public NamedCharacterWithoutSemicolonError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "名前つき文字参照 {0} の末尾にはセミコロンが必要です。";}}
+} // NamedCharacterWithoutSemicolonError
 
 public class RawAmpersandWarning : ParserMessage{
 public override EventLevel Level{get{return EventLevel.Warning;}}
-public override string MessageTemplate{get{return "文字参照ではない & が出現しました。";}}
+public override string MessageTemplate{get{return "生の & が使われています。";}}
 } // RawAmpersandWarning
+
+public class IgnoredCharacterReferenceInAttributeWarning : ParserMessage{
+public IgnoredCharacterReferenceInAttributeWarning(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.Warning;}}
+public override string MessageTemplate{get{return "属性値中にセミコロンなしの名前つき文字参照 {0} が出現しましたが、この文字参照は展開されません。";}}
+} // IgnoredCharacterReferenceInAttributeWarning
 
 } // namespace
 

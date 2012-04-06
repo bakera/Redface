@@ -54,6 +54,8 @@ namespace Bakera.RedFace{
 		protected ReferencedCharacterToken ConsumeCharacterReference(Tokenizer t){
 			char? c = t.ConsumeChar();
 			if(t.AdditionalAllowedCharacter != null && c == t.AdditionalAllowedCharacter){
+				// Not a character reference. No characters are consumed, and nothing is returned. (This is not an error, either.)
+				OnMessageRaised(new RawAmpersandWarning());
 				t.UnConsume(1);
 				return null;
 			}
@@ -75,60 +77,65 @@ namespace Bakera.RedFace{
 			}
 		}
 
-
-
 /*
 If the character reference is being consumed as part of an attribute, and the last character matched is not a U+003B SEMICOLON character (;), and the next character is either a U+003D EQUALS SIGN character (=) or in the range U+0030 DIGIT ZERO (0) to U+0039 DIGIT NINE (9), U+0041 LATIN CAPITAL LETTER A to U+005A LATIN CAPITAL LETTER Z, or U+0061 LATIN SMALL LETTER A to U+007A LATIN SMALL LETTER Z, then, for historical reasons, all the characters that were matched after the U+0026 AMPERSAND character (&) must be unconsumed, and nothing is returned.
 */
 
 		// 名前による文字参照を展開します。
 		protected ReferencedCharacterToken ConsumeNamedCharacterReference(Tokenizer t){
-			StringBuilder matchResult = new StringBuilder();
+			StringBuilder referenceName = new StringBuilder();
 			bool semicolonFound = false;
 
-			char? c = t.CurrentInputChar;
-			while(c.IsNameToken()){
-				matchResult.Append(c);
-				c = t.ConsumeChar();
-//				if(matchResult.Length > Chars.NameMaxLength) break;
+			char? lastChar = t.CurrentInputChar;
+			while(lastChar.IsNameToken()){
+				referenceName.Append(lastChar);
+				lastChar = t.ConsumeChar();
 			}
-			if(c == Chars.SEMICOLON){
-				matchResult.Append(c);
+			if(lastChar == Chars.SEMICOLON){
+				referenceName.Append(lastChar);
 				semicolonFound = true;
 			} else {
-				// CurrentInputCharをmatchResultの末尾にそろえる
+				// CurrentInputCharをreferenceNameの末尾にそろえる
 				t.UnConsume(1);
 			}
-			string originalString = matchResult.ToString();
+			string originalString = referenceName.ToString();
 
-			string result = null;
-			while(matchResult.Length > 0){
-				if(Chars.ExistsNamedChar(matchResult.ToString())){
-					result = Chars.GetNamedChar(matchResult.ToString());
+			string matchResult = null;
+			while(referenceName.Length > 0){
+				if(Chars.ExistsNamedChar(referenceName.ToString())){
+					matchResult = Chars.GetNamedChar(referenceName.ToString());
 					break;
 				}
-				matchResult.Remove(matchResult.Length-1, 1);
-				// CurrentInputCharをmatchResultの末尾にそろえる
+				referenceName.Remove(referenceName.Length-1, 1);
+				// CurrentInputCharをreferenceNameの末尾にそろえる
 				t.UnConsume(1);
 			}
 
-			if(result == null){
-				OnParseErrorRaised(string.Format("文字参照 {0} を参照しようとしましたが、みつかりませんでした。", originalString));
-				t.UnConsume(matchResult.Length);
-				return null;
-			} else if(!semicolonFound){
-				if(t.CurrentTokenState is CharacterReferenceInAttributeState && t.NextInputChar.IsSuffixOfIgnoreCharacterReferenceInAttribute()){
-					t.UnConsume(matchResult.Length);
-					OnParseErrorRaised(string.Format("属性値中の文字参照 &{0}; の末尾のセミコロンがありません。歴史的理由により、この文字参照は無視されます。", matchResult));
-					return null;
+			if(matchResult == null){
+				if(semicolonFound){
+					// 名前がなく、セミコロンがある場合はパースエラー
+					// if the characters after the U+0026 AMPERSAND character (&) consist of a sequence of one or more characters in the range ASCII digits, lowercase ASCII letters, and uppercase ASCII letters, followed by a ";" (U+003B) character, then this is a parse error.
+					OnMessageRaised(new UnknownNamedCharacterWithSemicolonError(originalString));
 				} else {
-					OnParseErrorRaised(string.Format("文字参照 &{0}; の末尾のセミコロンがありません。", matchResult));
-					int diff = originalString.Length - matchResult.Length;
+					// 名前がなくセミコロンがない場合はパースエラーにならない
+					OnMessageRaised(new UnknownNamedCharacterWithoutSemicolonWarning(originalString));
 				}
+				t.UnConsume(referenceName.Length);
+				return null;
+			}
+			if(!semicolonFound){
+				// 属性値の中のセミコロンなし文字参照は無視する
+				if(t.CurrentTokenState is CharacterReferenceInAttributeState && t.NextInputChar.IsSuffixOfIgnoreCharacterReferenceInAttribute()){
+					OnMessageRaised(new IgnoredCharacterReferenceInAttributeWarning(referenceName));
+					t.UnConsume(referenceName.Length);
+					return null;
+				}
+				// それ以外のセミコロンなし文字参照はエラー
+				OnMessageRaised(new NamedCharacterWithoutSemicolonError(referenceName));
 			}
 
-			ReferencedCharacterToken resultToken = new ReferencedCharacterToken(result);
-			resultToken.OriginalString = matchResult.ToString();
+			ReferencedCharacterToken resultToken = new ReferencedCharacterToken(matchResult);
+			resultToken.OriginalString = referenceName.ToString();
 			return resultToken;
 		}
 

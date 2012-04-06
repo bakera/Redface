@@ -432,16 +432,39 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 
 
 <item>
-	<id>UnknownNamedCharacterError</id>
+	<id>UnknownNamedCharacterWithSemicolonError</id>
 	<level>ParseError</level>
 	<message>名前つき文字参照 {0} は不明な文字参照です。</message>
 	<params>名前</params>
 	<description>
-<p>名前つき文字参照 (Named Character Reference) が書かれていて、しかしながら指定された名前が存在しないときにこのエラーが発生します。</p>
+<p>名前つき文字参照 (Named Character Reference) が書かれているが、その名前の文字が定義されておらず、かつ末尾にセミコロンがあるときにこのエラーが発生します。</p>
 <p>名前つき文字参照は「&amp;name;」のように書きますが、このとき name という名前が定義されていないとこのエラーになります。</p>
-
-
 <p>パースエラーとなり、単にデータとして &amp; が書いてあるものとみなします。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>UnknownNamedCharacterWithoutSemicolonWarning</id>
+	<level>ParseError</level>
+	<message>名前つき文字参照らしき文字列がありますが、名前 {0} は存在しないため無視します。</message>
+	<params>名前</params>
+	<description>
+<p>名前つき文字参照 (Named Character Reference) らしき文字列が書かれているが、その名前の文字が定義されておらず、末尾にセミコロンがないときにこの警告が出ます。</p>
+<p>パースエラーにはなりませんが、ならず、単にデータとして &amp; が書いてあるものとみなします。</p>
+<p>なお、末尾にセミコロンがある場合はパースエラーとなり、UnknownNamedCharacterErrorになります。</p>
+	</description>
+</item>
+
+<item>
+	<id>NamedCharacterWithoutSemicolonError</id>
+	<level>ParseError</level>
+	<message>名前つき文字参照 {0} の末尾にはセミコロンが必要です。</message>
+	<params>名前</params>
+	<description>
+<p>名前つき文字参照 (Named Character Reference) が書かれていて、その名前の文字が定義されており、かつ末尾にセミコロンがないときにこのエラーが出ます。</p>
+<p>これはパースエラーになりますが、文字参照として展開して処理を続行します。</p>
+<p>なお、HTML5では、セミコロンがなくても名前つき文字参照として解釈するものとそうでないものが明確に定義されています。すべての文字参照が末尾のセミコロンなしでも解釈されるわけではありません。</p>
 	</description>
 </item>
 
@@ -449,14 +472,30 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 <item>
 	<id>RawAmpersandWarning</id>
 	<level>Warning</level>
-	<message>文字参照ではない &amp; が出現しました。</message>
+	<message>生の &amp; が使われています。</message>
 	<description>
-<p>&amp; は文字参照の開始区切り子として使われます。HTML5では、直後の文字が &amp; や空白類文字、&lt; などである場合は文字参照とはみなさず、単に &amp; という文字が書かれているものとみなします。</p>
-<p>これはパースエラーではありません。</p>
+<p>&amp; は文字参照の開始区切り子として使われます。HTML5では、直後の文字が &amp; や空白類文字、&lt; などである場合は文字参照とはみなさず、単に &amp; という文字が書かれているものとみなします。これはパースエラーではありません。</p>
 <bq cite="http://www.w3.org/TR/html5/tokenization.html#tokenizing-character-references">
 Not a character reference. No characters are consumed, and nothing is returned. (This is not an error, either.)
 </bq>
-<p>しかし、これは以前のHTMLでは許されなかった記述ですので、念のため注意を促すようにしています。</p>
+<p>しかし、これは以前のHTMLでは許されなかった記述で、XMLとの互換性もありません。このような書き方を避けるというポリシーもあり得ると思いますので、念のため注意を促すようにしています。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>IgnoredCharacterReferenceInAttributeWarning</id>
+	<level>Warning</level>
+	<message>属性値中にセミコロンなしの名前つき文字参照 {0} が出現しましたが、この文字参照は展開されません。</message>
+	<params>名前</params>
+	<description>
+<p>HTML5では名前つき文字参照の末尾のセミコロンを省略できる場合がありますが、以下のすべてを満たす場合には文字参照として扱いません。</p>
+<ul>
+<li>属性値の中に出現している</li>
+<li>末尾にセミコロンがなく、すぐ後ろに英数字もしくは=が出現している</li>
+</ul>
+<p>たとえば href="http://example.com?foo&amp;amp=10&amp;amp2=20" のような属性値中の &amp;amp は展開されず、単に &amp;amp と書かれているものとみなします。これはパースエラーではありません。</p>
+<p>しかし、これは以前のHTMLでは許されなかった記述で、XMLとの互換性もありません。このような書き方を避けるというポリシーもあり得ると思いますので、念のため注意を促すようにしています。</p>
 	</description>
 </item>
 
