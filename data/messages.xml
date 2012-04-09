@@ -576,4 +576,98 @@ Not a character reference. No characters are consumed, and nothing is returned. 
 
 
 
+
+
+
+
+
+
+
+<item>
+	<id>NotAcknowledgedSelfClosingTagError</id>
+	<level>ParseError</level>
+	<message>{0} 要素の開始タグをself-closingタグにすることはできません。</message>
+	<params>要素名</params>
+	<description>
+<p>HTML5のHTML構文でも、&lt;br/> のような self-closingタグ (XMLで言うところの空要素タグ) を使用することは許されていますが、self-closingタグを使用できる要素は限られています。self-closingタグを使用できない要素の開始タグが /> で終わっている場合、このエラーになります。</p>
+<p>パースエラーとなりますが、通常の開始タグとみなして処理します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>SelfClosingEndTagError</id>
+	<level>ParseError</level>
+	<message>終了タグをself-closingタグにすることはできません。</message>
+	<params>要素名</params>
+	<description>
+<p>終了タグの末尾に / を書き、たとえば &lt;/p /> のようにすると、self-closingタグとみなしてこのエラーになります。</p>
+<p>パースエラーとなりますが、通常の終了タグとみなして処理します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>EndTagWithAttributeError</id>
+	<level>ParseError</level>
+	<message>{0}要素の終了タグに属性が指定されています。</message>
+	<params>要素名</params>
+	<description>
+<p>終了タグに属性が書かれているとこのエラーになります。</p>
+<p>終了タグに属性を指定することはできません。</p>
+<p>パースエラーとなりますが、属性は無視して通常の終了タグとみなして処理します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>UnexpectedNamespaceError</id>
+	<level>ParseError</level>
+	<message>{0}要素は名前空間{1}に属する要素ですが、xmlns属性で名前空間{2}が指定されています。</message>
+	<params>要素名,名前空間,名前空間</params>
+	<description>
+<p>HTMLの名前空間に属さない要素にxmlns属性で名前空間が指定されていて、かつ、その名前空間が想定しているものと異なる場合にこのエラーになります。</p>
+<p>HTML5のHTML構文では、SVGやMathMLなどの名前空間は決め打ちになっていて、xmlns属性で指定する必要がありません。逆に、通常と異なるものが指定されているとこのエラーになります。</p>
+<p>パースエラーとなりますが、xmlns属性を無視して処理します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>UnexpectedXlinkNamespaceError</id>
+	<level>ParseError</level>
+	<message>xmlns:xlink属性の値は{0}でなければなりませんが、{1}が指定されています。</message>
+	<params>属性名,名前空間,名前空間</params>
+	<description>
+<p>HTML5のHTML構文では、xmlns:xlink属性の値は http://www.w3.org/1999/xlink でなければなりません。異なる値が指定されているとこのエラーになります。</p>
+<p>パースエラーとなり、名前空間を無視して処理します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>UnexpectedTokenAfterHtmlError</id>
+	<level>ParseError</level>
+	<message>html要素の後ろに予期しないトークンが出現しました。{0}</message>
+	<params>トークン名</params>
+	<description>
+<p>html要素の終了タグの後ろにコメント以外の何かが出現した場合、このエラーになります。</p>
+<memo>ただし、html要素の開始タグや文書型宣言が出現した場合は別のエラーになります。</memo>
+<p>パースエラーとなりますが、body要素の末尾にそのトークンがあるものとみなして処理します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>UnexpectedDoctypeError</id>
+	<level>ParseError</level>
+	<message>予期しない文書型宣言が出現しました。</message>
+	<description>
+<p>文書型宣言の出現が期待されないところで文書型宣言が出現するとこのエラーになります。</p>
+<p>典型的なのは、文書型宣言が文書の先頭以外に書かれているケースです。また、文書型宣言の前にコメント以外の何かが書かれている場合もこのエラーになります。</p>
+<p>パースエラーとなり、出現した文書型宣言は無視します。</p>
+	</description>
+</item>
+
+
 </messages>

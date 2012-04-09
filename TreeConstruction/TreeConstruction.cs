@@ -78,14 +78,13 @@ namespace Bakera.RedFace{
 				AppendToken(CurrentInsertionMode, t);
 			}while(ReprocessFlag);
 			if(t is StartTagToken && t.SelfClosing && !t.AcknowledgedSelfClosing){
-				OnParseErrorRaised(string.Format("空要素でない要素に空要素タグを使用することはできません。: {0}", t.Name));
+				OnMessageRaised(new NotAcknowledgedSelfClosingTagError(t.Name));
 			}
 			if(t is EndTagToken && t.Attributes.Length > 0){
-				OnParseErrorRaised(string.Format("終了タグに属性を指定することはできません。: {0}", t.Name));
-
+				OnMessageRaised(new EndTagWithAttributeError(t.Name));
 			}
 			if(t is EndTagToken && t.SelfClosing){
-				OnParseErrorRaised(string.Format("終了タグに空要素タグを使用することはできません。: {0}", t.Name));
+				OnMessageRaised(new SelfClosingEndTagError(t.Name));
 			}
 		}
 
@@ -274,12 +273,12 @@ namespace Bakera.RedFace{
 			XmlElement result = CreateElementForToken(t, ns);
 			string xmlns = result.GetAttribute("xmlns", Document.XmlnsNamespace);
 			if(xmlns != null && !xmlns.Equals(ns, StringComparison.InvariantCulture)){
-				OnParseErrorRaised(string.Format("8.2.5.1 Creating and inserting elements : 文脈と異なる名前空間が指定されています。: {0}", t.Name));
+				OnMessageRaised(new UnexpectedNamespaceError(t.Name, xmlns, ns));
 			}
 
 			string xlink = result.GetAttribute("xmlns:xlink");
 			if(xlink != null && !xlink.Equals(Document.XLinkNamespace, StringComparison.InvariantCulture)){
-				OnParseErrorRaised(string.Format("8.2.5.1 Creating and inserting elements : xmlns:xlink属性の値は {0} でなければなりません。: {1}", Document.XLinkNamespace, t.Name));
+				OnMessageRaised(new UnexpectedXlinkNamespaceError(Document.XLinkNamespace, t.Name));
 			}
 			return InsertElement(result);
 		}

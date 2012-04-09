@@ -43,7 +43,7 @@ namespace Bakera.RedFace{
 		}
 
 		public override void AppendAnythingElse(TreeConstruction tree, Token token){
-			OnParseErrorRaised(string.Format("frameset文書のhtml終了タグの後ろに不明なトークンがあります。: {0}", token.Name));
+			OnMessageRaised(new UnexpectedTokenAfterHtmlError(token.Name));
 			return;
 		}
 

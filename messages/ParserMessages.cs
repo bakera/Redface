@@ -255,5 +255,46 @@ public override EventLevel Level{get{return EventLevel.Warning;}}
 public override string MessageTemplate{get{return "属性値中にセミコロンなしの名前つき文字参照 {0} が出現しましたが、この文字参照は展開されません。";}}
 } // IgnoredCharacterReferenceInAttributeWarning
 
+public class NotAcknowledgedSelfClosingTagError : ParserMessage{
+public NotAcknowledgedSelfClosingTagError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "{0} 要素の開始タグをself-closingタグにすることはできません。";}}
+} // NotAcknowledgedSelfClosingTagError
+
+public class SelfClosingEndTagError : ParserMessage{
+public SelfClosingEndTagError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "終了タグをself-closingタグにすることはできません。";}}
+} // SelfClosingEndTagError
+
+public class EndTagWithAttributeError : ParserMessage{
+public EndTagWithAttributeError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "{0}要素の終了タグに属性が指定されています。";}}
+} // EndTagWithAttributeError
+
+public class UnexpectedNamespaceError : ParserMessage{
+public UnexpectedNamespaceError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "{0}要素は名前空間{1}に属する要素ですが、xmlns属性で名前空間{2}が指定されています。";}}
+} // UnexpectedNamespaceError
+
+public class UnexpectedXlinkNamespaceError : ParserMessage{
+public UnexpectedXlinkNamespaceError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "xmlns:xlink属性の値は{0}でなければなりませんが、{1}が指定されています。";}}
+} // UnexpectedXlinkNamespaceError
+
+public class UnexpectedTokenAfterHtmlError : ParserMessage{
+public UnexpectedTokenAfterHtmlError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "html要素の後ろに予期しないトークンが出現しました。{0}";}}
+} // UnexpectedTokenAfterHtmlError
+
+public class UnexpectedDoctypeError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "予期しない文書型宣言が出現しました。";}}
+} // UnexpectedDoctypeError
+
 } // namespace
 
