@@ -7,7 +7,7 @@ namespace Bakera.RedFace{
 	public class BeforeHeadInsertionMode : InsertionMode{
 
 		public override void AppendDoctypeToken(TreeConstruction tree, DoctypeToken token){
-			OnParseErrorRaised(string.Format("先頭以外の箇所に文書型宣言があります。"));
+			OnMessageRaised(new UnexpectedDoctypeError());
 		}
 
 		public override void AppendCommentToken(TreeConstruction tree, CommentToken token){
@@ -40,7 +40,7 @@ namespace Bakera.RedFace{
 				AppendAnythingElse(tree, token);
 				return;
 			}
-			OnParseErrorRaised(string.Format("不明な終了タグがあります。"));
+			OnMessageRaised(new UnexpectedEndTagError(token.Name));
 			return;
 		}
 

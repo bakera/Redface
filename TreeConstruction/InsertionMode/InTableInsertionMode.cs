@@ -6,7 +6,7 @@ namespace Bakera.RedFace{
 	public class InTableInsertionMode : TableRelatedInsertionMode{
 
 		public override void AppendDoctypeToken(TreeConstruction tree, DoctypeToken token){
-			OnParseErrorRaised(string.Format("先頭以外の箇所に文書型宣言があります。"));
+			OnMessageRaised(new UnexpectedDoctypeError());
 		}
 
 		public override void AppendCommentToken(TreeConstruction tree, CommentToken token){
@@ -82,7 +82,7 @@ namespace Bakera.RedFace{
 			switch(token.Name){
 			case "table":
 				if(!tree.StackOfOpenElements.HaveElementInTableScope(token.Name)){
-					OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					OnMessageRaised(new LonlyEndTagError(token.Name));
 					return;
 				}
 				tree.StackOfOpenElements.PopUntilSameTagName(token.Name);
@@ -99,7 +99,7 @@ namespace Bakera.RedFace{
 			case "th":
 			case "thead":
 			case "tr":
-				OnParseErrorRaised(string.Format("table要素の直下に出現できない終了タグが出現しました。: {0}", token.Name));
+				OnMessageRaised(new UnexpectedEndTagError(token.Name));
 				return;
 			}
 			AppendAnythingElse(tree, token);

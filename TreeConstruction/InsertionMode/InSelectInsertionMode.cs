@@ -7,7 +7,7 @@ namespace Bakera.RedFace{
 
 
 		public override void AppendDoctypeToken(TreeConstruction tree, DoctypeToken token){
-			OnParseErrorRaised(string.Format("先頭以外の箇所に文書型宣言があります。"));
+			OnMessageRaised(new UnexpectedDoctypeError());
 			return;
 		}
 
@@ -17,7 +17,7 @@ namespace Bakera.RedFace{
 
 		public override void AppendCharacterToken(TreeConstruction tree, CharacterToken token){
 			if(token.IsNULL){
-				OnParseErrorRaised(string.Format("NUL文字が出現しました。"));
+				OnMessageRaised(new NullInDataError());
 				return;
 			}
 			tree.InsertCharacter(token);
@@ -88,7 +88,7 @@ namespace Bakera.RedFace{
 				if(tree.StackOfOpenElements.IsCurrentNameMatch("optgroup")){
 					tree.PopFromStack();
 				} else {
-					OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					OnMessageRaised(new LonlyEndTagError(token.Name));
 					return;
 				}
 				return;
@@ -97,7 +97,7 @@ namespace Bakera.RedFace{
 				if(tree.StackOfOpenElements.IsCurrentNameMatch("option")){
 					tree.PopFromStack();
 				} else {
-					OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					OnMessageRaised(new LonlyEndTagError(token.Name));
 					return;
 				}
 				return;

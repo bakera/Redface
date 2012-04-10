@@ -13,7 +13,7 @@ namespace Bakera.RedFace{
 
 
 		public override void AppendDoctypeToken(TreeConstruction tree, DoctypeToken token){
-			OnParseErrorRaised(string.Format("先頭以外の箇所に文書型宣言があります。"));
+			OnMessageRaised(new UnexpectedDoctypeError());
 			return;
 		}
 
@@ -23,7 +23,7 @@ namespace Bakera.RedFace{
 
 		public override void AppendCharacterToken(TreeConstruction tree, CharacterToken token){
 			if(token.IsNULL){
-				OnParseErrorRaised(string.Format("NUL文字が出現しました。"));
+				OnMessageRaised(new NullInDataError());
 				return;
 			}
 			if(token.IsSpaceCharacter){
@@ -39,7 +39,7 @@ namespace Bakera.RedFace{
 		public override void AppendEndOfFileToken(TreeConstruction tree, EndOfFileToken token){
 			string invalidOpenTag = tree.StackOfOpenElements.NotEither(myEndOfFilePermitOpenTags);
 			if(invalidOpenTag != null){
-				OnParseErrorRaised(string.Format("{0}の終了タグが不足しています。", invalidOpenTag));
+				OnMessageRaised(new SuddenlyEndAtElementError(invalidOpenTag));
 			}
 			tree.Parser.Stop();
 			return;
@@ -48,7 +48,7 @@ namespace Bakera.RedFace{
 
 		public override void AppendStartTagToken(TreeConstruction tree, StartTagToken token){
 			if(token.IsStartTag("html")){
-				OnParseErrorRaised(string.Format("予期せぬ箇所にhtml要素開始タグがあります。"));
+				OnMessageRaised(new MultipleHtmlElementError());
 				XmlElement topElement = tree.StackOfOpenElements[0];
 				tree.MergeAttribute(topElement, token);
 				return;
@@ -60,7 +60,7 @@ namespace Bakera.RedFace{
 			}
 
 			if(token.IsStartTag("body")){
-				OnParseErrorRaised(string.Format("予期せぬ箇所にbody要素開始タグがあります。"));
+				OnMessageRaised(new MultipleBodyElementError());
 				XmlElement bodyElement = tree.StackOfOpenElements[1];
 				if(bodyElement == null || bodyElement.Name != "body") return;
 				tree.Parser.FramesetOK = false;
@@ -69,7 +69,7 @@ namespace Bakera.RedFace{
 			}
 
 			if(token.IsStartTag("frameset")){
-				OnParseErrorRaised(string.Format("予期せぬ箇所にframeset要素開始タグがあります。"));
+				OnMessageRaised(new UnexpectedFramesetElementError());
 				XmlElement bodyElement = tree.StackOfOpenElements[1];
 				if(bodyElement == null || bodyElement.Name != "body") return;
 				if(tree.Parser.FramesetOK == false) return;
@@ -94,7 +94,7 @@ namespace Bakera.RedFace{
 					EndTagPHadBeSeen(tree, token);
 				}
 				if(tree.StackOfOpenElements.IsCurrentNameMatch(myHeadingElements)){
-					OnParseErrorRaised(string.Format("見出し要素の終了タグがありません。: {0}", tree.CurrentNode.Name));
+					OnMessageRaised(new NestedHeadingElementError(tree.CurrentNode.Name, token.Name));
 					tree.StackOfOpenElements.Pop();
 				}
 				tree.InsertElementForToken(token);
@@ -113,7 +113,7 @@ namespace Bakera.RedFace{
 
 			if(token.IsStartTag("form")){
 				if(tree.FormElementPointer != null){
-					OnParseErrorRaised(string.Format("form要素が入れ子になっています。"));
+					OnMessageRaised(new NestedFormElementError());
 					return;
 				}
 				if(tree.StackOfOpenElements.HaveElementInButtonScope("p")){
@@ -423,7 +423,7 @@ namespace Bakera.RedFace{
 
 			if(token.IsEndTag("body")){
 				if(!tree.StackOfOpenElements.HaveElementInScope("body")){
-					OnParseErrorRaised(string.Format("予期せぬ箇所で終了タグが出現しました。: {0}", token.Name));
+					OnMessageRaised(new UnexpectedEndTagError(token.Name));
 					return;
 				}
 				string invalidOpenTag = tree.StackOfOpenElements.NotEither(myBodyEndTagPermitOpenTags);
@@ -442,12 +442,12 @@ namespace Bakera.RedFace{
 
 			if(token.IsEndTag("address", "article", "aside", "blockquote", "button", "center", "details", "dir", "div", "dl", "fieldset", "figcaption", "figure", "footer", "header", "hgroup", "listing", "menu", "nav", "ol", "pre", "section", "summary", "ul")){
 				if(!tree.StackOfOpenElements.HaveElementInScope(token.Name)){
-					OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					OnMessageRaised(new LonlyEndTagError(token.Name));
 					return;
 				}
 				GenerateImpliedEndTags(tree, token);
 				if(!tree.StackOfOpenElements.IsCurrentNameMatch(token.Name)){
-					OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					OnMessageRaised(new LonlyEndTagError(token.Name));
 				}
 				tree.StackOfOpenElements.PopUntilSameTagName(token.Name);
 				return;
@@ -457,12 +457,12 @@ namespace Bakera.RedFace{
 				XmlElement node = tree.FormElementPointer;
 				tree.FormElementPointer = null;
 				if(node == null || !tree.StackOfOpenElements.Contains(node)){
-					OnParseErrorRaised(string.Format("formの終了タグが出現しましたが、対応するform要素がありません。"));
+					OnMessageRaised(new LonlyEndTagError(token.Name));
 					return;
 				}
 				GenerateImpliedEndTags(tree, token);
 				if(tree.CurrentNode != node){
-					OnParseErrorRaised(string.Format("formの終了タグが出現しましたが、対応するform要素がありません。"));
+					OnMessageRaised(new LonlyEndTagError(token.Name));
 				} else {
 					tree.StackOfOpenElements.Pop();
 				}
@@ -476,12 +476,12 @@ namespace Bakera.RedFace{
 
 			if(token.IsEndTag("li")){
 				if(!tree.StackOfOpenElements.HaveElementInListItemScope(token.Name)){
-					OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					OnMessageRaised(new LonlyEndTagError(token.Name));
 					return;
 				}
 				GenerateImpliedEndTags(tree, token, token.Name);
 				if(!tree.StackOfOpenElements.IsCurrentNameMatch(token.Name)){
-					OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					OnMessageRaised(new LonlyEndTagError(token.Name));
 				}
 				tree.StackOfOpenElements.PopUntilSameTagName(token.Name);
 				return;
@@ -489,12 +489,12 @@ namespace Bakera.RedFace{
 
 			if(token.IsEndTag("dd", "dt")){
 				if(!tree.StackOfOpenElements.HaveElementInScope(token.Name)){
-					OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					OnMessageRaised(new LonlyEndTagError(token.Name));
 					return;
 				}
 				GenerateImpliedEndTags(tree, token, token.Name);
 				if(!tree.StackOfOpenElements.IsCurrentNameMatch(token.Name)){
-					OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					OnMessageRaised(new LonlyEndTagError(token.Name));
 				}
 				tree.StackOfOpenElements.PopUntilSameTagName(token.Name);
 				return;
@@ -502,19 +502,19 @@ namespace Bakera.RedFace{
 
 			if(token.IsEndTag(myHeadingElements)){
 				if(!tree.StackOfOpenElements.HaveElementInScope(token.Name)){
-					OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					OnMessageRaised(new LonlyEndTagError(token.Name));
 					return;
 				}
 				GenerateImpliedEndTags(tree, token);
 				if(!tree.StackOfOpenElements.IsCurrentNameMatch(token.Name)){
-					OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					OnMessageRaised(new LonlyEndTagError(token.Name));
 				}
 				tree.StackOfOpenElements.PopUntilSameTagName(myHeadingElements);
 				return;
 			}
 
 			if(token.IsEndTag("sarcasm")){
-				OnDeepBreath();
+				OnMessageRaised(new SarcasmEndTagInformation());
 				AnyOtherEndTag(tree, token);
 				return;
 			}
@@ -526,12 +526,12 @@ namespace Bakera.RedFace{
 
 			if(token.IsEndTag("applet", "marquee", "object")){
 				if(!tree.StackOfOpenElements.HaveElementInScope(token.Name)){
-					OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					OnMessageRaised(new LonlyEndTagError(token.Name));
 					return;
 				}
 				GenerateImpliedEndTags(tree, token);
 				if(!tree.StackOfOpenElements.IsCurrentNameMatch(token.Name)){
-					OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					OnMessageRaised(new LonlyEndTagError(token.Name));
 				}
 				tree.StackOfOpenElements.PopUntilSameTagName(token.Name);
 				tree.ListOfActiveFormatElements.ClearUpToTheLastMarker();
@@ -571,14 +571,14 @@ namespace Bakera.RedFace{
 		private void EndTagPHadBeSeen(TreeConstruction tree, Token token){
 			string tagName = "p";
 			if(!tree.StackOfOpenElements.HaveElementInButtonScope(tagName)){
-				OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", tagName));
+				OnMessageRaised(new LonlyEndTagError(token.Name));
 				StartTagHadBeSeen(tree, "p");
 				tree.ReprocessFlag = true;
 				return;
 			}
 			GenerateImpliedEndTags(tree, token, tagName);
 			if(!tree.StackOfOpenElements.IsCurrentNameMatch(tagName)){
-				OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", tagName));
+				OnMessageRaised(new LonlyEndTagError(tagName));
 			}
 			tree.StackOfOpenElements.PopUntilSameTagName(tagName);
 			return;
@@ -589,13 +589,13 @@ namespace Bakera.RedFace{
 				if(StackOfElements.IsNameMatch(node, token.Name)){
 					GenerateImpliedEndTags(tree, token, token.Name);
 					if(!tree.StackOfOpenElements.IsCurrentNameMatch(token.Name)){
-						OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+						OnMessageRaised(new LonlyEndTagError(token.Name));
 					}
 					tree.StackOfOpenElements.PopUntilSameElement(node);
 					break;
 				} else {
 					if(StackOfElements.IsSpecialElement(node)){
-						OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+						OnMessageRaised(new LonlyEndTagError(token.Name));
 						return;
 					}
 				}

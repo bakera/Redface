@@ -8,7 +8,7 @@ namespace Bakera.RedFace{
 
 
 		public override void AppendDoctypeToken(TreeConstruction tree, DoctypeToken token){
-			OnParseErrorRaised(string.Format("先頭以外の箇所に文書型宣言があります。"));
+			OnMessageRaised(new UnexpectedDoctypeError());
 		}
 
 		public override void AppendCharacterToken(TreeConstruction tree, CharacterToken token){
@@ -43,14 +43,14 @@ namespace Bakera.RedFace{
 			}
 
 			if(token.IsStartTag("base", "basefont", "bgsound", "link", "meta", "noframes", "script", "style", "title")){
-				OnParseErrorRaised(string.Format("head要素内にしか出現できない要素です。: {0}", token.Name));
+				OnMessageRaised(new UnexpectedInHeadElementError(token.Name));
 				tree.PutToStack(tree.HeadElementPointer);
 				tree.AppendToken<InHeadInsertionMode>(token);
 				tree.PopFromStack();
 				return;
 			}
 			if(token.IsStartTag("head")){
-				OnParseErrorRaised(string.Format("head要素が終了してからhaad要素の開始タグが出現しました。"));
+				OnMessageRaised(new MultipleHeadElementError());
 				return;
 			}
 
@@ -63,7 +63,7 @@ namespace Bakera.RedFace{
 				AppendAnythingElse(tree, token);
 				return;
 			}
-			OnParseErrorRaised(string.Format("不明な終了タグがあります。"));
+			OnMessageRaised(new UnexpectedEndTagError(token.Name));
 			return;
 		}
 

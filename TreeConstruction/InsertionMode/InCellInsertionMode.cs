@@ -28,12 +28,12 @@ namespace Bakera.RedFace{
 			case "th":
 			case "td":
 				if(!tree.StackOfOpenElements.HaveElementInTableScope(token.Name)){
-					OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					OnMessageRaised(new LonlyEndTagError(token.Name));
 					return;
 				}
 				GenerateImpliedEndTags(tree, token);
 				if(!tree.StackOfOpenElements.IsCurrentNameMatch(token.Name)){
-					OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					OnMessageRaised(new LonlyEndTagError(token.Name));
 				}
 				tree.StackOfOpenElements.PopUntilSameTagName(token.Name);
 				tree.ListOfActiveFormatElements.ClearUpToTheLastMarker();
@@ -45,7 +45,7 @@ namespace Bakera.RedFace{
 			case "col":
 			case "colgroup":
 			case "html":
-				OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+				OnMessageRaised(new LonlyEndTagError(token.Name));
 				return;
 
 			case "table":
@@ -54,7 +54,7 @@ namespace Bakera.RedFace{
 			case "thead":
 			case "tr":
 				if(!tree.StackOfOpenElements.HaveElementInTableScope(token.Name)){
-					OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					OnMessageRaised(new LonlyEndTagError(token.Name));
 					return;
 				}
 				CloseTheCell(tree);

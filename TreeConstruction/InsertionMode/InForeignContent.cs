@@ -26,7 +26,7 @@ namespace Bakera.RedFace{
 
 
 		public override void AppendDoctypeToken(TreeConstruction tree, DoctypeToken token){
-			OnParseErrorRaised(string.Format("先頭以外の箇所に文書型宣言があります。"));
+			OnMessageRaised(new UnexpectedDoctypeError());
 			return;
 		}
 
@@ -129,7 +129,7 @@ namespace Bakera.RedFace{
 			// Any Other End Tag
 			XmlElement node = tree.CurrentNode as XmlElement;
 			if(!token.IsEndTag(node.Name)){
-				OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+				OnMessageRaised(new LonlyEndTagError(token.Name));
 			}
 			while(node != null){
 				if(token.IsEndTag(node.Name.ToLower())){

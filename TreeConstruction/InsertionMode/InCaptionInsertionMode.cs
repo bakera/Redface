@@ -31,14 +31,14 @@ namespace Bakera.RedFace{
 			case "caption":
 				GenerateImpliedEndTags(tree, token);
 				if(!tree.StackOfOpenElements.IsCurrentNameMatch(token.Name)){
-					OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					OnMessageRaised(new LonlyEndTagError(token.Name));
 				}
 				tree.StackOfOpenElements.PopUntilSameTagName(token.Name);
 				tree.ListOfActiveFormatElements.ClearUpToTheLastMarker();
 				tree.ChangeInsertionMode<InTableInsertionMode>();
 				return;
 			case "table":
-				OnParseErrorRaised(string.Format("caption要素の中に出現できない要素です。: {0}", token.Name));
+				OnMessageRaised(new UnexpectedEndTagError(token.Name));
 				AppendEndTagToken(tree, new FakeEndTagToken(){Name = "caption"});
 				tree.ReprocessFlag = true;
 				return;
@@ -52,7 +52,7 @@ namespace Bakera.RedFace{
 			case "th":
 			case "thead":
 			case "tr":
-				OnParseErrorRaised(string.Format("caption要素の中に不明な終了タグが出現しました。: {0}", token.Name));
+				OnMessageRaised(new UnexpectedEndTagError(token.Name));
 				return;
 			}
 			AppendAnythingElse(tree, token);

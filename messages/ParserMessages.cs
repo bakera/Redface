@@ -101,6 +101,12 @@ public override EventLevel Level{get{return EventLevel.ParseError;}}
 public override string MessageTemplate{get{return "スクリプトが終了していません。";}}
 } // SuddenlyEndAtScriptError
 
+public class SuddenlyEndAtElementError : ParserMessage{
+public SuddenlyEndAtElementError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "{0}要素が終了していません。";}}
+} // SuddenlyEndAtElementError
+
 public class EmptyDoctypeError : ParserMessage{
 public override EventLevel Level{get{return EventLevel.ParseError;}}
 public override string MessageTemplate{get{return "文書型宣言が空です。";}}
@@ -295,6 +301,60 @@ public class UnexpectedDoctypeError : ParserMessage{
 public override EventLevel Level{get{return EventLevel.ParseError;}}
 public override string MessageTemplate{get{return "予期しない文書型宣言が出現しました。";}}
 } // UnexpectedDoctypeError
+
+public class UnexpectedInHeadElementError : ParserMessage{
+public UnexpectedInHeadElementError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "{0}要素がhead要素の外で使われています。";}}
+} // UnexpectedInHeadElementError
+
+public class MultipleHtmlElementError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "html要素が複数あります。";}}
+} // MultipleHtmlElementError
+
+public class MultipleHeadElementError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "head要素が複数あります。";}}
+} // MultipleHeadElementError
+
+public class MultipleBodyElementError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "body要素が複数あります。";}}
+} // MultipleBodyElementError
+
+public class UnexpectedFramesetElementError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "body要素とframeset要素を併用することはできません。";}}
+} // UnexpectedFramesetElementError
+
+public class UnexpectedEndTagError : ParserMessage{
+public UnexpectedEndTagError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "予期しない{0}要素の終了タグがあります。";}}
+} // UnexpectedEndTagError
+
+public class LonlyEndTagError : ParserMessage{
+public LonlyEndTagError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "{0}要素の終了タグがありますが、対応する開始タグがありません。";}}
+} // LonlyEndTagError
+
+public class SarcasmEndTagInformation : ParserMessage{
+public override EventLevel Level{get{return EventLevel.Information;}}
+public override string MessageTemplate{get{return "sarcasm要素の終了タグが出現しました。";}}
+} // SarcasmEndTagInformation
+
+public class NestedHeadingElementError : ParserMessage{
+public NestedHeadingElementError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "{0}見出しに{1}見出しを入れ子にすることはできません。";}}
+} // NestedHeadingElementError
+
+public class NestedFormElementError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "form要素を入れ子にすることはできません。";}}
+} // NestedFormElementError
 
 } // namespace
 

@@ -226,6 +226,18 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 </item>
 
 
+<item>
+	<id>SuddenlyEndAtElementError</id>
+	<level>ParseError</level>
+	<message>{0}要素が終了していません。</message>
+	<params>要素名</params>
+	<description>
+<p>終了タグが必要な要素の解析中に、終了タグが出現せずにファイルの終端に達するとこのエラーが発生します。</p>
+<p>パースエラーとなりつつも処理を続行しますが、既にファイル終端に達しているので、たいていはそのまま処理を終了します。</p>
+	</description>
+</item>
+
+
 
 <item>
 	<id>EmptyDoctypeError</id>
@@ -666,6 +678,135 @@ Not a character reference. No characters are consumed, and nothing is returned. 
 <p>文書型宣言の出現が期待されないところで文書型宣言が出現するとこのエラーになります。</p>
 <p>典型的なのは、文書型宣言が文書の先頭以外に書かれているケースです。また、文書型宣言の前にコメント以外の何かが書かれている場合もこのエラーになります。</p>
 <p>パースエラーとなり、出現した文書型宣言は無視します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>UnexpectedInHeadElementError</id>
+	<level>ParseError</level>
+	<message>{0}要素がhead要素の外で使われています。</message>
+	<params>要素名</params>
+	<description>
+<p>meta要素やlink要素など、いくつかの要素はhead要素の中でしか使用できません。head要素の後でこのような要素が出現した場合、このエラーになります。</p>
+<p>パースエラーとなり、出現した要素はhead要素の末尾に挿入します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>MultipleHtmlElementError</id>
+	<level>ParseError</level>
+	<message>html要素が複数あります。</message>
+	<description>
+<p>html要素が既にあるにもかかわらず、あらたにhtml要素の開始タグが出現するとこのエラーになります。</p>
+<p>一つのHTML文書に存在して良いhtml要素は一つだけです。html要素を複数書くことはできません。</p>
+<p>また、html要素の開始タグより前に何らかの要素がある場合にもこのエラーになります。html要素の開始タグは省略可能なため、html開始タグより前に要素があると補われて解釈されます。</p>
+<p>パースエラーとなりますが、このhtml開始タグは無視せず、指定されている属性を読み取って既存のhtml要素に補うという動作をします。なお、既に同じ名前の属性があった場合は上書きせず、既存の属性が有効になります。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>MultipleHeadElementError</id>
+	<level>ParseError</level>
+	<message>head要素が複数あります。</message>
+	<description>
+<p>head要素が既にあるにもかかわらず、あらたにhead要素の開始タグが出現するとこのエラーになります。</p>
+<p>一つのHTML文書に存在して良いhead要素は一つだけです。head要素を複数書くことはできません。</p>
+<p>また、head要素の開始タグより前に何らかの要素がある場合にもこのエラーになります。head要素の開始タグは省略可能なため、head開始タグより前に要素があると補われて解釈されます。</p>
+<p>パースエラーとなり、このhead開始タグは無視します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>MultipleBodyElementError</id>
+	<level>ParseError</level>
+	<message>body要素が複数あります。</message>
+	<description>
+<p>body要素が既にあるにもかかわらず、あらたにbody要素の開始タグが出現するとこのエラーになります。</p>
+<p>一つのHTML文書に存在して良いbody要素は一つだけです。body要素を複数書くことはできません。</p>
+<p>また、body要素の開始タグより前に何らかの要素がある場合にもこのエラーになります。body要素の開始タグは省略可能なため、body開始タグより前に要素があると補われて解釈されます。</p>
+<p>パースエラーとなりますが、このbody開始タグは無視せず、指定されている属性を読み取って既存のbody要素に補うという動作をします。なお、既に同じ名前の属性があった場合は上書きせず、既存の属性が有効になります。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>UnexpectedFramesetElementError</id>
+	<level>ParseError</level>
+	<message>body要素とframeset要素を併用することはできません。</message>
+	<description>
+<p>body要素が既にあるにもかかわらず、frameset要素の開始タグが出現するとこのエラーになります。</p>
+<p>一つのHTML文書にbody要素とframeset要素を混在させることはできません。</p>
+<p>また、frameset要素の開始タグより前に何らかの要素がある場合にもこのエラーになります。body要素の開始タグは省略可能なため、frameset開始タグより前に要素があるとbody要素が補われて解釈されます。</p>
+<p>パースエラーになります。frameset要素が使えない状況 (frameset-ok flagが"not ok") なら単にこのタグを無視します。frameset要素が使える状況であれば、body要素の方を削除して、frameset要素をノードに挿入します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>UnexpectedEndTagError</id>
+	<level>ParseError</level>
+	<message>予期しない{0}要素の終了タグがあります。</message>
+	<params>トークン名</params>
+	<description>
+<p>予期しない要素の終了タグが現れるとこのエラーになります。</p>
+<p>このエラーは、単に対応する開始タグがないケースではなく、対応する開始タグを補うこともできないようなケースです。</p>
+<p>パースエラーとなり、このタグは無視します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>LonlyEndTagError</id>
+	<level>ParseError</level>
+	<message>{0}要素の終了タグがありますが、対応する開始タグがありません。</message>
+	<params>トークン名</params>
+	<description>
+<p>終了タグに対応する開始タグがない場合にこのエラーになります。</p>
+<p>多くは、単に対応する開始タグがない、もしくは終了タグのスペルミスをしているケースです。</p>
+<p>パースエラーとなり、このタグは無視します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>SarcasmEndTagInformation</id>
+	<level>Information</level>
+	<message>sarcasm要素の終了タグが出現しました。</message>
+	<description>
+<p>sarcasm要素の終了タグが出現しました。</p>
+<p>HTML5 の 8.2.5.4.7 The "in body" insertion mode によると、このときパーサーは以下のように動作する必要があります。</p>
+<bq>
+An end tag whose tag name is "sarcasm"
+Take a deep breath, then act as described in the "any other end tag" entry below.
+</bq>
+<p>Redfaceは、この "Take a deep breath" を具体的には実装していません。かわりにこのメッセージを出して、利用者が個々に処理できるようにしています。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>NestedHeadingElementError</id>
+	<level>ParseError</level>
+	<message>{0}見出しに{1}見出しを入れ子にすることはできません。</message>
+	<params>要素名,要素名</params>
+	<description>
+<p>h1～h6要素の終了タグがなく、h1～h6要素の開始タグが現れるとこのエラーになります。</p>
+<p>パースエラーとなりますが、終了タグを補って処理します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>NestedFormElementError</id>
+	<level>ParseError</level>
+	<message>form要素を入れ子にすることはできません。</message>
+	<description>
+<p>form要素の終了タグがなく、form要素の開始タグが現れるとこのエラーになります。</p>
+<p>パースエラーとなり、後に出現した開始タグを無視します。</p>
 	</description>
 </item>
 

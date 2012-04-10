@@ -8,7 +8,7 @@ namespace Bakera.RedFace{
 
 		public override void AppendCharacterToken(TreeConstruction tree, CharacterToken token){
 			if(token.IsNULL){
-				OnParseErrorRaised(string.Format("NUL文字が出現しました。"));
+				OnMessageRaised(new NullInDataError());
 				return;
 			}
 			tree.AppendPendingTableCharacterToken(token);

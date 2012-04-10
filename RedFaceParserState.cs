@@ -24,11 +24,6 @@ namespace Bakera.RedFace{
 			OnParserEventRaised(args);
 		}
 
-		// DeepBreathイベントを発生します。
-		protected virtual void OnDeepBreath(){
-			OnParserEventRaised(new ParserEventArgs(EventLevel.Warning));
-		}
-
 		// InformationRaisedイベントを発生します。
 		protected virtual void OnInformationRaised(string s){
 			OnParserEventRaised(new ParserEventArgs(EventLevel.Information){Message = s});

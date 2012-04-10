@@ -46,7 +46,7 @@ namespace Bakera.RedFace{
 			case "tfoot":
 			case "thead":
 				if(!tree.StackOfOpenElements.HaveElementInTableScope(token.Name)){
-					OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+					OnMessageRaised(new LonlyEndTagError(token.Name));
 					return;
 				}
 				AppendEndTagToken(tree, new FakeEndTagToken(){Name = "tr"});
@@ -60,7 +60,7 @@ namespace Bakera.RedFace{
 			case "html":
 			case "td":
 			case "th":
-				OnParseErrorRaised(string.Format("終了タグが出現しましたが、対応する開始タグがありません。: {0}", token.Name));
+				OnMessageRaised(new LonlyEndTagError(token.Name));
 				return;
 			}
 			AppendAnythingElse(tree, token);
