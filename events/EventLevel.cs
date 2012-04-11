@@ -10,7 +10,7 @@ namespace Bakera.RedFace{
 		Alert,            // 警告。仕様に反しないが、望ましくないと仕様に明記してあるもの
 		ConformanceError, // 文法エラー。ParseError ではないが、仕様に反するもの
 		ParseError,       // パースエラー。ParseError と仕様に明記してあるもの
-		SystemError,      // システムエラー。システム実装の都合で処理できないもの。
+		SystemFailure,    // システムエラー。システム実装の都合で処理できないもの。
 		Exception,        // 例外。意図しないエラー (データが読めなかった、プログラムの不具合、など)。
 	}
 }

@@ -7,7 +7,7 @@ namespace Bakera.RedFace{
 
 		public override void AppendCharacterToken(TreeConstruction tree, CharacterToken token){
 			if(token.IsNULL){
-				OnParseErrorRaised(string.Format("NUL文字が出現しました。"));
+				OnMessageRaised(new NullInDataError());
 				tree.InsertCharacter(Chars.REPLACEMENT_CHARACTER);
 				return;
 			}
@@ -149,7 +149,7 @@ namespace Bakera.RedFace{
 
 
 		private void AppendHtmlFormatStartTags(TreeConstruction tree, Token token){
-			OnParseErrorRaised(string.Format("{0}要素の開始タグが出現しましたが、この文脈でこの要素が出現することはできません。", token.Name));
+			OnMessageRaised(new ElementContextError(token.Name));
 			tree.PopFromStack();
 			XmlElement currentNode = tree.CurrentNode as XmlElement;
 			while(currentNode != null){

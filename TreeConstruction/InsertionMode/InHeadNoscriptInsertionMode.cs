@@ -32,7 +32,7 @@ namespace Bakera.RedFace{
 				return;
 			}
 			if(token.IsStartTag("head", "noscript")){
-				OnParseErrorRaised(string.Format("開始タグが重複しています。: {0}", token.Name));
+				OnMessageRaised(new UnexpectedStartTagInHeadNoscriptError(token.Name));
 				return;
 			}
 			AppendAnythingElse(tree, token);

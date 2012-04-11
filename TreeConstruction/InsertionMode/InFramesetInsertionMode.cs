@@ -72,7 +72,7 @@ namespace Bakera.RedFace{
 
 
 		public override void AppendAnythingElse(TreeConstruction tree, Token token){
-			OnParseErrorRaised(string.Format("framesetの内部に不明なトークンがあります。: {0}", token.Name));
+			OnMessageRaised(new UnexpectedTokenInFramesetError(token.Name));
 			return;
 		}
 	}

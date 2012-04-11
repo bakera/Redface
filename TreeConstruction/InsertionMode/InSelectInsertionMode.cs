@@ -53,7 +53,7 @@ namespace Bakera.RedFace{
 
 			case "select":
 				if(!tree.StackOfOpenElements.HaveElementInSelectScope(token.Name)){
-					OnParseErrorRaised(string.Format("select要素内にselect要素の開始タグが出現しました。"));
+					OnMessageRaised(new NestedSelectElementError());
 					AppendEndTagToken(tree, new FakeEndTagToken(){Name = "select"});
 					return;
 				}

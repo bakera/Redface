@@ -773,6 +773,43 @@ Not a character reference. No characters are consumed, and nothing is returned. 
 
 
 <item>
+	<id>MissingEndTagError</id>
+	<level>ParseError</level>
+	<message>{0}要素の終了タグがありません。</message>
+	<params>要素名</params>
+	<description>
+<p>終了タグを省略できない要素の終了タグが不足している場合にこのエラーになります。</p>
+<p>おかしな場所に &lt;/body> を書いた場合もこのエラーになる場合があります。</p>
+<p>パースエラーとなり、終了タグを補って処理します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>BrEndTagError</id>
+	<level>ParseError</level>
+	<message>br要素の終了タグを書くことはできません。</message>
+	<description>
+<p>br要素の終了タグが出現するとこのエラーになります。</p>
+<p>br要素の終了タグを書くことはできません。</p>
+<p>パースエラーとなり、br要素の開始タグがあるものとして処理します。つまり、&lt;br&gt;&lt;/br&gt;と書いてあるとbr要素が2つあるものとみなされます。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>ColEndTagError</id>
+	<level>ParseError</level>
+	<message>col要素の終了タグを書くことはできません。</message>
+	<description>
+<p>col要素の終了タグが出現するとこのエラーになります。</p>
+<p>col要素の終了タグを書くことはできません。</p>
+<p>パースエラーとなり、終了タグを無視します。</p>
+	</description>
+</item>
+
+
+<item>
 	<id>SarcasmEndTagInformation</id>
 	<level>Information</level>
 	<message>sarcasm要素の終了タグが出現しました。</message>
@@ -791,7 +828,7 @@ Take a deep breath, then act as described in the "any other end tag" entry below
 <item>
 	<id>NestedHeadingElementError</id>
 	<level>ParseError</level>
-	<message>{0}見出しに{1}見出しを入れ子にすることはできません。</message>
+	<message>{0}見出しの中に{1}の開始タグが出現しました。見出しを入れ子にすることはできません。</message>
 	<params>要素名,要素名</params>
 	<description>
 <p>h1～h6要素の終了タグがなく、h1～h6要素の開始タグが現れるとこのエラーになります。</p>
@@ -806,9 +843,216 @@ Take a deep breath, then act as described in the "any other end tag" entry below
 	<message>form要素を入れ子にすることはできません。</message>
 	<description>
 <p>form要素の終了タグがなく、form要素の開始タグが現れるとこのエラーになります。</p>
+<p>form要素を入れ子にすることはできません。</p>
 <p>パースエラーとなり、後に出現した開始タグを無視します。</p>
 	</description>
 </item>
+
+
+<item>
+	<id>NestedButtonElementError</id>
+	<level>ParseError</level>
+	<message>button要素を入れ子にすることはできません。</message>
+	<description>
+<p>button要素の終了タグがなく、button要素の開始タグが現れるとこのエラーになります。</p>
+<p>form要素を入れ子にすることはできません。</p>
+<p>パースエラーとなり、終了タグを補って処理します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>NestedAnchorElementError</id>
+	<level>ParseError</level>
+	<message>a要素を入れ子にすることはできません。</message>
+	<description>
+<p>a要素の終了タグがなく、a要素の開始タグが現れるとこのエラーになります。</p>
+<p>a要素を入れ子にすることはできません。</p>
+<p>パースエラーとなり、終了タグを補って処理します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>NestedNobrElementError</id>
+	<level>ParseError</level>
+	<message>nobr要素を入れ子にすることはできません。</message>
+	<description>
+<p>nobr要素の終了タグがなく、nobr要素の開始タグが現れるとこのエラーになります。</p>
+<p>nobr要素を入れ子にすることはできません。</p>
+<p>パースエラーとなり、終了タグを補って処理します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>NestedSelectElementError</id>
+	<level>ParseError</level>
+	<message>select要素を入れ子にすることはできません。</message>
+	<description>
+<p>select要素の終了タグがなく、select要素の開始タグが現れるとこのエラーになります。</p>
+<p>select要素を入れ子にすることはできません。</p>
+<p>パースエラーとなり、終了タグを補って処理します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>NestedSelectElementError</id>
+	<level>ParseError</level>
+	<message>select要素を入れ子にすることはできません。</message>
+	<description>
+<p>select要素の終了タグがなく、select要素の開始タグが現れるとこのエラーになります。</p>
+<p>select要素を入れ子にすることはできません。</p>
+<p>パースエラーとなり、終了タグを補って処理します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>ImageElementError</id>
+	<level>ParseError</level>
+	<message>HTML5ではimage要素を使用することはできません。</message>
+	<description>
+<p>image要素の開始タグが現れるとこのエラーになります。</p>
+<p>HTML5ではimage要素を使用することはできません。</p>
+<p>パースエラーとなり、img要素とみなして処理します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>IsindexElementError</id>
+	<level>ParseError</level>
+	<message>HTML5ではisindex要素を使用することはできません。</message>
+	<description>
+<p>isindex要素の開始タグが現れるとこのエラーになります。</p>
+<p>HTML5ではisindex要素を使用することはできません。</p>
+<p>パースエラーとなり、isindexと同等の機能を持ったform要素を挿入します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>DirectParentRequiredError</id>
+	<level>ParseError</level>
+	<message>{0}要素は{1}要素の直接の子要素でなければなりませんが、{2}要素の子要素になっています。</message>
+	<params>要素名,要素名,要素名</params>
+	<description>
+<p>特定の要素の直接の子要素でなければならない要素が、直接の子要素になっていない場合にこのエラーになります。たとえば、rt要素はruby要素の子要素でなければなりませんが、rubyとrtの間に別の要素が入っているとこのエラーになります。</p>
+<p>パースエラーとなり、親要素の終了タグを補って処理します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>ElementContextError</id>
+	<level>ParseError</level>
+	<message>{0}要素をこの文脈で使用することはできません。</message>
+	<params>要素名</params>
+	<description>
+<p>特定の文脈でなければ使用できない要素がありますが、その文脈の外でその要素の開始タグが出現するとこのエラーになります。</p>
+<p>たとえば、caption要素はtable要素の中でしか使えないため、tableの外で使おうとするとこのエラーになります。</p>
+<p>パースエラーとなり、開始タグを単純に無視します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>UnexpectedTokenInFramesetError</id>
+	<level>ParseError</level>
+	<message>frameset要素内に予期しないトークンが出現しました。</message>
+	<params>トークン名</params>
+	<description>
+<p>frameset要素の中では、frame要素の開始タグやコメントなど、いくつかの決まったトークンしか書くことができません。予期しないトークンが出現するとこのエラーになります。</p>
+<p>パースエラーとなり、単純にそのトークンを無視します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>UnexpectedStartTagInHeadNoscriptError</id>
+	<level>ParseError</level>
+	<message>{0}要素をhead内のnoscript要素内で使用することはできません。</message>
+	<params>要素名</params>
+	<description>
+<p>head内のnoscript要素内では、head要素やnoscript要素は使用できません。それらが出現するとこのエラーになります。</p>
+<p>パースエラーとなり、単純に無視します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>UnexpectedStartTagInCaptionError</id>
+	<level>ParseError</level>
+	<message>caption要素終了タグがなく、{0}要素が現れました。</message>
+	<params>要素名</params>
+	<description>
+<p>caption要素内にtable関連要素の開始タグがある場合にこのエラーになります。</p>
+<p>caption要素の終了タグを忘れている場合もこのエラーになります。</p>
+<p>パースエラーとなり、caption要素の終了タグを補って処理します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>NamelessDoctypeFailure</id>
+	<level>SystemFailure</level>
+	<message>名前のない文書型宣言を扱うことはできません。</message>
+	<description>
+<p>文書型宣言にルート要素名が指定されていない場合にこのエラーになります。Redfaceは名前のない文書型宣言を扱うことができません。これはHTML5のエラーではなく、Redfaceのシステム都合のエラーです。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>NoDoctypeError</id>
+	<level>ParseError</level>
+	<message>文書型宣言がありません。</message>
+	<description>
+<p>文書型宣言がない場合にこのエラーになります。</p>
+<p>文書型宣言よりも前にコメント以外の余計な何かがある場合にもこのエラーになる場合があります。</p>
+<p>パースエラーとなり、ドキュメントモードを Quirks に変更します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>UnknownDoctypeError</id>
+	<level>ParseError</level>
+	<message>未知の文書型宣言が指定されています。</message>
+	<description>
+<p>HTML5の仕様で規定されていない、未知の文書型宣言が指定されているとこのエラーになります。</p>
+<p>パースエラーになりますが、Quirksモードになったりはしません。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>QuirksDoctypeError</id>
+	<level>ParseError</level>
+	<message>Quirksモードとなる文書型宣言が指定されています。</message>
+	<description>
+<p>HTML5の仕様で規定されている過去の文書型宣言のうち、Quirksモードとなるような文書型宣言が指定されているとこのエラーになります。</p>
+<p>たとえば、HTML3.2やHTML4.0 Transitional (4.01ではありません) の文書型宣言があるとこのエラーとなります。</p>
+<p>パースエラーとなり、ドキュメントモードをQuirksに変更します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>LimitedQuirksDoctypeError</id>
+	<level>ParseError</level>
+	<message>Limited Quirksモードとなる文書型宣言が指定されています。</message>
+	<description>
+<p>HTML5の仕様で規定されている過去の文書型宣言のうち、Limited Quirksモードとなるような文書型宣言が指定されているとこのエラーになります。</p>
+<p>たとえば、XHTML1.0 Transitionalや、システム識別子がないHTML4.01 Transitionalの文書型宣言があるとこのエラーとなります。</p>
+<p>パースエラーとなり、ドキュメントモードをLimited Quirksに変更します。</p>
+	</description>
+</item>
+
+
+
 
 
 </messages>

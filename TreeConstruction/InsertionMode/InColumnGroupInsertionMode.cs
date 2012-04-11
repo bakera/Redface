@@ -44,7 +44,7 @@ namespace Bakera.RedFace{
 				tree.ChangeInsertionMode<InTableInsertionMode>();
 				return;
 			case "col":
-				OnParseErrorRaised(string.Format("col要素の終了タグが出現しました。"));
+				OnMessageRaised(new ColEndTagError());
 				return;
 			}
 			AppendAnythingElse(tree, token);

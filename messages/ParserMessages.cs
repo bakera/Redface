@@ -340,6 +340,22 @@ public override EventLevel Level{get{return EventLevel.ParseError;}}
 public override string MessageTemplate{get{return "{0}要素の終了タグがありますが、対応する開始タグがありません。";}}
 } // LonlyEndTagError
 
+public class MissingEndTagError : ParserMessage{
+public MissingEndTagError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "{0}要素の終了タグがありません。";}}
+} // MissingEndTagError
+
+public class BrEndTagError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "br要素の終了タグを書くことはできません。";}}
+} // BrEndTagError
+
+public class ColEndTagError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "col要素の終了タグを書くことはできません。";}}
+} // ColEndTagError
+
 public class SarcasmEndTagInformation : ParserMessage{
 public override EventLevel Level{get{return EventLevel.Information;}}
 public override string MessageTemplate{get{return "sarcasm要素の終了タグが出現しました。";}}
@@ -348,13 +364,93 @@ public override string MessageTemplate{get{return "sarcasm要素の終了タグが出現し
 public class NestedHeadingElementError : ParserMessage{
 public NestedHeadingElementError(params Object[] o){this.Params = o;}
 public override EventLevel Level{get{return EventLevel.ParseError;}}
-public override string MessageTemplate{get{return "{0}見出しに{1}見出しを入れ子にすることはできません。";}}
+public override string MessageTemplate{get{return "{0}見出しの中に{1}の開始タグが出現しました。見出しを入れ子にすることはできません。";}}
 } // NestedHeadingElementError
 
 public class NestedFormElementError : ParserMessage{
 public override EventLevel Level{get{return EventLevel.ParseError;}}
 public override string MessageTemplate{get{return "form要素を入れ子にすることはできません。";}}
 } // NestedFormElementError
+
+public class NestedButtonElementError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "button要素を入れ子にすることはできません。";}}
+} // NestedButtonElementError
+
+public class NestedAnchorElementError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "a要素を入れ子にすることはできません。";}}
+} // NestedAnchorElementError
+
+public class NestedNobrElementError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "nobr要素を入れ子にすることはできません。";}}
+} // NestedNobrElementError
+
+public class ImageElementError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "HTML5ではimage要素を使用することはできません。";}}
+} // ImageElementError
+
+public class IsindexElementError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "HTML5ではisindex要素を使用することはできません。";}}
+} // IsindexElementError
+
+public class DirectParentRequiredError : ParserMessage{
+public DirectParentRequiredError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "{0}要素は{1}要素の直接の子要素でなければなりませんが、{2}要素の子要素になっています。";}}
+} // DirectParentRequiredError
+
+public class ElementContextError : ParserMessage{
+public ElementContextError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "{0}要素をこの文脈で使用することはできません。";}}
+} // ElementContextError
+
+public class UnexpectedTokenInFramesetError : ParserMessage{
+public UnexpectedTokenInFramesetError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "frameset要素内に予期しないトークンが出現しました。";}}
+} // UnexpectedTokenInFramesetError
+
+public class UnexpectedStartTagInHeadNoscriptError : ParserMessage{
+public UnexpectedStartTagInHeadNoscriptError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "{0}要素をhead内のnoscript要素内で使用することはできません。";}}
+} // UnexpectedStartTagInHeadNoscriptError
+
+public class UnexpectedStartTagInCaptionError : ParserMessage{
+public UnexpectedStartTagInCaptionError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "caption要素終了タグがなく、{0}要素が現れました。";}}
+} // UnexpectedStartTagInCaptionError
+
+public class NamelessDoctypeFailure : ParserMessage{
+public override EventLevel Level{get{return EventLevel.SystemFailure;}}
+public override string MessageTemplate{get{return "名前のない文書型宣言を扱うことはできません。";}}
+} // NamelessDoctypeFailure
+
+public class NoDoctypeError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "文書型宣言がありません。";}}
+} // NoDoctypeError
+
+public class UnknownDoctypeError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "未知の文書型宣言が指定されています。";}}
+} // UnknownDoctypeError
+
+public class QuirksDoctypeError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "Quirksモードとなる文書型宣言が指定されています。";}}
+} // QuirksDoctypeError
+
+public class LimitedQuirksDoctypeError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "Limited Quirksモードとなる文書型宣言が指定されています。";}}
+} // LimitedQuirksDoctypeError
 
 } // namespace
 

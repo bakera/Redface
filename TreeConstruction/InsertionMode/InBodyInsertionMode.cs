@@ -175,7 +175,7 @@ namespace Bakera.RedFace{
 
 			if(token.IsStartTag("button")){
 				if(tree.StackOfOpenElements.HaveElementInScope("button")){
-					OnParseErrorRaised(string.Format("button要素の終了タグが不足しています。"));
+					OnMessageRaised(new NestedButtonElementError());
 					EndTagHadBeSeen(tree, "button");
 					tree.ReprocessFlag = true;
 					return;
@@ -192,7 +192,7 @@ namespace Bakera.RedFace{
 				int index = list.GetAfterMarkerIndexByName("a");
 				if(index >=0){
 					XmlElement aElement = list.GetAfterMarkerByAfterIndex(index);
-					OnParseErrorRaised(string.Format("a要素の中に他のa要素を入れ子にすることはできません。"));
+					OnMessageRaised(new NestedAnchorElementError());
 					EndTagHadBeSeen(tree, "a");
 					stack.Remove(aElement);
 					list.Remove(aElement);
@@ -213,7 +213,7 @@ namespace Bakera.RedFace{
 			if(token.IsStartTag("nobr")){
 				Reconstruct(tree, token);
 				if(!tree.StackOfOpenElements.HaveElementInScope(token.Name)){
-					OnParseErrorRaised(string.Format("nobr開始タグが出現しましたが、以前のnobrが終了していません。"));
+					OnMessageRaised(new NestedNobrElementError());
 					FormatEndTagHadBeSeen(tree, token, "nobr");
 					Reconstruct(tree, token);
 					return;
@@ -279,14 +279,14 @@ namespace Bakera.RedFace{
 			}
 
 			if(token.IsStartTag("image")){
-				OnParseErrorRaised("HTML5ではimage要素を使用することはできません。img要素に置き換えます。");
+				OnMessageRaised(new ImageElementError());
 				token.Name = "img";
 				tree.ReprocessFlag = true;
 				return;
 			}
 
 			if(token.IsStartTag("isindex")){
-				OnParseErrorRaised("HTML5ではisindex要素を使用することはできません。");
+				OnMessageRaised(new IsindexElementError());
 				XmlElement node = tree.FormElementPointer;
 				if(node != null) return;
 				tree.AcknowledgeSelfClosingFlag(token);
@@ -372,7 +372,7 @@ namespace Bakera.RedFace{
 				if(tree.StackOfOpenElements.HaveElementInScope("ruby")){
 					GenerateImpliedEndTags(tree, token);
 					if(!tree.StackOfOpenElements.IsCurrentNameMatch("ruby")){
-						OnParseErrorRaised(string.Format("{0}要素が出現しましたが、親要素がruby要素ではありません。: {1}", token.Name, tree.CurrentNode.Name));
+						OnMessageRaised(new DirectParentRequiredError(token.Name, "ruby", tree.CurrentNode.Name));
 						tree.StackOfOpenElements.PopUntilSameTagName("ruby");
 					}
 				}
@@ -407,7 +407,7 @@ namespace Bakera.RedFace{
 			}
 
 			if(token.IsStartTag("caption", "col", "colgroup", "frame", "head", "tbody", "td", "tfoot", "th", "thead", "tr")){
-				OnParseErrorRaised(string.Format("{0}要素の開始タグが出現しましたが、この文脈でこの要素が出現することはできません。", token.Name));
+				OnMessageRaised(new ElementContextError(token.Name));
 				return;
 			}
 
@@ -428,7 +428,7 @@ namespace Bakera.RedFace{
 				}
 				string invalidOpenTag = tree.StackOfOpenElements.NotEither(myBodyEndTagPermitOpenTags);
 				if(invalidOpenTag != null){
-					OnParseErrorRaised(string.Format("{0}の終了タグが不足しています。", invalidOpenTag));
+					OnMessageRaised(new MissingEndTagError(invalidOpenTag));
 				}
 				tree.ChangeInsertionMode<AfterBodyInsertionMode>();
 				return;
@@ -539,7 +539,7 @@ namespace Bakera.RedFace{
 			}
 
 			if(token.IsEndTag("br")){
-				OnParseErrorRaised(string.Format("br要素の終了タグが出現しました。"));
+				OnMessageRaised(new BrEndTagError());
 				StartTagHadBeSeen(tree, "br");
 				return;
 			}

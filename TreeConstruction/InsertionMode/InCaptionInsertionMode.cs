@@ -16,7 +16,7 @@ namespace Bakera.RedFace{
 			case "th":
 			case "thead":
 			case "tr":
-				OnParseErrorRaised(string.Format("caption要素の中に出現できない要素です。: {0}", token.Name));
+				OnMessageRaised(new UnexpectedStartTagInCaptionError(token.Name));
 				AppendEndTagToken(tree, new FakeEndTagToken(){Name = "caption"});
 				tree.ReprocessFlag = true;
 				return;
