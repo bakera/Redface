@@ -62,7 +62,7 @@ namespace Bakera.RedFace{
 			case "input":
 			case "keygen":
 			case "textarea":
-				OnParseErrorRaised(string.Format("select要素内に出現できない要素です。: {0}", token.Name));
+				OnMessageRaised(new UnexpectedStartTagInSelectError(token.Name));
 				AppendEndTagToken(tree, new FakeEndTagToken(){Name = "select"});
 				tree.ReprocessFlag = true;
 				return;
@@ -113,7 +113,7 @@ namespace Bakera.RedFace{
 
 
 		public override void AppendAnythingElse(TreeConstruction tree, Token token){
-			OnParseErrorRaised(string.Format("select要素内に出現できないトークンです。: {0}", token.Name));
+			OnMessageRaised(new UnexpectedTokenInSelectError(token.Name));
 			return;
 		}
 

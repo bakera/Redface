@@ -15,7 +15,7 @@ namespace Bakera.RedFace{
 			case "tr":
 			case "td":
 			case "th":
-				OnParseErrorRaised(string.Format("select要素の中に出現できない要素です。: {0}", token.Name));
+				OnMessageRaised(new UnexpectedStartTagInSelectInTableError(token.Name));
 				AppendEndTagToken(tree, new FakeEndTagToken(){Name = "select"});
 				tree.ReprocessFlag = true;
 				return;
@@ -33,7 +33,7 @@ namespace Bakera.RedFace{
 			case "tr":
 			case "td":
 			case "th":
-				OnParseErrorRaised(string.Format("select要素の中に出現できない終了タグです。: {0}", token.Name));
+				OnMessageRaised(new UnexpectedEndTagInSelectInTableError(token.Name));
 				if(tree.StackOfOpenElements.HaveElementInTableScope(token.Name)){
 					AppendEndTagToken(tree, new FakeEndTagToken(){Name = "select"});
 					tree.ReprocessFlag = true;

@@ -387,6 +387,35 @@ public override EventLevel Level{get{return EventLevel.ParseError;}}
 public override string MessageTemplate{get{return "nobr要素を入れ子にすることはできません。";}}
 } // NestedNobrElementError
 
+public class NestedSelectElementError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "select要素を入れ子にすることはできません。";}}
+} // NestedSelectElementError
+
+public class UnexpectedStartTagInSelectError : ParserMessage{
+public UnexpectedStartTagInSelectError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "select要素の終了タグがなく、{0}要素が出現しました。";}}
+} // UnexpectedStartTagInSelectError
+
+public class UnexpectedStartTagInSelectInTableError : ParserMessage{
+public UnexpectedStartTagInSelectInTableError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "table要素内のselect要素の終了タグがなく、{0}要素が出現しました。";}}
+} // UnexpectedStartTagInSelectInTableError
+
+public class UnexpectedEndTagInSelectInTableError : ParserMessage{
+public UnexpectedEndTagInSelectInTableError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "table要素内のselect要素の終了タグがなく、{0}要素の終了タグが出現しました。";}}
+} // UnexpectedEndTagInSelectInTableError
+
+public class UnexpectedTokenInSelectError : ParserMessage{
+public UnexpectedTokenInSelectError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "select要素の中に予期しないトークン {0} があります。";}}
+} // UnexpectedTokenInSelectError
+
 public class ImageElementError : ParserMessage{
 public override EventLevel Level{get{return EventLevel.ParseError;}}
 public override string MessageTemplate{get{return "HTML5ではimage要素を使用することはできません。";}}

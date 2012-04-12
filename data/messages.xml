@@ -892,21 +892,60 @@ Take a deep breath, then act as described in the "any other end tag" entry below
 	<description>
 <p>select要素の終了タグがなく、select要素の開始タグが現れるとこのエラーになります。</p>
 <p>select要素を入れ子にすることはできません。</p>
-<p>パースエラーとなり、終了タグを補って処理します。</p>
+<p>パースエラーとなり、select要素の終了タグを補って処理します。</p>
 	</description>
 </item>
 
 
 <item>
-	<id>NestedSelectElementError</id>
+	<id>UnexpectedStartTagInSelectError</id>
 	<level>ParseError</level>
-	<message>select要素を入れ子にすることはできません。</message>
+	<message>select要素の終了タグがなく、{0}要素が出現しました。</message>
+	<params>要素名</params>
 	<description>
-<p>select要素の終了タグがなく、select要素の開始タグが現れるとこのエラーになります。</p>
-<p>select要素を入れ子にすることはできません。</p>
-<p>パースエラーとなり、終了タグを補って処理します。</p>
+<p>select要素の中で、使用できない要素の開始タグが現れ、かつselect要素の終了タグが補われる状況のときにこのエラーになります。</p>
+<p>input要素、textarea要素、keygen要素をselect要素の中に入れようとしたときにこのエラーになります。</p>
+<p>パースエラーとなり、select要素の終了タグを補って処理します。</p>
 	</description>
 </item>
+
+
+<item>
+	<id>UnexpectedStartTagInSelectInTableError</id>
+	<level>ParseError</level>
+	<message>table要素内のselect要素の終了タグがなく、{0}要素が出現しました。</message>
+	<params>要素名</params>
+	<description>
+<p>table要素の中のselect要素の中でtable関連要素の開始タグが現れたときにこのエラーになります。</p>
+<p>パースエラーとなり、select要素の終了タグを補って処理します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>UnexpectedEndTagInSelectInTableError</id>
+	<level>ParseError</level>
+	<message>table要素内のselect要素の終了タグがなく、{0}要素の終了タグが出現しました。</message>
+	<params>要素名</params>
+	<description>
+<p>table要素の中のselect要素の中でtable関連要素の終了タグが現れたときにこのエラーになります。</p>
+<p>パースエラーとなり、対応する開始タグがある場合はselect要素の終了タグを補う処理をします。対応する開始タグがない場合は、この終了タグを無視します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>UnexpectedTokenInSelectError</id>
+	<level>ParseError</level>
+	<message>select要素の中に予期しないトークン {0} があります。</message>
+	<params>トークン名</params>
+	<description>
+<p>select要素の中で使用できないトークンが現れるとこのエラーになります。</p>
+<p>パースエラーとなり、このトークンを無視します。</p>
+<p>なお、トークンがinput要素やtable要素などの開始タグだった場合には別のエラー UnexpectedStartTagInSelectError となり、select要素の終了タグを補う処理が行われます。</p>
+	</description>
+</item>
+
 
 
 <item>
