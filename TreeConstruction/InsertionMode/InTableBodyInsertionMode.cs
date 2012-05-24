@@ -15,7 +15,7 @@ namespace Bakera.RedFace{
 				return;
 			case "th":
 			case "td":
-				OnParseErrorRaised(string.Format("tbody要素直下に{0}要素の開始タグが出現しました。", token.Name));
+				OnMessageRaised(new CellWithoutTableRowError(token.Name));
 				AppendStartTagToken(tree, new FakeStartTagToken(){Name = "tr"});
 				tree.ReprocessFlag = true;
 				return;

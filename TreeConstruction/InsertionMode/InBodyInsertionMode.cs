@@ -619,18 +619,18 @@ namespace Bakera.RedFace{
 				XmlElement formattingElement = list.GetAfterMarkerByAfterIndex(formattingElementItemIndex);
 
 				if(!stack.IsInclude(formattingElement)){
-					OnParseErrorRaised(string.Format("終了タグが出現しました。対応する要素はListOfActiveFormatElementsに含まれていますが、StackOfOpenElementsに含まれていません。: {0}", token.Name));
+					OnMessageRaised(new DisproportionalFormatEndTagError(token.Name));
 					list.RemoveAfterMarkerByAfterIndex(formattingElementItemIndex);
 					return;
 				}
 
 				if(!stack.HaveElementInScope(formattingElement.Name)){
-					OnParseErrorRaised(string.Format("終了タグが出現しました。対応する要素はListOfActiveFormatElementsに含まれていますが、StackOfOpenElementsのscope内に含まれていません。: {0}", token.Name));
+					OnMessageRaised(new DisproportionalFormatEndTagError(token.Name));
 					return;
 				}
 
 				if(tree.CurrentNode != formattingElement){
-					OnParseErrorRaised(string.Format("終了タグが出現しました。対応する要素はListOfActiveFormatElementsに含まれており、StackOfOpenElementsのscope内にありますが、CurrentNodeではありません。: {0}", token.Name));
+					OnMessageRaised(new DisproportionalFormatEndTagError(token.Name));
 					// エラーだが処理は続行
 				}
 

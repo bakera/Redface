@@ -935,6 +935,30 @@ Take a deep breath, then act as described in the "any other end tag" entry below
 
 
 <item>
+	<id>DisproportionalFormatEndTagError</id>
+	<level>ParseError</level>
+	<message>{0}要素が正しい入れ子になっていません。</message>
+	<params>要素名</params>
+	<description>
+<p>b要素、i要素などのフォーマット系要素が正しく入れ子になっていない場合のエラーです。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>CellWithoutTableRowError</id>
+	<level>ParseError</level>
+	<message>{0}要素の親となるtr要素がありません。</message>
+	<params>要素名</params>
+	<description>
+<p>tbody要素の中にth要素やtd要素が直接現れた場合、このエラーになります。</p>
+<p>th要素、td要素はtr要素の中で使用しなければなりません。</p>
+<p>パースエラーとなりますが、tr要素を補って処理を継続します。</p>
+	</description>
+</item>
+
+
+<item>
 	<id>UnexpectedTokenInSelectError</id>
 	<level>ParseError</level>
 	<message>select要素の中に予期しないトークン {0} があります。</message>
@@ -945,7 +969,6 @@ Take a deep breath, then act as described in the "any other end tag" entry below
 <p>なお、トークンがinput要素やtable要素などの開始タグだった場合には別のエラー UnexpectedStartTagInSelectError となり、select要素の終了タグを補う処理が行われます。</p>
 	</description>
 </item>
-
 
 
 <item>

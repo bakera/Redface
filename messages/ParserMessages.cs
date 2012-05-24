@@ -410,6 +410,18 @@ public override EventLevel Level{get{return EventLevel.ParseError;}}
 public override string MessageTemplate{get{return "table要素内のselect要素の終了タグがなく、{0}要素の終了タグが出現しました。";}}
 } // UnexpectedEndTagInSelectInTableError
 
+public class DisproportionalFormatEndTagError : ParserMessage{
+public DisproportionalFormatEndTagError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "{0}要素が正しい入れ子になっていません。";}}
+} // DisproportionalFormatEndTagError
+
+public class CellWithoutTableRowError : ParserMessage{
+public CellWithoutTableRowError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "{0}要素の親となるtr要素がありません。";}}
+} // CellWithoutTableRowError
+
 public class UnexpectedTokenInSelectError : ParserMessage{
 public UnexpectedTokenInSelectError(params Object[] o){this.Params = o;}
 public override EventLevel Level{get{return EventLevel.ParseError;}}
