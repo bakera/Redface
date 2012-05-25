@@ -419,8 +419,34 @@ public override string MessageTemplate{get{return "{0}要素が正しい入れ子になって
 public class CellWithoutTableRowError : ParserMessage{
 public CellWithoutTableRowError(params Object[] o){this.Params = o;}
 public override EventLevel Level{get{return EventLevel.ParseError;}}
-public override string MessageTemplate{get{return "{0}要素の親となるtr要素がありません。";}}
+public override string MessageTemplate{get{return "tbody要素の直下に{0}要素の開始タグが出現しました。";}}
 } // CellWithoutTableRowError
+
+public class DoubleTableError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "table要素直下にtable要素の開始タグが出現しました。";}}
+} // DoubleTableError
+
+public class HiddenInputInTableError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "table要素直下にinput type=\"hidden\"が出現しました。";}}
+} // HiddenInputInTableError
+
+public class FormInTableError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "table要素直下にform要素の開始タグが出現しました。";}}
+} // FormInTableError
+
+public class FosterParentedTokenError : ParserMessage{
+public FosterParentedTokenError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "table要素直下に予期しないトークン {0} があります。";}}
+} // FosterParentedTokenError
+
+public class FosterParentedTextError : ParserMessage{
+public override EventLevel Level{get{return EventLevel.ParseError;}}
+public override string MessageTemplate{get{return "table要素直下に空白類以外のテキストがあります。";}}
+} // FosterParentedTextError
 
 public class UnexpectedTokenInSelectError : ParserMessage{
 public UnexpectedTokenInSelectError(params Object[] o){this.Params = o;}

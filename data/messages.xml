@@ -948,12 +948,71 @@ Take a deep breath, then act as described in the "any other end tag" entry below
 <item>
 	<id>CellWithoutTableRowError</id>
 	<level>ParseError</level>
-	<message>{0}要素の親となるtr要素がありません。</message>
+	<message>tbody要素の直下に{0}要素の開始タグが出現しました。</message>
 	<params>要素名</params>
 	<description>
-<p>tbody要素の中にth要素やtd要素が直接現れた場合、このエラーになります。</p>
+<p>tbody要素の直下にth要素やtd要素が直接現れた場合、このエラーになります。</p>
 <p>th要素、td要素はtr要素の中で使用しなければなりません。</p>
 <p>パースエラーとなりますが、tr要素を補って処理を継続します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>DoubleTableError</id>
+	<level>ParseError</level>
+	<message>table要素直下にtable要素の開始タグが出現しました。</message>
+	<description>
+<p>table要素の直下にtable要素の開始タグが現れた場合、このエラーになります。</p>
+<p>パースエラーとなりますが、先のtable要素に終了タグを補って処理を継続します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>HiddenInputInTableError</id>
+	<level>ParseError</level>
+	<message>table要素直下にinput type=\"hidden\"が出現しました。</message>
+	<description>
+<p>table要素の直下にinput type="hidden"が現れた場合、このエラーになります。</p>
+<p>パースエラーとなりますが、そのまま処理を継続します。foster parentの処理は行われず、その場にノードが挿入されます。</p>
+<p>なお、input要素にtype属性が指定されていない場合や、type属性がhidden以外の場合は、foster parentの処理が行われます。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>FormInTableError</id>
+	<level>ParseError</level>
+	<message>table要素直下にform要素の開始タグが出現しました。</message>
+	<description>
+<p>table要素の直下にform要素が現れた場合、このエラーになります。</p>
+<p>パースエラーとなります。このtableがform要素の中に入っている場合、開始タグは単に無視されます。そうでない場合は、form要素を挿入します。このとき、foster parentの処理は行われません。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>FosterParentedTokenError</id>
+	<level>ParseError</level>
+	<message>table要素直下に予期しないトークン {0} があります。</message>
+	<params>トークン名</params>
+	<description>
+<p>table要素の直下に使用できないトークンが現れるとこのエラーになります。</p>
+<p>パースエラーとなり、foster parentの処理が行われます。すなわち、table要素の前にノードが挿入されます。</p>
+<p>table要素の直下に空白類でないテキストが出現した場合、FosterParentedTextErrorが発生します (本来は同じエラーなのですが、処理の便宜上、違うエラーになっています)。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>FosterParentedTextError</id>
+	<level>ParseError</level>
+	<message>table要素直下に空白類以外のテキストがあります。</message>
+	<description>
+<p>table要素の直下に空白類でないテキストが現れるとこのエラーになります。</p>
+<p>パースエラーとなり、foster parentの処理が行われます。すなわち、table要素の前にテキストが挿入されます。</p>
+<p>全角スペースでインデントされたソースではこのエラーが発生するので注意してください。</p>
 	</description>
 </item>
 

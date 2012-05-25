@@ -21,7 +21,8 @@ namespace Bakera.RedFace{
 				// 空白類しかない
 				Array.ForEach(tokenlist, (c)=>tree.InsertCharacter(c));
 			} else {
-				OnParseErrorRaised(string.Format("table要素の中にテキストが出現しました。" ));
+				// reprocess the character tokens in the pending table character tokens list using the rules given in the "anything else" entry in the "in table" insertion mode.
+				OnMessageRaised(new FosterParentedTextError());
 				tree.FosterParentMode = true;
 				Array.ForEach(tokenlist, (c)=>tree.AppendToken<InBodyInsertionMode>(c));
 				tree.FosterParentMode = false;

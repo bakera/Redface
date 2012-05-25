@@ -51,7 +51,7 @@ namespace Bakera.RedFace{
 				tree.ReprocessFlag = true;
 				return;
 			case "table":
-				OnParseErrorRaised(string.Format("table要素直下にtable要素の開始タグが出現しました。"));
+				OnMessageRaised(new DoubleTableError());
 				AppendEndTagToken(tree, new FakeEndTagToken(){Name = "table"});
 				// このパーサーは fragment case を実装しない
 				// then, if that token wasn't ignored, reprocess the current token.
@@ -63,12 +63,12 @@ namespace Bakera.RedFace{
 					AppendAnythingElse(tree, token);
 					return;
 				}
-				OnParseErrorRaised(string.Format("table要素直下にinput type=hidden が出現しました。"));
+				OnMessageRaised(new HiddenInputInTableError());
 				tree.InsertElementForToken(token);
 				tree.PopFromStack();
 				return;
 			case "form":
-				OnParseErrorRaised(string.Format("table要素直下にform要素の開始タグが出現しました。"));
+				OnMessageRaised(new FormInTableError());
 				if(tree.FormElementPointer != null) return;
 				XmlElement form = tree.InsertElementForToken(token);
 				tree.FormElementPointer = form;
@@ -108,14 +108,14 @@ namespace Bakera.RedFace{
 		public override void AppendEndOfFileToken(TreeConstruction tree, EndOfFileToken token){
 			// If the current node is not the root html element, then this is a parse error.
 			// Note: It can only be the current node in the fragment case.
-			OnParseErrorRaised(string.Format("table要素の中で終端に達しました。"));
+			OnMessageRaised(new SuddenlyEndAtElementError(token.Name));
 			tree.Parser.Stop();
 			return;
 		}
 
 
 		public override void AppendAnythingElse(TreeConstruction tree, Token token){
-			OnParseErrorRaised(string.Format("table要素の中で不明なトークンが出現しました。{0}", token.Name));
+			OnMessageRaised(new FosterParentedTokenError(token.Name));
 			tree.FosterParentMode = true;
 			tree.AppendToken<InBodyInsertionMode>(token);
 			tree.FosterParentMode = false;

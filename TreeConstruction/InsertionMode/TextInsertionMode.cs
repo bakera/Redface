@@ -10,7 +10,7 @@ namespace Bakera.RedFace{
 		}
 
 		public override void AppendEndOfFileToken(TreeConstruction tree, EndOfFileToken token){
-			OnParseErrorRaised(string.Format("テキスト解析の途中で終端に達しました。終了タグがありません。"));
+			OnMessageRaised(new SuddenlyEndAtElementError(tree.CurrentNode.Name));
 			// Ignore?: 
 			// If the current node is a script element, mark the script element as "already started".
 			tree.PopFromStack();

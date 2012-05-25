@@ -28,12 +28,6 @@ namespace Bakera.RedFace{
 			OnParserEventRaised(args);
 		}
 
-		// ParseErrorRaisedイベントを発生します。
-		protected virtual void OnParseErrorRaised(string message){
-			OnMessageRaised(EventLevel.ParseError, message);
-		}
-
-
 
 		// ParserMessageオブジェクトを指定して、メッセージを通知します。
 		protected virtual void OnMessageRaised(ParserMessage message){
