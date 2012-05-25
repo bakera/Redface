@@ -187,7 +187,7 @@ namespace Bakera.RedFace{
 
 			result = es.SniffEncodingFromMeta();
 			if(result != null){
-				OnMessageRaised(EventLevel.Information, string.Format("meta要素から文字符号化方式を判別しました。: {0} (未確定)", result.EncodingName));
+				OnMessageRaised(new MetaCharsetFoundInformation(result.EncodingName));
 				SetEncoding(result, EncodingConfidence.Tentative);
 				return result;
 			}
@@ -198,18 +198,18 @@ namespace Bakera.RedFace{
 		// Encodingを後から変更します。
 		public void ChangeEncoding(Encoding enc){
 			if(this.Encoding == Encoding.Unicode || this.Encoding == Encoding.BigEndianUnicode){
-				OnMessageRaised(EventLevel.Information, string.Format("文字符号化方式が指定されましたが、ストリームは既にUTF-16として読み込まれています。指定された文字符号化方式を無視してUTF-16に確定します。: {0}", enc.EncodingName));
+				OnMessageRaised(new CannotChangeFromUTF16Warning(enc.EncodingName));
 				this.EncodingConfidence = EncodingConfidence.Certain;
 				return;
 			}
 
 			if(enc == Encoding.Unicode || enc == Encoding.BigEndianUnicode){
-				OnMessageRaised(EventLevel.Information, string.Format("文字符号化方式UTF-16が指定されましたが、UTF-8が指定されたものとして扱います。: {0}", enc.EncodingName));
+				OnMessageRaised(new CannotChangeToUTF16Warning(enc.EncodingName));
 				enc = Encoding.UTF8;
 			}
 
 			if(enc == this.Encoding){
-				OnMessageRaised(EventLevel.Information, string.Format("指定された文字符号化方式は、既知の文字符号化方式と一致しています。文字符号化方式を確定します。: {0}", enc.EncodingName));
+				OnMessageRaised(new SameCharsetInformation(enc.EncodingName));
 				this.EncodingConfidence = EncodingConfidence.Certain;
 				return;
 			}

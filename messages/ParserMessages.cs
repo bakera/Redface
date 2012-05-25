@@ -1,5 +1,11 @@
 using System;
 namespace Bakera.RedFace{
+public class GenericVerbose : ParserMessage{
+public GenericVerbose(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.Verbose;}}
+public override string MessageTemplate{get{return "{0}";}}
+} // GenericVerbose
+
 public class EncodingSniffingInformation : ParserMessage{
 public override EventLevel Level{get{return EventLevel.Information;}}
 public override string MessageTemplate{get{return "•¶š•„†‰»•û®‚ª•s–¾‚È‚½‚ßAƒRƒ“ƒeƒ“ƒc“à—e‚©‚ç•¶š•„†‰»•û®‚Ì„‘ª‚ğs‚¢‚Ü‚·B";}}
@@ -8,14 +14,50 @@ public override string MessageTemplate{get{return "•¶š•„†‰»•û®‚ª•s–¾‚È‚½‚ßAƒ
 public class BOMFoundInformation : ParserMessage{
 public BOMFoundInformation(params Object[] o){this.Params = o;}
 public override EventLevel Level{get{return EventLevel.Information;}}
-public override string MessageTemplate{get{return "BYTE ORDER MARK‚ğŒŸo‚µ‚Ü‚µ‚½B•¶š•„†‰»•û®‚ğŠm’è‚µ‚Ü‚µ‚½B : {0}";}}
+public override string MessageTemplate{get{return "BYTE ORDER MARK‚ğŒŸo‚µ‚Ü‚µ‚½B•¶š•„†‰»•û®‚ğŠm’è‚µ‚Ü‚µ‚½B: {0}";}}
 } // BOMFoundInformation
 
 public class MetaCharsetFoundInformation : ParserMessage{
 public MetaCharsetFoundInformation(params Object[] o){this.Params = o;}
 public override EventLevel Level{get{return EventLevel.Information;}}
-public override string MessageTemplate{get{return "Meta Charset‚ğŒŸo‚µ‚Ü‚µ‚½B•¶š•„†‰»•û®‚ğŠm’è‚µ‚Ü‚µ‚½B : {0}";}}
+public override string MessageTemplate{get{return "•¶š•„†‰»•û®‚ÌSniffing’†‚Émeta charset‚ğŒŸo‚µ‚Ü‚µ‚½B•¶š•„†‰»•û®‚ğ‰¼’è‚µ‚Ü‚µ‚½B: {0}";}}
 } // MetaCharsetFoundInformation
+
+public class SniffingFailureWarning : ParserMessage{
+public SniffingFailureWarning(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.Warning;}}
+public override string MessageTemplate{get{return "•¶š•„†‰»•û®‚ÌSniffing‚É¸”s‚µ‚Ü‚µ‚½B•¶š•„†‰»•û® {0} ‚ğ‰¼’è‚µ‚Äˆ—‚µ‚Ü‚·B";}}
+} // SniffingFailureWarning
+
+public class CannotChangeFromUTF16Warning : ParserMessage{
+public CannotChangeFromUTF16Warning(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.Warning;}}
+public override string MessageTemplate{get{return "UTF-16‚ÌƒXƒgƒŠ[ƒ€‚É•¶š•„†‰»•û® {0} ‚ªw’è‚³‚ê‚Ä‚¢‚Ü‚·Bw’è‚ğ–³‹‚µA•¶š•„†‰»•û®‚ğUTF-16‚ÉŠm’è‚µ‚Ü‚·B";}}
+} // CannotChangeFromUTF16Warning
+
+public class CannotChangeToUTF16Warning : ParserMessage{
+public CannotChangeToUTF16Warning(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.Warning;}}
+public override string MessageTemplate{get{return "•¶š•„†‰»•û® {0} ‚Æ‚µ‚Ä“Ç‚İ‚Ü‚ê‚Ä‚¢‚éƒf[ƒ^‚ÉAUTF-16‚ªw’è‚³‚ê‚Ä‚¢‚Ü‚·BUTF-8‚ªw’è‚³‚ê‚Ä‚¢‚é‚à‚Ì‚Æ‚İ‚È‚µ‚Ü‚·B";}}
+} // CannotChangeToUTF16Warning
+
+public class SameCharsetInformation : ParserMessage{
+public SameCharsetInformation(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.Information;}}
+public override string MessageTemplate{get{return "‰¼’è‚µ‚½•¶š•„†‰»•û® {0} ‚Æw’è‚ªˆê’v‚µ‚Ä‚¢‚Ü‚·B";}}
+} // SameCharsetInformation
+
+public class DifferentCharsetWarning : ParserMessage{
+public DifferentCharsetWarning(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.Warning;}}
+public override string MessageTemplate{get{return "‰¼’è‚µ‚½•¶š•„†‰»•û® {0} ‚ÆˆÙ‚È‚é•¶š•„†‰»•û® {1} ‚ªw’è‚³‚ê‚Ä‚¢‚Ü‚·B•¶š•„†‰»•û®‚ğ•ÏX‚µ‚Ä\•¶‰ğÍ‚ğ‚â‚è’¼‚µ‚Ü‚·B";}}
+} // DifferentCharsetWarning
+
+public class UnknownCharsetWarning : ParserMessage{
+public UnknownCharsetWarning(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.Warning;}}
+public override string MessageTemplate{get{return "–¢’m‚Ì•¶š•„†‰»•û®‚ªw’è‚³‚ê‚Ä‚¢‚Ü‚·B: {0}";}}
+} // UnknownCharsetWarning
 
 public class NonCharactersError : ParserMessage{
 public NonCharactersError(params Object[] o){this.Params = o;}
@@ -74,6 +116,24 @@ public InvaridCharAtAfterAttributeNameError(params Object[] o){this.Params = o;}
 public override EventLevel Level{get{return EventLevel.ParseError;}}
 public override string MessageTemplate{get{return "‘®«–¼ {0} ‚ÌŒã‚É = ‚ª‚È‚­A{1} ‚ªoŒ»‚µ‚Ü‚µ‚½B";}}
 } // InvaridCharAtAfterAttributeNameError
+
+public class InvaridXMLCharInElementNameError : ParserMessage{
+public InvaridXMLCharInElementNameError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.Alert;}}
+public override string MessageTemplate{get{return "—v‘f–¼ {0} ‚É‚ÍXML‚Ì—v‘f–¼‚Ég—p‚Å‚«‚È‚¢•¶š‚ªŠÜ‚Ü‚ê‚Ä‚¢‚Ü‚·B";}}
+} // InvaridXMLCharInElementNameError
+
+public class InvaridXMLCharInAttributeNameError : ParserMessage{
+public InvaridXMLCharInAttributeNameError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.Alert;}}
+public override string MessageTemplate{get{return "‘®«–¼ {0} ‚É‚ÍXML‚Å‚Íg—p‚Å‚«‚È‚¢•¶š‚ªŠÜ‚Ü‚ê‚Ä‚¢‚Ü‚·B";}}
+} // InvaridXMLCharInAttributeNameError
+
+public class UnknownXMLError : ParserMessage{
+public UnknownXMLError(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.Alert;}}
+public override string MessageTemplate{get{return "•s–¾‚ÈXML‚ÌƒGƒ‰[‚Å‚·B: {0}";}}
+} // UnknownXMLError
 
 public class MissingAttributeValueError : ParserMessage{
 public override EventLevel Level{get{return EventLevel.ParseError;}}

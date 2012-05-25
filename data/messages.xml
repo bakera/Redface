@@ -1,5 +1,17 @@
 <messages>
 
+
+<item>
+	<id>GenericVerbose</id>
+	<level>Verbose</level>
+	<message>{0}</message>
+	<params>メッセージ</params>
+	<description>
+<p>VerboseモードでRedFaceの動作の詳細を報告するメッセージです。</p>
+	</description>
+</item>
+
+
 <item>
 	<id>EncodingSniffingInformation</id>
 	<level>Information</level>
@@ -14,7 +26,7 @@
 <item>
 	<id>BOMFoundInformation</id>
 	<level>Information</level>
-	<message>BYTE ORDER MARKを検出しました。文字符号化方式を確定しました。 : {0}</message>
+	<message>BYTE ORDER MARKを検出しました。文字符号化方式を確定しました。: {0}</message>
 	<params>文字コード</params>
 	<description>
 <p>文字符号化方式のSniffing中、BYTE ORDER MARKを発見して文字符号化方式を確定した際のメッセージです。</p>
@@ -26,12 +38,86 @@
 <item>
 	<id>MetaCharsetFoundInformation</id>
 	<level>Information</level>
-	<message>Meta Charsetを検出しました。文字符号化方式を確定しました。 : {0}</message>
+	<message>文字符号化方式のSniffing中にmeta charsetを検出しました。文字符号化方式を仮定しました。: {0}</message>
 	<params>文字コード</params>
 	<description>
-<p>文字符号化方式のSniffing中、BYTE ORDER MARKを発見して文字符号化方式を確定した際のメッセージです。</p>
+<p>文字符号化方式のSniffing中、meta charsetらしきものを発見して文字符号化方式を仮定した際のメッセージです。</p>
+<p>このmeta charsetを見つける処理は通常のHTMLのパースと違い、簡素な処理になっています。そのため、ここで検出されたmeta charserらしきものも、改めてパースすると実際にはmeta charsetではなかった、という可能性があります。そのため、ここでは文字符号化方式が仮定されるだけで、確定しません。後に正式にHTMLをパースしてmeta charsetが発見されると、そこで指定が上書きされる場合があります (その場合、DifferentCharsetWarning が出ます)。</p>
 	</description>
 </item>
+
+
+<item>
+	<id>SniffingFailureWarning</id>
+	<level>Warning</level>
+	<message>文字符号化方式のSniffingに失敗しました。文字符号化方式 {0} を仮定して処理します。</message>
+	<params>文字コード</params>
+	<description>
+<p>文字符号化方式のSniffingで、meta charsetらしきものを発見できず、文字符号化方式の仮定に失敗した際のメッセージです。</p>
+<p>この場合、パーサーのデフォルトの文字符号化方式が使われます。RedFaceのデフォルトはUTF-8です。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>CannotChangeFromUTF16Warning</id>
+	<level>Warning</level>
+	<message>UTF-16のストリームに文字符号化方式 {0} が指定されています。指定を無視し、文字符号化方式をUTF-16に確定します。</message>
+	<params>文字コード</params>
+	<description>
+<p>データがUTF-16として読み込まれているときに、UTF-16でないmeta charsetなどが指定されているとこのエラーになります。UTF-16はASCIIと互換性がないため、処理中に文字符号方式を変更することはできません。おそらくmeta charsetの指定が間違っています。</p>
+<p>指定を無視して、UTF-16で確定します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>CannotChangeToUTF16Warning</id>
+	<level>Warning</level>
+	<message>文字符号化方式 {0} として読み込まれているデータに、UTF-16が指定されています。UTF-8が指定されているものとみなします。</message>
+	<params>文字コード</params>
+	<description>
+<p>データがASCII互換の文字符号化方式として読み込まれているときに、meta charsetなどでUTF-16が指定されているとこのエラーになります。UTF-16はASCIIと互換性がないため、この変更はできません。おそらくmeta charsetの指定が間違っています。</p>
+<p>UTF-8が指定されているものとみなして処理します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>SameCharsetInformation</id>
+	<level>Information</level>
+	<message>仮定した文字符号化方式 {0} と指定が一致しています。</message>
+	<params>文字コード</params>
+	<description>
+<p>文字符号化方式を仮定して読み込んでいる状態のとき、meta charsetなどで仮定と同じ文字符号化方式が指定されているときのメッセージです。</p>
+<p>仮定が正しかったと判断し、文字符号化方式を確定します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>DifferentCharsetWarning</id>
+	<level>Warning</level>
+	<message>仮定した文字符号化方式 {0} と異なる文字符号化方式 {1} が指定されています。文字符号化方式を変更して構文解析をやり直します。</message>
+	<params>文字コード,文字コード</params>
+	<description>
+<p>文字符号化方式を仮定して読み込んでいる状態のとき、meta charsetなどで仮定と異なる文字符号化方式が指定されているときのメッセージです。</p>
+<p>仮定が間違っていたと判断し、文字符号化方式を変更して読み込みしなおします。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>UnknownCharsetWarning</id>
+	<level>Warning</level>
+	<message>未知の文字符号化方式が指定されています。: {0}</message>
+	<params>文字コード</params>
+	<description>
+<p>文字符号化方式の名前として指定された文字列が未知のもので、文字符号化方式を確定できなかったときのメッセージです。</p>
+<p>文字符号化方式の名前が間違っているか、あるいはRedFaceが (.NET Frameworkが) 対応していない文字符号化方式が指定されています。</p>
+	</description>
+</item>
+
 
 
 <item>
@@ -136,8 +222,6 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 </item>
 
 
-
-
 <item>
 	<id>InvaridCharAtBeforeAttributeNameError</id>
 	<level>ParseError</level>
@@ -161,6 +245,42 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 <p>パースエラーになりますが、そういう文字を含む名前の属性とみなして処理を続行することになっています。ただし、この名前はXMLとの互換性がないため、RedFaceではうまく扱うことができません。</p>
 	</description>
 </item>
+
+
+<item>
+	<id>InvaridXMLCharInElementNameError</id>
+	<level>Alert</level>
+	<message>要素名 {0} にはXMLの要素名に使用できない文字が含まれています。</message>
+	<params>名前</params>
+	<description>
+<p>要素名にXMLで使用できない文字が使用されているとこの警告が出ます。</p>
+<p>この名前はXMLとの互換性がないため、RedFaceではうまく扱うことができません。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>InvaridXMLCharInAttributeNameError</id>
+	<level>Alert</level>
+	<message>属性名 {0} にはXMLでは使用できない文字が含まれています。</message>
+	<params>名前</params>
+	<description>
+<p>属性名にXMLで使用できない文字が使用されているとこの警告が出ます。</p>
+<p>この名前はXMLとの互換性がないため、RedFaceではうまく扱うことができません。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>UnknownXMLError</id>
+	<level>Alert</level>
+	<message>不明なXMLのエラーです。: {0}</message>
+	<params>エラーメッセージ</params>
+	<description>
+<p>XMLのノードを作成することに失敗しました。XMLと互換性のない何かが使われているとこの警告が出る場合があります。後半はシステムが返したエラーメッセージをそのまま表示しています。</p>
+	</description>
+</item>
+
 
 <item>
 	<id>MissingAttributeValueError</id>

@@ -100,10 +100,10 @@ namespace Bakera.RedFace{
 				IgnoreNextLineFeed = false;
 			}
 			if(IsInHtmlContext(t)){
-				OnMessageRaised(EventLevel.Verbose, string.Format("HTMLコンテキストでトークンを挿入します。: {0}", t));
+				OnMessageRaised(new GenericVerbose(string.Format("HTMLコンテキストでトークンを挿入します。: {0}", t)));
 				t.AppendTo(this, mode);
 			} else {
-				OnMessageRaised(EventLevel.Verbose, string.Format("InForeignContentコンテキストでトークンを挿入します。: {0}", t));
+				OnMessageRaised(new GenericVerbose(string.Format("InForeignContentコンテキストでトークンを挿入します。: {0}", t)));
 				t.AppendTo(this, myInsertionModeManager.GetState<InForeignContent>());
 			}
 		}
@@ -135,14 +135,14 @@ namespace Bakera.RedFace{
 		public void ChangeInsertionMode<T>() where T : InsertionMode, new(){
 			if(CurrentInsertionMode != null && CurrentInsertionMode.GetType() == typeof(T)) return;
 			myInsertionModeManager.SetState<T>();
-			OnMessageRaised(EventLevel.Verbose, string.Format("InsertionMode を変更しました: {0}", CurrentInsertionMode));
+			OnMessageRaised(new GenericVerbose(string.Format("InsertionMode を変更しました: {0}", CurrentInsertionMode)));
 		}
 
 		// InsertionModeを元に戻します。
 		public void SwitchToOriginalInsertionMode(){
 			myInsertionModeManager.SetState(OriginalInsertionMode);
 			OriginalInsertionMode = null;
-			OnMessageRaised(EventLevel.Verbose, string.Format("InsertionMode を元に戻しました: {0}", CurrentInsertionMode));
+			OnMessageRaised(new GenericVerbose(string.Format("InsertionMode を元に戻しました: {0}", CurrentInsertionMode)));
 		}
 
 		public void ResetInsertionModeAppropriately(){
@@ -248,18 +248,18 @@ namespace Bakera.RedFace{
 		public XmlElement CreateElementForToken(TagToken t, string ns){
 			string name = Document.ReplaceInvalidXmlName(t.Name);
 			if(name != t.Name){
-				OnMessageRaised(EventLevel.Alert, string.Format("要素名 {0} はXMLで使用できない文字を含んでいます。", t.Name));
+				OnMessageRaised(new InvaridXMLCharInElementNameError(t.Name));
 			}
 			XmlElement result = Document.CreateElement(name, ns);
 			foreach(AttributeToken at in t.Attributes){
 				string attrName = Document.ReplaceInvalidXmlName(at.Name);
 				if(attrName != at.Name){
-					OnMessageRaised(EventLevel.Alert, string.Format("属性名 {0} はXMLで使用できない文字を含んでいます。", at.Name));
+				OnMessageRaised(new InvaridXMLCharInAttributeNameError(at.Name));
 				}
 				try{
 					result.SetAttribute(attrName, at.Value);
 				} catch(XmlException e){
-					OnMessageRaised(EventLevel.Alert, string.Format("XMLのエラーが発生しました。: {0}", e.Message));
+					OnMessageRaised(new UnknownXMLError(e.Message));
 				}
 			}
 			myCreatedElementToken.Add(result, t);
@@ -285,7 +285,7 @@ namespace Bakera.RedFace{
 
 		// XmlElementをCurrentNodeに挿入します。
 		public XmlElement InsertElement(XmlElement e){
-			OnMessageRaised(EventLevel.Verbose, string.Format("要素を挿入しました。: {0}", e.Name));
+			OnMessageRaised(new GenericVerbose(string.Format("要素を挿入しました。: {0}", e.Name)));
 			AppendChild(e);
 			PutToStack(e);
 			return e;
@@ -321,7 +321,7 @@ namespace Bakera.RedFace{
 
 		public void AcknowledgeSelfClosingFlag(TagToken t){
 			t.AcknowledgedSelfClosing = true;
-			OnMessageRaised(EventLevel.Verbose, string.Format("終了タグの省略が可能なトークンです。: {0}", t.Name));
+			OnMessageRaised(new GenericVerbose(string.Format("終了タグの省略が可能なトークンです。: {0}", t.Name)));
 		}
 
 // Tokenの参照

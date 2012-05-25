@@ -103,28 +103,27 @@ namespace Bakera.RedFace{
 			} else {
 				Encoding enc = myInputStream.SniffEncoding();
 				if(enc == null){
-					OnMessageRaised(EventLevel.Information, string.Format("文字符号化方式の読み取りに失敗しました。既定の文字符号化方式を使用します。: {0}", myDefaultEncoding.EncodingName));
+					OnMessageRaised(new SniffingFailureWarning(myDefaultEncoding.EncodingName));
 					myInputStream.SetEncoding(myDefaultEncoding, EncodingConfidence.Tentative);
 				}
 			}
-			OnMessageRaised(EventLevel.Verbose, string.Format("構文解析を開始します。"));
 
 			// パースする
-			OnMessageRaised(EventLevel.Verbose, "Tree Constructを開始します。");
+			OnMessageRaised(new GenericVerbose("構文解析を開始します。"));
 			TreeConstruct();
+
 			// EncodingChangedイベントで停止した場合、一度だけ再実行
 			if(myEncodingChangingFlag){
-				OnMessageRaised(EventLevel.Verbose, "Tree Constructが中断されました。");
-				OnMessageRaised(EventLevel.Warning, string.Format("構文解析の途中で文字符号化方式が判明したため、構文解析をやり直します。判明した文字符号化方式: {0}", myForceEncoding.EncodingName));
+				OnMessageRaised(new DifferentCharsetWarning(myInputStream.Encoding, myForceEncoding.EncodingName));
 				myStopFlag = false;
 				myEncodingChangingFlag = false;
 				Initialize();
 				myInputStream.SetEncoding(myForceEncoding, EncodingConfidence.Certain);
 				TreeConstruct();
 			} else {
-				OnMessageRaised(EventLevel.Verbose, "Tree Constructが終了しました。");
+				OnMessageRaised(new GenericVerbose("Tree Constructが終了しました。"));
 			}
-			OnMessageRaised(EventLevel.Verbose, "パース終了しました。");
+			OnMessageRaised(new GenericVerbose("パース終了しました。"));
 			EndTime = DateTime.Now;
 		}
 
@@ -143,7 +142,7 @@ namespace Bakera.RedFace{
 			while(!myStopFlag){
 				Token t = myTokenizer.GetToken();
 				if(t == null) continue;
-				OnMessageRaised(EventLevel.Verbose, string.Format("Tokenを作成しました。: {0}", t));
+				OnMessageRaised(new GenericVerbose(string.Format("Tokenを作成しました。: {0}", t)));
 				// AppendTokenを実行。
 				// 実行後にReprocessフラグが立てられている場合は同じトークンを再処理する
 				do{
@@ -152,7 +151,7 @@ namespace Bakera.RedFace{
 				} while(myTreeConstruction.ReprocessFlag);
 
 				if(t is EndOfFileToken){
-					OnMessageRaised(EventLevel.Verbose, "ファイルの終端に達したため、終了します。");
+					OnMessageRaised(new GenericVerbose("ファイルの終端に達したため、終了します。"));
 					break;
 				}
 			}

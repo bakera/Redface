@@ -20,13 +20,6 @@ namespace Bakera.RedFace{
 			}
 		}
 
-		// イベントレベルを指定して、メッセージを通知します。
-		protected virtual void OnMessageRaised(EventLevel level, string s = null){
-			ParserEventArgs args = new ParserEventArgs(level);
-			args.OriginalSender = this;
-			if(s != null) args.Message = s;
-			OnParserEventRaised(args);
-		}
 
 		// ParserMessageオブジェクトを指定して、メッセージを通知します。
 		protected virtual void OnMessageRaised(ParserMessage message){

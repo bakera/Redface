@@ -50,7 +50,7 @@ namespace Bakera.RedFace{
 
 
 				if(charsetValue != null){
-					OnMessageRaised(EventLevel.Verbose, string.Format("meta要素のcharset属性が指定されています。: {0}", charsetValue));
+					OnMessageRaised(new GenericVerbose(string.Format("meta要素のcharset属性が指定されています。: {0}", charsetValue)));
 					charsetName = charsetValue;
 					if(charsetName == ""){
 						OnInformationRaised(string.Format("meta要素のcharset属性に空の値が指定されています。: {0}", charsetValue));
@@ -71,13 +71,14 @@ namespace Bakera.RedFace{
 
 				InputStream stream = tree.Parser.InputStream;
 				if(stream.EncodingConfidence == EncodingConfidence.Irrelevant){
-					OnMessageRaised(EventLevel.Verbose, string.Format("metaで文字符号化方式が指定されていますが、文字符号化方式の判別が必要ないモードであるため、指定を無視します。"));
+					OnMessageRaised(new GenericVerbose(string.Format("metaで文字符号化方式が指定されていますが、文字符号化方式の判別が必要ないモードであるため、指定を無視します。")));
 					return;
 				}
-				OnMessageRaised(EventLevel.Verbose, string.Format("metaの属性値から文字符号化方式を決定します。"));
+
+				OnMessageRaised(new GenericVerbose(string.Format("metaの属性値から文字符号化方式を決定します。")));
 				Encoding enc = EncodingSniffer.GetEncodingByName(charsetName);
 				if(enc == null){
-					OnMessageRaised(EventLevel.Information, string.Format("指定された名前から文字符号化方式を取得できませんでした。: {0}", charsetName));
+					OnMessageRaised(new UnknownCharsetWarning(charsetName));
 					return;
 				}
 

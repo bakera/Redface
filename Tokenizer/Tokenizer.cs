@@ -127,7 +127,7 @@ namespace Bakera.RedFace{
 		public void ChangeTokenState<T>() where T : TokenizationState, new(){
 			if(CurrentTokenState != null && typeof(T) == CurrentTokenState.GetType()) return;
 			myTokenStateManager.SetState<T>();
-			OnMessageRaised(EventLevel.Verbose, string.Format("TokenizationState を変更しました: {0}", CurrentTokenState));
+			OnMessageRaised(new GenericVerbose(string.Format("TokenizationState を変更しました: {0}", CurrentTokenState)));
 		}
 		// トークン走査状態をひとつ前のものに戻します。
 		public void BackTokenState(){
