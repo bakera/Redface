@@ -1,16 +1,32 @@
 using System;
 namespace Bakera.RedFace{
+public class EncodingSniffingInformation : ParserMessage{
+public override EventLevel Level{get{return EventLevel.Information;}}
+public override string MessageTemplate{get{return "文字符号化方式が不明なため、コンテンツ内容から文字符号化方式の推測を行います。";}}
+} // EncodingSniffingInformation
+
+public class BOMFoundInformation : ParserMessage{
+public BOMFoundInformation(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.Information;}}
+public override string MessageTemplate{get{return "BYTE ORDER MARKを検出しました。文字符号化方式を確定しました。 : {0}";}}
+} // BOMFoundInformation
+
+public class MetaCharsetFoundInformation : ParserMessage{
+public MetaCharsetFoundInformation(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.Information;}}
+public override string MessageTemplate{get{return "Meta Charsetを検出しました。文字符号化方式を確定しました。 : {0}";}}
+} // MetaCharsetFoundInformation
+
 public class NonCharactersError : ParserMessage{
 public NonCharactersError(params Object[] o){this.Params = o;}
 public override EventLevel Level{get{return EventLevel.ParseError;}}
 public override string MessageTemplate{get{return "制御コード、あるいは未定義の文字 (noncharacters) が含まれています。: {0}";}}
 } // NonCharactersError
 
-public class ZWNBSPInformation : ParserMessage{
-public ZWNBSPInformation(params Object[] o){this.Params = o;}
+public class ZWNBSPWarning : ParserMessage{
 public override EventLevel Level{get{return EventLevel.Warning;}}
-public override string MessageTemplate{get{return "文中に U+FEFF (BYTE ORDER MARK / ZERO WIDTH NO BREAK SPACE) を検出しましたが、無視します。: {0}";}}
-} // ZWNBSPInformation
+public override string MessageTemplate{get{return "文中に U+FEFF (BYTE ORDER MARK / ZERO WIDTH NO BREAK SPACE) を検出しましたが、無視します。";}}
+} // ZWNBSPWarning
 
 public class NullInElementNameError : ParserMessage{
 public override EventLevel Level{get{return EventLevel.ParseError;}}

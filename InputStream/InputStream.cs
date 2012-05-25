@@ -120,7 +120,7 @@ namespace Bakera.RedFace{
 				// ZWNBSは無視する (willful violation)
 				// BOMはTextReaderによって既に無視されているはず
 				if(charNum == Chars.BOM){
-					OnMessageRaised(EventLevel.Information, string.Format("文中に U+FEFF (BYTE ORDER MARK / ZERO WIDTH NO BREAK SPACE) を検出しましたが、無視します。"));
+					OnMessageRaised(new ZWNBSPWarning());
 					continue;
 				}
 
@@ -171,26 +171,24 @@ namespace Bakera.RedFace{
 
 		// バイナリStreamの先頭最大1024バイトを読み取ってEncodingを判別します。
 		public Encoding SniffEncoding(){
-			OnMessageRaised(EventLevel.Verbose, string.Format("文字符号化方式の事前読み取りを開始します。"));
+			OnMessageRaised(new EncodingSniffingInformation());
 			int length = myStream.Length > SniffEncodingBufferSize ? SniffEncodingBufferSize : (int)myStream.Length;
-
 			byte[] buffer = new byte[length];
 			myStream.Read(buffer, 0, length);
 			myStream.Position = 0;
 
 			EncodingSniffer es = new EncodingSniffer(buffer);
-
-			OnMessageRaised(EventLevel.Verbose, string.Format("BOMの読み取りを試みます。"));
 			Encoding result = es.SniffEncodingFromBOM();
 			if(result != null){
-				OnMessageRaised(EventLevel.Information, string.Format("BOMから文字符号化方式を判別しました。: {0} (確定)", result.EncodingName));
+				OnMessageRaised(new BOMFoundInformation(result.EncodingName));
+				SetEncoding(result, EncodingConfidence.Certain);
 				return result;
 			}
 
-			OnMessageRaised(EventLevel.Verbose, string.Format("meta要素の事前読み取りを試みます。"));
 			result = es.SniffEncodingFromMeta();
 			if(result != null){
 				OnMessageRaised(EventLevel.Information, string.Format("meta要素から文字符号化方式を判別しました。: {0} (未確定)", result.EncodingName));
+				SetEncoding(result, EncodingConfidence.Tentative);
 				return result;
 			}
 			return null;

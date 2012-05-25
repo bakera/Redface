@@ -1,6 +1,40 @@
 <messages>
 
 <item>
+	<id>EncodingSniffingInformation</id>
+	<level>Information</level>
+	<message>文字符号化方式が不明なため、コンテンツ内容から文字符号化方式の推測を行います。</message>
+	<description>
+<p>文字符号化方式があらかじめ明示されていない場合、コンテンツデータの先頭1024バイトを読み取って文字符号化方式の推測を行います。その処理を行う際のメッセージです。</p>
+<p>文字符号化方式があらかじめ明示されていると、このメッセージは出なくなります。ここで言う「あらかじめ」とは、データを一切読まなくても判明している状態です。たとえば、利用者によって明示的に指定されているか、HTTP応答ヘッダで指定されている、といった状態を指します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>BOMFoundInformation</id>
+	<level>Information</level>
+	<message>BYTE ORDER MARKを検出しました。文字符号化方式を確定しました。 : {0}</message>
+	<params>文字コード</params>
+	<description>
+<p>文字符号化方式のSniffing中、BYTE ORDER MARKを発見して文字符号化方式を確定した際のメッセージです。</p>
+<p>BYTE ORDER MARKを発見すると、それだけで文字符号化方式が「確定」します。meta charsetの検索などは行われません。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>MetaCharsetFoundInformation</id>
+	<level>Information</level>
+	<message>Meta Charsetを検出しました。文字符号化方式を確定しました。 : {0}</message>
+	<params>文字コード</params>
+	<description>
+<p>文字符号化方式のSniffing中、BYTE ORDER MARKを発見して文字符号化方式を確定した際のメッセージです。</p>
+	</description>
+</item>
+
+
+<item>
 	<id>NonCharactersError</id>
 	<level>ParseError</level>
 	<message>制御コード、あるいは未定義の文字 (noncharacters) が含まれています。: {0}</message>
@@ -16,10 +50,9 @@ Any occurrences of any characters in the ranges U+0001 to U+0008, U+000E to U+00
 </item>
 
 <item>
-	<id>ZWNBSPInformation</id>
+	<id>ZWNBSPWarning</id>
 	<level>Warning</level>
-	<message>文中に U+FEFF (BYTE ORDER MARK / ZERO WIDTH NO BREAK SPACE) を検出しましたが、無視します。: {0}</message>
-	<params>文字コード</params>
+	<message>文中に U+FEFF (BYTE ORDER MARK / ZERO WIDTH NO BREAK SPACE) を検出しましたが、無視します。</message>
 	<description>
 <p>文中に U+FEFF (BYTE ORDER MARK / ZERO WIDTH NO BREAK SPACE) が出現しました。</p>
 <p>HTML5では、文中の U+FEFF は単に無視されます。</p>

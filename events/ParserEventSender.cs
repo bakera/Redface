@@ -28,7 +28,6 @@ namespace Bakera.RedFace{
 			OnParserEventRaised(args);
 		}
 
-
 		// ParserMessageオブジェクトを指定して、メッセージを通知します。
 		protected virtual void OnMessageRaised(ParserMessage message){
 			ParserEventArgs args = new ParserEventArgs(message);

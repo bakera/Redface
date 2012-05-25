@@ -105,8 +105,6 @@ namespace Bakera.RedFace{
 				if(enc == null){
 					OnMessageRaised(EventLevel.Information, string.Format("文字符号化方式の読み取りに失敗しました。既定の文字符号化方式を使用します。: {0}", myDefaultEncoding.EncodingName));
 					myInputStream.SetEncoding(myDefaultEncoding, EncodingConfidence.Tentative);
-				} else {
-					myInputStream.SetEncoding(enc, EncodingConfidence.Tentative);
 				}
 			}
 			OnMessageRaised(EventLevel.Verbose, string.Format("構文解析を開始します。"));
