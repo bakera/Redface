@@ -108,6 +108,29 @@
 
 
 <item>
+	<id>DifferentDoubleCharsetWarning</id>
+	<level>Warning</level>
+	<message>確定した文字符号化方式 {0} と異なる文字符号化方式 {1} が指定されています。</message>
+	<params>文字コード,文字コード</params>
+	<description>
+<p>文字符号化方式を確定した後に、meta charsetなどで異なる文字符号化方式が指定されているときのメッセージです。</p>
+<p>指定を無視します。</p>
+	</description>
+</item>
+
+
+<item>
+	<id>EmptyCharsetWarning</id>
+	<level>Warning</level>
+	<message>charsetの値が空です。</message>
+	<description>
+<p>文字符号化方式の名前として指定された文字列が空文字列になっている場合のメッセージです。</p>
+<p>meta http-equivの場合、content属性値の文法ミスでcharset値を正しく読み取れなかった場合にもこのエラーになります。</p>
+	</description>
+</item>
+
+
+<item>
 	<id>UnknownCharsetWarning</id>
 	<level>Warning</level>
 	<message>未知の文字符号化方式が指定されています。: {0}</message>

@@ -12,7 +12,6 @@ namespace Bakera.RedFace{
 		}
 
 
-
 // イベント
 
 		// ImpliedEndTagInsertedイベントを発生します。
@@ -24,10 +23,6 @@ namespace Bakera.RedFace{
 			OnParserEventRaised(args);
 		}
 
-		// InformationRaisedイベントを発生します。
-		protected virtual void OnInformationRaised(string s){
-			OnParserEventRaised(new ParserEventArgs(EventLevel.Information){Message = s});
-		}
 
 	}
 

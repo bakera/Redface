@@ -53,18 +53,18 @@ namespace Bakera.RedFace{
 					OnMessageRaised(new GenericVerbose(string.Format("meta要素のcharset属性が指定されています。: {0}", charsetValue)));
 					charsetName = charsetValue;
 					if(charsetName == ""){
-						OnInformationRaised(string.Format("meta要素のcharset属性に空の値が指定されています。: {0}", charsetValue));
+						OnMessageRaised(new EmptyCharsetWarning());
 						return;
 					}
-					OnInformationRaised(string.Format("meta charset で文字符号化方式が指定されています。: {0}", charsetValue));
+					OnMessageRaised(new GenericVerbose(string.Format("meta charset で文字符号化方式が指定されています。: {0}", charsetValue)));
 				} else if(httpEquivValue != null && httpEquivValue.Equals("Content-Type", StringComparison.InvariantCultureIgnoreCase) && contentValue != null){
 					charsetName = EncodingSniffer.ExtractEncodingNameFromMetaElement(contentValue);
 
 					if(string.IsNullOrEmpty(charsetName)){
-						OnInformationRaised(string.Format("meta要素でhttp-equiv=\"Content-Type\"が指定されていますが、content属性に有効なcharsetの指定がありません。: {0}", contentValue));
+						OnMessageRaised(new EmptyCharsetWarning());
 						return;
 					}
-					OnInformationRaised(string.Format("meta http-equivで文字符号化方式が指定されています。: {0}({1})", contentValue, charsetName));
+					OnMessageRaised(new GenericVerbose(string.Format("meta http-equivで文字符号化方式が指定されています。: {0}({1})", contentValue, charsetName)));
 				}
 
 				if(charsetName == null) return;
@@ -84,9 +84,9 @@ namespace Bakera.RedFace{
 
 				if(stream.EncodingConfidence == EncodingConfidence.Certain){
 					if(enc == stream.Encoding){
-						OnInformationRaised(string.Format("metaで文字符号化方式が指定されていますが、既に確定している文字符号化方式と一致しています。指定を無視します。: {0}", enc.EncodingName));
+						OnMessageRaised(new SameCharsetInformation(enc.EncodingName));
 					} else {
-						OnInformationRaised(string.Format("文字符号化方式は既に確定していますが、metaでは異なる文字符号化方式が指定されています。指定を無視します。: {0}", enc.EncodingName));
+						OnMessageRaised(new DifferentDoubleCharsetWarning(enc.EncodingName));
 					}
 					return;
 				}

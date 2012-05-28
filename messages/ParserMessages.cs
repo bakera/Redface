@@ -53,6 +53,17 @@ public override EventLevel Level{get{return EventLevel.Warning;}}
 public override string MessageTemplate{get{return "仮定した文字符号化方式 {0} と異なる文字符号化方式 {1} が指定されています。文字符号化方式を変更して構文解析をやり直します。";}}
 } // DifferentCharsetWarning
 
+public class DifferentDoubleCharsetWarning : ParserMessage{
+public DifferentDoubleCharsetWarning(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.Warning;}}
+public override string MessageTemplate{get{return "確定した文字符号化方式 {0} と異なる文字符号化方式 {1} が指定されています。";}}
+} // DifferentDoubleCharsetWarning
+
+public class EmptyCharsetWarning : ParserMessage{
+public override EventLevel Level{get{return EventLevel.Warning;}}
+public override string MessageTemplate{get{return "charsetの値が空です。";}}
+} // EmptyCharsetWarning
+
 public class UnknownCharsetWarning : ParserMessage{
 public UnknownCharsetWarning(params Object[] o){this.Params = o;}
 public override EventLevel Level{get{return EventLevel.Warning;}}
