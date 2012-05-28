@@ -1,5 +1,12 @@
 <messages>
 
+<!--
+Verbose: 
+Warning: おそらくミスではない、念のため報告
+Alert: 文法エラーではないがおそらくミス
+Error: 文法エラー
+-->
+
 
 <item>
 	<id>GenericVerbose</id>
@@ -600,6 +607,17 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 	<id>UnknownEndTagError</id>
 	<level>ParseError</level>
 	<message>不明な終了タグがあります。</message>
+	<description>
+<p>終了タグの &lt;/ に続いて英文字以外の文字が出現するとこのエラーになります。</p>
+<p>パースエラーとなり、このタグのような部分はコメント (BogusComment) として扱われます。</p>
+	</description>
+</item>
+
+<item>
+	<id>ImpliedEndTagInsertedWarning</id>
+	<level>Warning</level>
+	<message>{0} 要素の終了タグを補いました。</message>
+	<params>要素,トークン</params>
 	<description>
 <p>終了タグの &lt;/ に続いて英文字以外の文字が出現するとこのエラーになります。</p>
 <p>パースエラーとなり、このタグのような部分はコメント (BogusComment) として扱われます。</p>

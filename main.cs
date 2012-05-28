@@ -110,7 +110,8 @@ namespace Bakera.RedFace{
 		public void WriteEvent(Object sender, ParserEventArgs e){
 			if(e.Level >= myEventLevel){
 				Console.Write("[{0}] ", e.Level);
-				if(!string.IsNullOrEmpty(e.Message)) Console.WriteLine(e.Message);
+				Console.Write("({0}) ", e.Message.GetType().Name);
+				if(!string.IsNullOrEmpty(e.Message.Message)) Console.WriteLine(e.Message.Message);
 				if(sender is RedFaceParser && e.Level > EventLevel.Information){
 					if(e.OriginalSender != null){
 						Console.WriteLine(" {0}:", e.OriginalSender.GetType().Name);

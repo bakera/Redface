@@ -7,7 +7,12 @@ namespace Bakera.RedFace{
 
 		public string Message{
 			get{
-				return string.Format(MessageTemplate, Params);
+				string format = this.MessageTemplate;
+				object[] paramObjects = this.Params;
+				if(paramObjects == null || paramObjects.Length == 0){
+					return format;
+				}
+				return string.Format(format, paramObjects);
 			}
 		}
 

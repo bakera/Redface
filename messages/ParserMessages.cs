@@ -280,6 +280,12 @@ public override EventLevel Level{get{return EventLevel.ParseError;}}
 public override string MessageTemplate{get{return "不明な終了タグがあります。";}}
 } // UnknownEndTagError
 
+public class ImpliedEndTagInsertedWarning : ParserMessage{
+public ImpliedEndTagInsertedWarning(params Object[] o){this.Params = o;}
+public override EventLevel Level{get{return EventLevel.Warning;}}
+public override string MessageTemplate{get{return "{0} 要素の終了タグを補いました。";}}
+} // ImpliedEndTagInsertedWarning
+
 public class UnknownMarkupError : ParserMessage{
 public override EventLevel Level{get{return EventLevel.ParseError;}}
 public override string MessageTemplate{get{return "不明な < があります。";}}

@@ -37,7 +37,7 @@ namespace Bakera.RedFace{
 			while(tree.StackOfOpenElements.IsImpliedEndTagElement()){
 				if(tree.StackOfOpenElements.IsCurrentNameMatch(except)) break;
 				XmlElement e = tree.StackOfOpenElements.Pop();
-				OnImpliedEndTagInserted(e, token);
+				OnMessageRaised(new ImpliedEndTagInsertedWarning(e, token));
 			}
 			return;
 		}
