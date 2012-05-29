@@ -99,8 +99,10 @@ namespace Bakera.RedFace{
 			StartTime = DateTime.Now;
 
 			if(myForceEncoding != null){
+				OnMessageRaised(new GenericVerbose(string.Format("文字符号化方式 {0} が指定されています。", myForceEncoding.EncodingName)));
 				myInputStream.SetEncoding(myForceEncoding, EncodingConfidence.Certain);
 			} else {
+				OnMessageRaised(new GenericVerbose("文字符号化方式が指定されていないため、Sniffingを行います。"));
 				Encoding enc = myInputStream.SniffEncoding();
 				if(enc == null){
 					OnMessageRaised(new SniffingFailureWarning(myDefaultEncoding.EncodingName));
@@ -180,6 +182,7 @@ namespace Bakera.RedFace{
 		// charsetを明示的に指定します。
 		// encoding判定は行われず、ここで指定したEncodingが強制的に使用されるようになります。
 		public void SetForceEncoding(string s){
+			OnMessageRaised(new GenericVerbose(string.Format("文字符号化方式 {0} をセットします。", s)));
 			myForceEncoding = EncodingSniffer.GetEncodingByName(s);
 		}
 

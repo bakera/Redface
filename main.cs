@@ -31,12 +31,22 @@ namespace Bakera.RedFace{
 
 
 		private int ParseFromUri(string uri){
+
+			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+			request.AllowAutoRedirect = false;
+			request.UserAgent = "RedFace/0.1";
+
+			HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
 			RedFaceParser p = new RedFaceParser();
 			p.ParserEventRaised += WriteEvent;
 
-			WebClient client = new WebClient();
-			client.Headers.Add("User-Agent", "RedFace/0.1");
-			using(Stream data = client.OpenRead(uri)){
+			string charsetName = EncodingSniffer.ExtractEncodingNameFromMetaElement(response.ContentType);
+			if(!string.IsNullOrEmpty(charsetName)){
+				Console.WriteLine("HTTP応答ヘッダで文字符号化方式が指定されています。: {0}", charsetName);
+				p.SetForceEncoding(charsetName);
+			}
+			using(Stream data = response.GetResponseStream()){
 				p.Parse(data);
 			}
 			PrintResult(p);
