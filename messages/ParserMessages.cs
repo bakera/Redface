@@ -299,7 +299,7 @@ public override string MessageTemplate{get{return "”’l•¶šQÆ‚Ì”’l‚ªw’è‚³‚ê‚
 public class NamedCharacterReferenceWithoutSemicolonError : ParserMessage{
 public NamedCharacterReferenceWithoutSemicolonError(params Object[] o){this.Params = o;}
 public override EventLevel Level{get{return EventLevel.ParseError;}}
-public override string MessageTemplate{get{return "”’l•¶šQÆ‚Ì––”ö‚É‚ÍƒZƒ~ƒRƒƒ“‚ª•K—v‚Å‚·B";}}
+public override string MessageTemplate{get{return "•¶šQÆ‚Ì––”ö‚É‚ÍƒZƒ~ƒRƒƒ“‚ª•K—v‚Å‚·B";}}
 } // NamedCharacterReferenceWithoutSemicolonError
 
 public class UnknownNamedCharacterReferenceWithSemicolonError : ParserMessage{
