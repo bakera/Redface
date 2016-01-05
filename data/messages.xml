@@ -619,8 +619,7 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 	<message>{0} 要素の終了タグを補いました。</message>
 	<params>要素,トークン</params>
 	<description>
-<p>終了タグの &lt;/ に続いて英文字以外の文字が出現するとこのエラーになります。</p>
-<p>パースエラーとなり、このタグのような部分はコメント (BogusComment) として扱われます。</p>
+<p>一部の要素の終了タグは省略することができ、自動的に補われます。終了タグを補った場合にこのメッセージが出ます。</p>
 	</description>
 </item>
 
@@ -681,7 +680,7 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 	<params>名前</params>
 	<description>
 <p>名前つき文字参照 (Named Character Reference) らしき文字列が書かれているが、その名前の文字が定義されておらず、末尾にセミコロンがないときにこの警告が出ます。</p>
-<p>パースエラーにはなりませんが、ならず、単にデータとして &amp; が書いてあるものとみなします。</p>
+<p>パースエラーにはならず、単にデータとして &amp; が書いてあるものとみなします。</p>
 <p>なお、末尾にセミコロンがある場合はパースエラーとなり、UnknownNamedCharacterErrorになります。</p>
 	</description>
 </item>
@@ -870,7 +869,7 @@ Not a character reference. No characters are consumed, and nothing is returned. 
 	<message>予期しない文書型宣言が出現しました。</message>
 	<description>
 <p>文書型宣言の出現が期待されないところで文書型宣言が出現するとこのエラーになります。</p>
-<p>典型的なのは、文書型宣言が文書の先頭以外に書かれているケースです。また、文書型宣言の前にコメント以外の何かが書かれている場合もこのエラーになります。</p>
+<p>典型例は、文書型宣言が文書の先頭以外に書かれているケースです。また、文書型宣言の前にコメント以外の何かが書かれている場合もこのエラーになります。</p>
 <p>パースエラーとなり、出現した文書型宣言は無視します。</p>
 	</description>
 </item>
