@@ -651,7 +651,7 @@ The requirement to strip a U+FEFF BYTE ORDER MARK character regardless of whethe
 <item>
 	<id>NamedCharacterReferenceWithoutSemicolonError</id>
 	<level>ParseError</level>
-	<message>数値文字参照の末尾にはセミコロンが必要です。</message>
+	<message>名前つき文字参照の末尾にはセミコロンが必要です。</message>
 	<params>名前</params>
 	<description>
 <p>名前つき文字参照 (Named Character Reference) が書かれていて、その名前の文字が定義されており、かつ末尾にセミコロンがないときにこのエラーが出ます。</p>
